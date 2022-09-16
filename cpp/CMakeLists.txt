@@ -21,15 +21,16 @@ include(cmake/macros.cmake)
 #
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # using Clang
-    #set(CMAKE_C_FLAGS   "-Wall")
-    #set(CMAKE_CXX_FLAGS "-Wall")
+    set(CMAKE_C_FLAGS   "-Wall -g")
+    set(CMAKE_CXX_FLAGS "-Wall -g")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
-    #set(CMAKE_C_FLAGS   "-Wall --coverage -O0")
-    #set(CMAKE_CXX_FLAGS "-Wall --coverage -O0")
+    set(CMAKE_C_FLAGS   "-Wall --coverage -O0 -g")
+    set(CMAKE_CXX_FLAGS "-Wall --coverage -O0 -g")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # using Visual Studio C++
 endif()
 
 
+add_subdirectory(games)
 add_subdirectory(unittest)

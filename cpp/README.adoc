@@ -1,5 +1,6 @@
 == C/C++ Playground
 
+* link:games/README.adoc[Games]
 * link:unittest/README.adoc[Unittesting] (sort of)
 
 
