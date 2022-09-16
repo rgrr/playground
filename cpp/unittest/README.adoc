@@ -2,4 +2,5 @@
 
 === Tests
 
+* link:01-first-test[Very first and simple test]
 * link:bag[Bag]
