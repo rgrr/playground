@@ -3,3 +3,4 @@
 === Games
 
 * link:hello[Hello]
+* link:hello-extended[Hello-Extended]
