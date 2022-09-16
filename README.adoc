@@ -14,6 +14,10 @@ Toolchain etc is taken from https://www.msys2.org/[MSYS2].
 ==== MSYS2
 Because my software is most of the time running on 32bit targets, MINGW32 packets are used for playing and testing.
 
+More information can be found in https://clue.endress.com/x/SetHD[Clue].
+
+NOTE: MSYS2 installation should go to the default location ``c:\msys64``.
+
 .Installation
 [source, bash]
 ----
