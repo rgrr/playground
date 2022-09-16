@@ -100,7 +100,7 @@ create-makefiles-gcc:
 .PHONY: clean
 clean:
 	@export PATH=$(PATH_EXT)$$PATH
-	$(CMAKE) --build $(BUILD_DIR) --target clean $(CMAKE_OPT) -- -k 0 -v
+	$(CMAKE) --build $(BUILD_DIR) --target clean $(CMAKE_OPT) -- -v
 
 
 .PHONY: build
@@ -113,4 +113,4 @@ build:
 exec:
 	@export PATH=$(PATH_EXT)$$PATH
 	$(CMAKE) --build    $(BUILD_DIR) $(CMAKE_OPT) -- -k 0 -v
-	$(CTEST) --test-dir $(BUILD_DIR) --output-on-failure --output-junit "junit.xml" $(CTEST_OPT) -j 8
+	$(CTEST) --test-dir $(BUILD_DIR) --output-on-failure --output-junit "junit.xml" $(CTEST_OPT)
