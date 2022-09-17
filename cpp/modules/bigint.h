@@ -6,8 +6,14 @@ using namespace std;
 
 class BigInt{
 	string digits;
-public:
 
+private:
+	//Helper Functions:
+	friend void divide_by_2(BigInt &a);
+	friend bool Null(const BigInt &);
+	friend int Length(const BigInt &);
+
+public:
 	//Constructors:
 	BigInt(unsigned long long n = 0);
 	BigInt(string &);
@@ -15,9 +21,6 @@ public:
 	BigInt(BigInt &);
 
 	//Helper Functions:
-	friend void divide_by_2(BigInt &a);
-	friend bool Null(const BigInt &);
-	friend int Length(const BigInt &);
 	int operator[](const int)const;
 
 			/* * * * Operator Overloading * * * */
@@ -60,20 +63,15 @@ public:
 	friend BigInt &operator^=(BigInt &,const BigInt &);
 	friend BigInt operator^(BigInt &, const BigInt &);
 
-	//Square Root Function
-	friend BigInt sqrt(BigInt &a);
-
 	//Read and Write
 	friend ostream &operator<<(ostream &,const BigInt &);
 	friend istream &operator>>(istream &, BigInt &);
 
+	//Square Root Function
+	friend BigInt sqrt(BigInt &a);
+
 	//Others
-	friend BigInt NthCatalan(int n);
-	friend BigInt NthFibonacci(int n);
-	friend BigInt Factorial(int n);
+	static BigInt NthCatalan(int n);
+	static BigInt NthFibonacci(int n);
+	static BigInt Factorial(int n);
 };
-
-
-BigInt NthFibonacci(int n);
-BigInt NthCatalan(int n);
-BigInt Factorial(int n);

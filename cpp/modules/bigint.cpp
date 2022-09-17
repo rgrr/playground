@@ -225,7 +225,7 @@ BigInt &operator/=(BigInt& a,const BigInt &b){
 		return a;
 	}
 	int i, lgcat = 0, cc;
-	int n = Length(a), m = Length(b);
+	int n = Length(a);   //, m = Length(b);
 	vector<int> cat(n, 0);
 	BigInt t;
 	for (i = n - 1; t * 10 + a.digits[i] < b;i--){
@@ -263,7 +263,7 @@ BigInt &operator%=(BigInt& a,const BigInt &b){
 		return a;
 	}
 	int i, lgcat = 0, cc;
-	int n = Length(a), m = Length(b);
+	int n = Length(a);   // , m = Length(b);
 	vector<int> cat(n, 0);
 	BigInt t;
 	for (i = n - 1; t * 10 + a.digits[i] < b;i--){
@@ -304,6 +304,8 @@ BigInt operator^(BigInt & a,BigInt & b){
 	return temp;
 }
 
+
+
 void divide_by_2(BigInt & a){
 	int add = 0;
 	for (int i = a.digits.size() - 1; i >= 0;i--){
@@ -314,6 +316,8 @@ void divide_by_2(BigInt & a){
 	while(a.digits.size() > 1 && !a.digits.back())
 		a.digits.pop_back();
 }
+
+
 
 BigInt sqrt(BigInt & a){
 	BigInt left(1), right(a), v(1), mid, prod;
@@ -335,9 +339,11 @@ BigInt sqrt(BigInt & a){
 		mid = BigInt();
 	}
 	return v;
-}
+}   // sqrt
 
-BigInt NthCatalan(int n){
+
+
+BigInt BigInt::NthCatalan(int n){
 	BigInt a(1),b;
 	for (int i = 2; i <= n;i++)
 		a *= i;
@@ -348,9 +354,11 @@ BigInt NthCatalan(int n){
 	a *= (n + 1);
 	b /= a;
 	return b;
-}
+}   // BigInt::NthCatalan
 
-BigInt NthFibonacci(int n){
+
+
+BigInt BigInt::NthFibonacci(int n){
 	BigInt a(1), b(1), c;
 	if(!n)
 		return c;
@@ -361,14 +369,18 @@ BigInt NthFibonacci(int n){
 		a = c;
 	}
 	return b;
-}
+}   // BigInt::NthFibonacci
 
-BigInt Factorial(int n){
+
+
+BigInt BigInt::Factorial(int n){
 	BigInt f(1);
 	for (int i = 2; i <= n;i++)
 		f *= i;
 	return f;
-}
+}   // BigInt::Factorial
+
+
 
 istream &operator>>(istream &in,BigInt&a){
 	string s;
