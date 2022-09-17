@@ -1,6 +1,17 @@
-== Unittesting
+== Unit Testing
+
+=== Intro
+https://github.com/google/googletest[GoogleTest] is used as test framework for some unit test
+examples.
+
+=== Links
+* https://google.github.io/googletest/primer.html[GoogleTest Primer]
+* https://google.github.io/googletest/[GoogleTest User's Guide]
 
 === Tests
 
 * link:01-first-test[Very first and simple test]
+* link:02-bigint[BigInt Tests]: https://www.geeksforgeeks.org/bigint-big-integers-in-c-with-example/[BigInt]
+  is a small C++ module taken from the internet which does math operations on big **unsigned** integers
+  stored in strings.  This is for demonstration of simple GoogleTest capabilities.
 * link:bag[Bag]

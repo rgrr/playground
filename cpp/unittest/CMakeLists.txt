@@ -21,4 +21,5 @@ add_subdirectory("_googletest" googletest)
 
 
 add_subdirectory(01-first-test)
+add_subdirectory(02-bigint)
 add_subdirectory(bag)
