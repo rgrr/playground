@@ -12,11 +12,12 @@ For C/C++ experiments most of the time https://eclipse.org[Eclipse] is used as I
 Toolchain etc is taken from https://www.msys2.org/[MSYS2].
 
 ==== MSYS2
-Because my software is most of the time running on 32bit targets, MINGW32 packets are used for playing and testing.
+Because my software is most of the time running on 32bit targets, MINGW32 packets are used for playing and testing
+(``sizeof(void *)==4`` on MINGW32, while 8 on MINGW64).
 
-More information can be found in https://clue.endress.com/x/SetHD[Clue].
+More information on MSYS2 installation can be found in https://clue.endress.com/x/SetHD[Clue].
 
-NOTE: MSYS2 installation should go to the default location ``c:\msys64``.
+NOTE: MSYS2 installation should go to the default location ``c:\msys64`` to make everything work smoothly.
 
 .Installation
 [source, bash]
