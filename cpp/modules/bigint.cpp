@@ -7,9 +7,18 @@ BigInt::BigInt(string & s){
 	digits = "";
 	int n = s.size();
 	for (int i = n - 1; i >= 0;i--){
-		if(!isdigit(s[i]))
+		if (s[i] == '\'')
+		{
+			// grouping
+		}
+		else if ( !isdigit(s[i]))
+		{
 			throw("ERROR");
-		digits.push_back(s[i] - '0');
+		}
+		else
+		{
+			digits.push_back(s[i] - '0');
+		}
 	}
 }
 BigInt::BigInt(unsigned long long nr){
@@ -22,9 +31,18 @@ BigInt::BigInt(const char *s){
 	digits = "";
 	for (int i = strlen(s) - 1; i >= 0;i--)
 	{
-		if(!isdigit(s[i]))
+		if (s[i] == '\'')
+		{
+			// grouping
+		}
+		else if ( !isdigit(s[i]))
+		{
 			throw("ERROR");
-		digits.push_back(s[i] - '0');
+		}
+		else
+		{
+			digits.push_back(s[i] - '0');
+		}
 	}
 }
 BigInt::BigInt(BigInt & a){
