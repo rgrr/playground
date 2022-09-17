@@ -1,0 +1,25 @@
+== C/C++ Playground
+
+* link:games/README.adoc[Misc Games]
+* link:unittest/README.adoc[Unit Testing] (sort of)
+
+
+=== Makefile
+The link:Makefile[] is required for a seamless Eclipse integration.
+Most complicated/confusing part is the setup of the ``PATH`` environment variable.
+This assures that the MSYS2 toolchain is really used before anything else in the ``$PATH``.
+
+IMPORTANT: ``c:/msys64/usr/bin/make.exe`` must be used as the
+"Build command" in "Project Settings/C++ Build" in Eclipse.
+Otherwise cmake does not find the toolchain.
+
+NOTE: fun fact: internally cmake will use Ninja because it is faster
+and shows less problems compared to make.
+
+=== CMakeLists.txt
+This is the root link:CMakeLists.txt[] file.  All other ``CMakeLists.txt``
+are included with an invocation of ``add_subdirectory()``.
+Unittests are included through the cmake macro ``add_unittest()``.
+
+NOTE: ``add_unittest()`` is not limited to unittesting.  It allows
+quick and dirty inclusion of small test projects as well.
