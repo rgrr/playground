@@ -261,7 +261,7 @@ BigInt &operator%=(BigInt& a,const BigInt &b){
 	a = t;
 	return a;
 }
-BigInt operator%(const BigInt &a,BigInt &b){
+BigInt operator%(const BigInt &a, const BigInt &b){
 	BigInt temp;
 	temp = a;
 	temp %= b;
