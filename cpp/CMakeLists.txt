@@ -1,4 +1,5 @@
-# This is the root CMakeLists.txt.
+# This is the top CMakeLists.txt.
+#
 # Everything else is included from sub-CMakeLists.txt
 #
 cmake_minimum_required(VERSION 3.17.0 FATAL_ERROR)
@@ -6,7 +7,7 @@ cmake_minimum_required(VERSION 3.17.0 FATAL_ERROR)
 project(Playground LANGUAGES C CXX)
 
 # meant is the project root
-get_filename_component(ROOT_DIR         "${CMAKE_CURRENT_LIST_DIR}/.."                ABSOLUTE)
+get_filename_component(ROOT_DIR         "${CMAKE_CURRENT_LIST_DIR}"                ABSOLUTE)
 
 # we want at least C++17
 set(CMAKE_CXX_STANDARD 17)

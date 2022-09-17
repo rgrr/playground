@@ -9,7 +9,7 @@ uint64_t Fac(uint64_t n)
 	{
 		return 0xffff'ffff'ffff'ffff;
 	}
-	else if (n > 21)
+	else if (n > 20)
 	{
 		return 0xffff'ffff'ffff'ffff;
 	}
@@ -42,8 +42,9 @@ TEST(FactorialTest, HandlesPositiveInput)
 	EXPECT_EQ(Fac(8), 40320);
 	EXPECT_EQ(Fac(15), 1307674368000);
 	EXPECT_EQ(Fac(18), 6402373705728000);
+	EXPECT_EQ(Fac(19), 121645100408832000);
 	EXPECT_EQ(Fac(20), 2432902008176640000);
-	EXPECT_EQ(Fac(21), 14197454024290336768ULL);    // here we are actually finished
+	EXPECT_EQ(Fac(21), 0xffff'ffff'ffff'ffff);      // overflow
 	EXPECT_EQ(Fac(22), 0xffff'ffff'ffff'ffff);      // overflow
-	EXPECT_EQ(Fac(23), 0xffff'ffff'ffff'ffff);      // more overflow
+	EXPECT_EQ(Fac(-1), 0xffff'ffff'ffff'ffff);      // more overflow
 }

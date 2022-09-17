@@ -74,7 +74,7 @@ CMAKE_OPT            ?= $(cmake_opt)
 CTEST_OPT            ?= $(ctest_opt)
 ifneq ($(target),)
     CMAKE_OPT    += --target $(target)
-    CTEST_OPT    += -R $(target)
+    CTEST_OPT    += -R $(target) -V
 endif
 
 
@@ -112,5 +112,5 @@ build:
 .PHONY: exec
 exec:
 	@export PATH=$(PATH_EXT)$$PATH
-	$(CMAKE) --build    $(BUILD_DIR) $(CMAKE_OPT) -- -k 0 -v
-	$(CTEST) --test-dir $(BUILD_DIR) --output-on-failure --output-junit "junit.xml" $(CTEST_OPT)
+	$(CMAKE) --build    $(BUILD_DIR) $(CMAKE_OPT) -- -k 0 -v                                      &&  \
+	$(CTEST) --test-dir $(BUILD_DIR) --output-on-failure $(CTEST_OPT)

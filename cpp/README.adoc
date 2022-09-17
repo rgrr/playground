@@ -1,7 +1,7 @@
 == C/C++ Playground
 
-* link:games/README.adoc[Games]
-* link:unittest/README.adoc[Unittesting] (sort of)
+* link:games/README.adoc[Misc Games]
+* link:unittest/README.adoc[Unit Testing] (sort of)
 
 
 === Makefile
