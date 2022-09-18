@@ -48,3 +48,16 @@ TEST(FactorialTest, HandlesPositiveInput)
 	EXPECT_EQ(Fac(22), 0xffff'ffff'ffff'ffff);      // overflow
 	EXPECT_EQ(Fac(-1), 0xffff'ffff'ffff'ffff);      // more overflow
 }
+
+
+
+TEST(MachineTest, TypeSizes)
+{
+	unsigned int u = 0;
+	unsigned long ul = 0;
+	void *p = nullptr;
+
+	EXPECT_EQ(sizeof(u), 4);
+	EXPECT_EQ(sizeof(ul), 4);
+	EXPECT_EQ(sizeof(p), 4);
+}
