@@ -1,28 +1,60 @@
 = Playground
 :source-highlighter: highlight.js
+:toc:
+:toclevels: 5
 
 This is mailto:reinhard.griech@endress.com[Hardy's, Playground on egit] personal playground.
+But everyone is free to contribute.
 
-Everyone is free to contribute.
+
+== Playground
+
+* link:cpp/README.adoc[C/C++]
 
 
+== Games
+Games should not be understood literally... instead these are finger exercises for the software developer.
+
+The following exercises are targeted:
+
+. setup xref:setup-eclipse[Eclipse], xref:setup-cmake[cmake] 
+  and xref:setup-clang[clang/gcc]
+. introduction to GoogleTest [link:cpp/unittest/README.adoc[subdir]]
+. gitlab-runner
+. test driven development with a simple bag module
+. https://en.wikipedia.org/wiki/Software_design_pattern[Software Design Pattern]
+.. https://en.wikipedia.org/wiki/Observer_pattern[Observer]
+.. https://en.wikipedia.org/wiki/Singleton_pattern[Singleton]
+.. https://en.wikipedia.org/wiki/Builder_pattern[Builder]
+.. more to come
+
+
+[[setup-eclipse]]
 == Setup
-=== C/C++
-For C/C++ experiments most of the time https://eclipse.org[Eclipse] is used as IDE.
-Toolchain etc is taken from https://www.msys2.org/[MSYS2].
 
+=== C/C++
+
+==== Eclipse
+For C/C++ experiments, https://eclipse.org[Eclipse] is used as IDE.
+For installation details refer to https://clue.endress.com/x/mDtzBg[Clue].
+
+
+[[setup-cmake]]
+[[setup-clang]]
 ==== MSYS2
+Toolchain etc is taken from https://www.msys2.org/[MSYS2].
 Because my software is most of the time running on 32bit targets, MINGW32 packets are used for playing and testing
-(``sizeof(void *)==4`` on MINGW32, while 8 on MINGW64).
+(`sizeof(void *)==4` on MINGW32, while 8 on MINGW64).
 
 More information on MSYS2 installation can be found in https://clue.endress.com/x/SetHD[Clue].
 
-NOTE: MSYS2 installation should go to the default location ``c:\msys64`` to make everything work smoothly.
+TIP: MSYS2 installation should go to the default location `c:\msys64` to make everything work smoothly.
 
 .Installation
 [source, bash]
 ----
 # tooling
+pacman -S --needed make
 pacman -S --needed mingw-w64-i686-cmake mingw-w64-i686-ninja
 
 # gcc
@@ -32,6 +64,29 @@ pacman -S --needed mingw-w64-i686-gcc mingw-w64-i686-gdb
 pacman -S --needed mingw-w64-i686-clang mingw-w64-i686-compiler-rt mingw-w64-i686-lldb mingw-w64-i686-clang-analyzer mingw-w64-i686-clang-tools-extra
 ----
 
-== Playground
 
-* link:cpp/README.adoc[C/C++]
+==== Visual Studio Code
+As an alternative https://code.visualstudio.com/[VSC] can be used.  Not my real favorite, because every addition or change to it's setup ends in >1h googling.
+But flexibility is great and there exists a load of extensions.
+The following is just a loose collection of topics concerning VSC.
+
+===== .vscode/settings.json
+
+.Adding MINGW32 to the Terminal Setup
+[source, json]
+----
+    "terminal.integrated.profiles.windows": {
+        "MINGW32": {
+            "path": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": [
+                "--login",
+                "-i"
+            ],
+            "env": {
+                "MSYSTEM": "MINGW32",
+                "CHERE_INVOKING": "1"
+            }
+        },
+    },
+    "terminal.integrated.defaultProfile.windows": "MINGW32",
+----

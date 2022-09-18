@@ -1,3 +1,7 @@
+:source-highlighter: highlight.js
+:toc:
+:toclevels: 4
+
 == Unit Testing
 
 === Intro
