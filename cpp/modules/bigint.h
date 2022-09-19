@@ -21,7 +21,7 @@ public:
 	BigInt(BigInt &);
 
 	//Helper Functions:
-	int operator[](const int)const;
+	int operator[](const unsigned int)const;
 
 			/* * * * Operator Overloading * * * */
 
