@@ -33,5 +33,6 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 
+add_subdirectory(design-pattern)
 add_subdirectory(games)
 add_subdirectory(unittest)

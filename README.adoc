@@ -19,7 +19,9 @@ The following exercises are targeted:
 
 . setup xref:setup-eclipse[Eclipse], xref:setup-cmake[cmake] 
   and xref:setup-clang[clang/gcc]
-. introduction to GoogleTest [link:cpp/unittest/README.adoc[subdir]]
+. GoogleTest [link:cpp/unittest/README.adoc[subdir]]
+.. introduction with a simple example
+.. mocking
 . gitlab-runner
 . test driven development with a simple bag module
 . https://en.wikipedia.org/wiki/Software_design_pattern[Software Design Pattern]
