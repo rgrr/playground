@@ -7,6 +7,7 @@
 === Subdirectories
 * link:games/README.adoc[games] - playing around with stuff
 * link:unittest/README.adoc[unittest] (sort of)
+* link:design-pattern/README.adoc[design pattern]
 * link:modules[modules] - contains some modules required for playing
 * link:cmake[cmake] - contains some macros (at the moment one) for cmake
 
