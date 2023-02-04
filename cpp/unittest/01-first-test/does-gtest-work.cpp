@@ -58,6 +58,12 @@ TEST(MachineTest, TypeSizes)
 	void *p = nullptr;
 
 	EXPECT_EQ(sizeof(u), 4);
+
+#ifdef _LP64
+	EXPECT_EQ(sizeof(ul), 8);
+	EXPECT_EQ(sizeof(p), 8);
+#else
 	EXPECT_EQ(sizeof(ul), 4);
 	EXPECT_EQ(sizeof(p), 4);
+#endif
 }

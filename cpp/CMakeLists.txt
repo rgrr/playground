@@ -22,8 +22,9 @@ include(cmake/macros.cmake)
 #
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # using Clang
-    set(CMAKE_C_FLAGS   "-Wall -g")
-    set(CMAKE_CXX_FLAGS "-Wall -g")
+    # requires installation of libclang-rt-14-dev
+    set(CMAKE_C_FLAGS   "-Wall -g -fprofile-instr-generate -fcoverage-mapping")
+    set(CMAKE_CXX_FLAGS "-Wall -g -fprofile-instr-generate -fcoverage-mapping")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     set(CMAKE_C_FLAGS   "-Wall --coverage -O0 -g")
