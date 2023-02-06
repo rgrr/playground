@@ -1,0 +1,96 @@
+:imagesdir:img
+:toc:
+:toclevels: 5
+
+== About RP2040 / Raspberry Pi Pico
+
+* https://www.raspberrypi.com/news/raspberry-pi-silicon-pico-now-on-sale/
+* ist wirkliches Embedded, da keine MMU.  Also nicht für linux-geeignet halten!
+
+
+== Technik
+
+* Cortex-M0, immerhin Dual-Core
+* 133MHz Takt
+* 256K RAM + 16K Cache
+* externes Flash über XIP (mit 16KB Boot-ROM), mit 16KB Cache.  Pico hat 2MB Flash
+* USB Fullspeed-Interface
+* diverse andere Peripherie wie GPIO, UART, I2C, SPI, PWM, Timer, RTC, ADC, SSI
+* 40nm Strukturbreite, aktuelle High-End-Technologien sind in der Gegend 4nm (aber
+  für MCUs sind 40nm ok)
+
+-> hört sich sehr langweilig und eher alt an (ist es aber nicht)
+
+NOTE: 1. man bedenke, dass 1981 der erste IBM PC mit 4.77MHz getaktet wurde und zuerst 16 bzw 64KB RAM hatte.
+Ok, ist über 40 Jahre her...
+
+NOTE: 2. und dieser PC nach heutiger Kaufkraft knapp 10.000€ kosten würde.  Ok, da war auch noch
+Tastatur und so dabei.  Halt eine sehr teure...
+
+Einer der Gründe: die Raspberry Pi Foundation hat es geschafft, die "Community" zu aktivieren.
+Deshalb gibt ein Raspi Pico einen echten Schub in der / für die "Szene".
+
+'''
+
+Andere Zahlen:
+
+* der Chip belegt eine Fläche von 2mm², d.h. 1.4x1.4mm²!
+  Siehe z.B. https://www.tomshardware.com/news/raspberry-pi-10-million-rp2040s
+  -> da kann man jetzt draus schlussfolgern, dass sich feinere Strukturen nicht lohnen,
+  da man dann die Bondingdrähte nicht mehr ranbekommt, Gehäuse hat 56 Pins.
+* auf einen 30cm-Wafer sind 21000..22000 "gute" Chips (30cm Wafer hat ca. 70.000mm²)
+* die RaspberryPi Foundation hat 500 Wafer geordert, ein 40nm-Wafer bei TSMC kostet nach einer
+  Angabe im Netz 2300$ (https://news.ycombinator.com/item?id=25958138)
+* das macht 500x20.000 = 10.000.000 Chips, bzw 500x2300$ = ~ 1.200.000$ alleine
+  an Wafer-Kosten (dazu kommen noch Masken, Packaging, Transport, Entwicklung, ...)
+* Stückpreis 1$, in größeren Mengen 70¢ (gibt klarerweise deutlich Billigere)
+* Boards (Pico) kosten ab 4$, PicoW mit WiFi CYW43439 ca. 6$
+* da bleibt auch mit Entwicklungskosten eine gewisse Marge
+
+image::Raspberry-Pi-RP2040-Block-Diagram.png[Bild des Dies]
+
+image::bonding-wires.jpeg[Bonding]
+
+'''
+
+Gimmicks, die das Herz eines Embedded-Entwicklers (TDE!) höher schlagen lassen:
+
+* FreeRTOS, auch SMP
+* Umfangreiches SDK
+* Community -> viele Beispiele / Anwendungen / Hilfe / alles "offen"
+* USB-Interface per TinyUSB ansteuerbar
+* PIO - Programmable Input Output (zwei Blöcke)
+* für Leute die gerne "tunen": der RP2040 lässt sich ohne große Probleme (bei
+  Raumtemperatur) auf 300MHz übertakten
+
+kleiner Minuspunkt: im "DORMANT State" braucht die MCU alleine ~200µA.  Für viele
+Anwendungsfälle ist das aber auch ganz ok.  Maximale Stromaufnahme liegt bei ca.
+30mA (aber abhängig von der Taktfrequenz).  i.Ü. bei 1.1V!
+
+'''
+
+Der ESP32 hat WiFi / Bluetooth.  Warum nicht der?
+
+* Formfaktor: der Pico hat ein Standard-DIP40-Äußeres und passt sehr gut
+  auf Standard-Breadboards.  Der ESP32 ist 5mm breiter, so dass man in diesen
+  Breadboards echte Platzprobleme bekommt 
+* USB: der ESP32 hat selber kein USB integriert (zumindest meine nicht).
+  USB fördert bei mir den Spieltrieb, da ich es bisher nicht gemacht habe
+* PIO: ebenfalls Spieltrieb geweckt
+* Community: beim RasPi ist das klar, dass jeder jedem zuträgt und hilft.
+  Beim ESP empfinde ich das nicht so
+* sehr gute Tool-Unterstützung
+** SWD (Serial Wire Debug): OpenOCD, pyOCD (OCD=On-Chip Debugger, nicht
+   Obcessive Compulsive Disorder ;-)), RTT (Real Time Transfer)
+** die Compiler (gcc, llvm) sind gefühlt seit 10 Jahren ausgereift
+** gdb, SVD, ...
+** wer will kann auch MicroPhyton, CircuitPython, Javascript, uLisp, Rust, Lua,
+   Go, BASIC, Pascal, Ruby - https://www.raspberrypi.com/news/multilingual-blink-for-raspberry-pi-pico/
+* und zu guter Letzt gibt es auch WiFi für den Pico (und bald wohl auch BLE)
+
+
+== USB
+
+
+== PIO
+
