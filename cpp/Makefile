@@ -88,6 +88,9 @@ else
     ABS_PWD          := $(shell /usr/bin/cygpath -ma .)
 endif
 
+# create compile_commands.json
+CMAKE_BUILD_OPT      := -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
 
 #
 # set the cmake / ctest options
@@ -105,6 +108,12 @@ endif
 clean:
 	@export PATH=$(PATH_EXT)$$PATH
 	$(CMAKE) --build $(BUILD_DIR) --target clean $(CMAKE_OPT) -- -v
+
+
+.PHONY: clean-real
+clean-real:
+	@export PATH=$(PATH_EXT)$$PATH
+	$(RM) -rfv $(BUILD_DIR)
 
 
 .PHONY: build
@@ -125,7 +134,6 @@ create-makefiles-gcc:
 	@export PATH=$(PATH_EXT)$$PATH
 	export CC=$(GCC)
 	export CXX=$(GCCXX)
-	$(RM) -rf $(BUILD_DIR)
 	$(CMAKE) $(CMAKE_BUILD_OPT) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) -DCMAKE_C_COMPILER=$$CC -DCMAKE_CXX_COMPILER=$$CXX -B $(BUILD_DIR) -G "$(CMAKE_GENERATOR)"
 
 
@@ -144,7 +152,6 @@ create-makefiles-clang:
 	@export PATH=$(PATH_EXT)$$PATH
 	export CC=$(CLANG)
 	export CXX=$(CLANGXX)
-	$(RM) -rf $(BUILD_DIR)
 	$(CMAKE) $(CMAKE_BUILD_OPT) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) -DCMAKE_C_COMPILER=$$CC -DCMAKE_CXX_COMPILER=$$CXX -B $(BUILD_DIR) -G "$(CMAKE_GENERATOR)"
 
 
@@ -158,3 +165,10 @@ coverage-clang: exec
 	# --show-branches=count --show-expansions
 	echo ...
 	echo "open file://$(ABS_PWD)/$(BUILD_DIR)/index.html with browser to view coverage results"
+
+
+.PHONY: check-clang
+check-clang:
+	@export PATH=$(PATH_EXT):$$PATH
+	cd $(BUILD_DIR)
+	run-clang-tidy
