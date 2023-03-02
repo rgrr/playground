@@ -23,3 +23,7 @@ examples.
   is a small C++ module taken from the internet which does math operations on big **unsigned** integers
   stored in strings.  This is for demonstration of simple GoogleTest capabilities.
 * link:bag[Bag]
+
+=== Ideen für Spielereien
+
+* Unittests für https://graphics.stanford.edu/~seander/bithacks.html

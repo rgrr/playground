@@ -109,3 +109,17 @@ The following is just a loose collection of topics concerning VSC.
     },
     "terminal.integrated.defaultProfile.windows": "MINGW32",
 ----
+
+
+==== Linux
+Setup for running the tests/everything under Linux should be quite simple: under
+Debian install `gcc-multiarch` and `g++-multiarch` to get 32bit applications
+(sometimes the tests need to be generated with `-m32`).
+
+NOTE: Compiling with clang is most of the times much faster: the fielddevice
+unittests need 60s with gcc on my machine, while it took 15s with clang.
+Most of clangs advantage comes from better usage of multiple cores.  Don't
+know, what the actual cause is, that gcc behaves "bad".
+
+
+
