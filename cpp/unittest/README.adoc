@@ -12,6 +12,10 @@ examples.
 * https://google.github.io/googletest/primer.html[GoogleTest Primer]
 * https://google.github.io/googletest/[GoogleTest User's Guide]
 
+==== Tutorials
+* https://www.youtube.com/watch?v=JJqRlSTQlh4[Google Test and Mock Platform, Complete Tutorial. Part 1: Google Test]
+
+
 === Tests
 
 * link:01-first-test[Very first and simple test]
@@ -19,3 +23,7 @@ examples.
   is a small C++ module taken from the internet which does math operations on big **unsigned** integers
   stored in strings.  This is for demonstration of simple GoogleTest capabilities.
 * link:bag[Bag]
+
+=== Ideen für Spielereien
+
+* Unittests für https://graphics.stanford.edu/~seander/bithacks.html

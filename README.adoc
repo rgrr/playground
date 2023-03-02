@@ -17,18 +17,38 @@ Games should not be understood literally... instead these are finger exercises f
 
 The following exercises are targeted:
 
+=== Setup / Tooling
 . setup xref:setup-eclipse[Eclipse], xref:setup-cmake[cmake] 
   and xref:setup-clang[clang/gcc]
+. gitlab-runner
+. libraries
+.. STL
+.. Boost
+
+=== Unittesting
 . GoogleTest [link:cpp/unittest/README.adoc[subdir]]
 .. introduction with a simple example
 .. mocking
-. gitlab-runner
 . test driven development with a simple bag module
+
+=== Design Patterns
 . https://en.wikipedia.org/wiki/Software_design_pattern[Software Design Pattern]
-.. https://en.wikipedia.org/wiki/Observer_pattern[Observer]
-.. https://en.wikipedia.org/wiki/Singleton_pattern[Singleton]
-.. https://en.wikipedia.org/wiki/Builder_pattern[Builder]
-.. more to come
+.. Creational
+... https://en.wikipedia.org/wiki/Builder_pattern[Builder]
+... https://en.wikipedia.org/wiki/Singleton_pattern[Singleton]...
+.... https://www.heise.de/blog/Patterns-in-der-Softwareentwicklung-Die-Alternativen-zum-Singleton-Muster-7280137.html[and it's alternatives]
+... https://en.wikipedia.org/wiki/Factory_method_pattern[Factory]    
+.. Structural
+... https://en.wikipedia.org/wiki/Adapter_pattern[Adapter]
+... https://en.wikipedia.org/wiki/Composite_pattern[Composite]
+... https://en.wikipedia.org/wiki/Facade_pattern[Facade]
+... https://en.wikipedia.org/wiki/Proxy_pattern[Proxy]
+.. Behavioral
+... https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern[Chain of Responsibility]
+... https://en.wikipedia.org/wiki/Observer_pattern[Observer]
+. https://www.heise.de/suche/?q="Patterns+in+der+Softwareentwicklung"&sort_by=date[Patterns at heise.de] and then read bottom-up
+. https://en.wikibooks.org/wiki/C%2B%2B_Programming/Code/Design_Patterns[C++ Programming: Code patterns design (Wikibooks)]...
+.. and the corresponding https://en.wikibooks.org/wiki/C%2B%2B_Programming[C++ Programming] book
 
 
 [[setup-eclipse]]
@@ -92,3 +112,16 @@ The following is just a loose collection of topics concerning VSC.
     },
     "terminal.integrated.defaultProfile.windows": "MINGW32",
 ----
+
+==== Linux
+Setup for running the tests/everything under Linux should be quite simple: under
+Debian install `gcc-multiarch` and `g++-multiarch` to get 32bit applications
+(sometimes the tests need to be generated with `-m32`).
+
+NOTE: Compiling with clang is most of the times much faster: the fielddevice
+unittests need 60s with gcc on my machine, while it took 15s with clang.
+Most of clangs advantage comes from better usage of multiple cores.  Don't
+know, what the actual cause is, that gcc behaves "bad".
+
+
+

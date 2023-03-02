@@ -1,0 +1,194 @@
+:imagesdir: img
+:toc:
+:toclevels: 5
+
+
+= About RP2040 and more
+Hardy Griech <reinhard.griech@endress.com>
+v0.0, 2023-02-07
+
+== About RP2040 / Raspberry Pi Pico
+
+* https://www.raspberrypi.com/news/raspberry-pi-silicon-pico-now-on-sale/
+* ist wirkliches Embedded, da keine MMU.  Also nicht für linux-geeignet halten!
+
+<<<
+
+== Technik
+
+=== Highlights
+
+* Cortex-M0+, immerhin Dual-Core (Architektur ARMv6-M kommt von 2002)
+* 133MHz Takt
+* 256K RAM + 16K Cache
+* externes Flash über XIP (mit 16KB Boot-ROM), mit 16KB Cache.  Pico hat 2MB Flash,
+  maximal möglich 16MByte
+* USB Fullspeed-Interface
+* diverse andere Peripherie wie GPIO, UART, I2C, SPI, PWM, Timer, RTC, ADC, SSI
+* 40nm Strukturbreite, aktuelle High-End-Technologien sind in der Gegend 4nm (aber
+  für MCUs sind 40nm ok)
+
+-> hört sich sehr langweilig und eher alt an (ist es aber nicht)
+
+Einer der Gründe: die Raspberry Pi Foundation hat es geschafft, die "Community" zu aktivieren.
+Deshalb gibt ein Raspi Pico einen echten Schub in der / für die "Szene".
+
+NOTE: 1. man bedenke, dass 1981 der erste IBM PC mit 4.77MHz getaktet wurde und zuerst 16 bzw 64KB RAM hatte.
+Ok, ist über 40 Jahre her...
+
+NOTE: 2. ...und dieser PC nach heutiger Kaufkraft knapp 10000€ kosten würde.  Ok, da war auch noch
+Tastatur und so dabei.  Halt eine sehr teure...
+
+<<<
+
+=== Andere Zahlen
+
+* der Chip belegt eine Fläche von 2mm², d.h. 1.4x1.4mm²!
+  Siehe z.B. https://www.tomshardware.com/news/raspberry-pi-10-million-rp2040s
+  -> da kann man jetzt draus schlussfolgern, dass sich feinere Strukturen nicht lohnen,
+  da man dann die Bondingdrähte nicht mehr ranbekommt, Gehäuse hat 56 Pins.
+* auf einen 30cm-Wafer sind 21000..22000 "gute" Chips (30cm Wafer hat ca. 70.000mm²)
+* die RaspberryPi Foundation hat 500 Wafer geordert, ein 40nm-Wafer bei TSMC kostet nach einer
+  Angabe im Netz 2300$ (https://news.ycombinator.com/item?id=25958138)
+* das macht 500x20.000 = 10.000.000 Chips, bzw 500x2300$ = ~ 1.200.000$ alleine
+  an Wafer-Kosten (dazu kommen noch Masken, Packaging, Transport, Entwicklung, ...)
+* Stückpreis 1$, in größeren Mengen 70¢ (gibt klarerweise deutlich billigere MCUs)
+* Boards (Pico) kosten ab 4$, PicoW mit WiFi CYW43439 ca. 6$
+* da bleibt auch mit Entwicklungskosten eine gewisse Marge
+
+<<<
+
+=== Paar Bilder
+
+John McMaster: https://twitter.com/johndmcmaster/status/1355092011829719046
+
+."Draufsicht"
+[cols=3]
+|===
+a|image::Raspberry-pi_rp2-b0_s1-9_mit20x.jpg[Foto des Dies, width=300]
+a|image::Raspberry-Pi-RP2040-Block-Diagram.png[Blöcke auf dem Die, width=300]
+a|image::bonding-wires.jpeg[Bonding, width=300]
+|===
+
+<<<
+
+=== Gimmicks...
+
+...die das Herz eines Embedded-Entwicklers (TDE!) höher schlagen lassen:
+
+* FreeRTOS, auch mit SMP
+* Umfangreiches SDK
+* Community footnote:[Heutzutage sind die Communities leider stark zersplittert.  Früher
+  gab es für solche Fälle das USENET.]
+** viele Beispiele / Anwendungen / Hilfe / alles "offen"
+** und die Foundation ist auch "committed": es wird sehr viel Arbeit in guten
+   Support hineingesteckt, ähnlich wie bei Boardsupport bei Raspbian
+* USB-Interface per TinyUSB ansteuerbar
+* PIO - Programmable Input Output (zwei Blöcke)
+* Dual-Core
+* für Leute die gerne "tunen": der RP2040 lässt sich ohne große Probleme (bei
+  Raumtemperatur) auf >250MHz übertakten
+* Takt lässt sich frei einstellen (im Gegensatz z.B. zum nRF52)
+
+kleiner Minuspunkt: im "DORMANT State" braucht die MCU alleine ~200µA.  Für viele
+Anwendungsfälle ist das aber auch ganz ok.  Maximale Stromaufnahme liegt bei ca.
+30mA (klarerweise abhängig von der Taktfrequenz).  i.Ü. bei 1.1V!
+
+<<<
+
+=== Der ESP32 hat WiFi / Bluetooth.  Warum nicht den nehmen?
+
+* Formfaktor: der Pico ist 17.78mm breit (Standard DIP40 hat 15.24mm) und passt sehr gut
+  auf billige Standard-Breadboards.  Der ESP32 ist 5-7.5mm breiter, so dass man in diesen
+  Breadboards echte Platzprobleme bekommt
++
+.Breadboards
+[cols=2]
+|===
+| RP2040 | ESP32
+
+a|image::Breadboard-Pico.png[Pico RP2040 Breadboard, width=300]
+a|image::esp32-devkitc-development-kit-espressif.jpg[Nano ESP32 Breadboard, width=300]
+
+a|* RP2040 Boards gibt es nochmal eine Runde schmaler und kleiner
+* der PicoW hat den gleichen "form factor"
+
+a|Es gibt sie auch breiter... (und wenige die schmaler sind).
+Was dann mitunter zu echten Basteleien führt:
+
+image::ESP32-Breadboards2.jpg[ESP32 Basteleien, width=300]
+a|image::ESP32-Breadboards2.jpg[ESP32 Basteleien, width=300]
+|===
+
+* USB: der ESP32 hat selber kein USB integriert (zumindest meine nicht).
+  USB fördert bei mir den Spieltrieb, da ich es bisher nicht gemacht habe
+* Debug-Schnittstelle (SWD, CMSIS-DAP) ist beim RP2040 einfacher zu haben
+* Community: beim RasPi ist klar, dass jeder jedem zuträgt und hilft.
+  Beim ESP empfinde ich das nicht so
+* und zu guter Letzt gibt es auch WiFi für den Pico (und seit Kurzem auch Bluetooth)
+
+TIP: Da der Debug-Stecker der "H"-Varianten
+schwer erhältlich ist, den Pico ohne Stiftleisten kaufen und diese selber anlöten.
+
+<<<
+
+=== Sonstige Pluspunkte
+
+* PIO: ebenfalls Spieltrieb geweckt
+* sehr gute Tool-Unterstützung
+** SWD (Serial Wire Debug): OpenOCD, pyOCD (OCD=On-Chip Debugger, nicht
+   Obsessive Compulsive Disorder ;-)), RTT (Real Time Transfer)
+** die Compiler (gcc, llvm) sind gefühlt seit 10 Jahren ausgereift (Arm!)
+** gdb, SVD, ...
+** wer will, kann auch https://micropython.org/download/?mcu=rp2040[MicroPhyton],
+   https://circuitpython.org/board/raspberry_pi_pico/[CircuitPython],
+   https://kalumajs.org/[Javascript],
+   http://www.ulisp.com/show?3KN3[uLisp],
+   https://reltech.substack.com/p/getting-started-with-rust-on-a-raspberry[Rust],
+   https://github.com/kevinboone/luapico[Lua],
+   https://tinygo.org/docs/reference/microcontrollers/pico/[Go],
+   https://www.heise.de/news/Fuer-die-Programmierung-vor-Ort-BASIC-Computer-mit-Arduino-RP2040-Connect-7285690.html[BASIC],
+   https://wiki.freepascal.org/ARM_Embedded_Tutorial_-_Raspberry_Pi_Pico_Setting_up_for_Development[Pascal],
+   https://github.com/picoruby[Ruby],
+   https://www.tomshardware.com/news/raspberry-pi-pico-bipes[Scratch] verwenden.
+   Siehe https://www.raspberrypi.com/news/multilingual-blink-for-raspberry-pi-pico/
+
+<<<
+
+=== Ein paar Links (mehr)
+
+* Startpunkt: https://www.raspberrypi.com/products/raspberry-pi-pico/
+* Datenblatt: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+* SDK: https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf
+* Hackaday: https://hackaday.com/tag/rp2040/
+* verschiedene Boards: https://www.tomshardware.com/best-picks/best-rp2040-boards
+
+<<<
+
+== Debugging
+
+Nicht so 100%ig, erfordert viel Bereitschaft.  Ursache ist vor allen Dingen der
+Dualcore, der dazu noch relativ unüblich mit zwei DAPs aufgebaut ist.
+
+* unter PlatformIO mit OpenOCD 0.11 scheint es gut zu gehen: da wird ein Socket (für gdbserver) für
+  beide Cores aufgemacht und die jeweils in einen Thread gepackt
+* OpenOCD 0.12 macht pro Core einen gdbserver-Socket auf, was bedeutet, dass
+  man zwei gdbs starten muss, die auch noch irgendwie voneinander abhängen
+* pyOCD 0.34.x kann nur entweder Core0 oder Core1 aufmachen.  Damit ist also
+  Debugging von SMP nicht wirklich möglich
+
+ 
+
+
+== USB
+
+
+== PIO
+
+<<<
+
+== Tooling
+* Eclipse
+* PulseView
+* AsciiDoc(tor)
+

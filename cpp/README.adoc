@@ -25,6 +25,9 @@ TIP: `c:/msys64/usr/bin/make.exe` should be used as the
 NOTE: fun fact: internally we will let cmake use Ninja because it is faster
 and shows less problems compared to make.
 
+NOTE: this setup is working under Linux as well.
+
+
 === CMakeLists.txt
 This is the root link:CMakeLists.txt[CMakeLists.txt] file.  All other `CMakeLists.txt`
 are included with an invocation of `add_subdirectory()`.
