@@ -1,0 +1,29 @@
+:source-highlighter: highlight.js
+:toc:
+:toclevels: 4
+
+== Design Pattern
+
+=== Intro
+
+=== Links
+* https://en.wikipedia.org/wiki/Design_Patterns[wikipedia]
+* Heise
+** https://www.heise.de/blog/Ein-erster-Ueberblick-Design-Patterns-und-Architekturmuster-mit-C-7147402.html[Übersicht Design Patterns]
+** https://www.heise.de/blog/Klassifizierung-von-Design-Patterns-in-der-Softwareentwicklung-7194039.html[Klassifizierung]
+** https://www.heise.de/blog/Patterns-in-der-Softwareentwicklung-nicht-isoliert-sondern-in-Beziehung-7223539.html[Patterns in der Softwareentwicklung]
+** https://www.heise.de/blog/Antipatterns-in-der-Softwareentwicklung-die-boese-Schwester-der-Design-Patterns-7239865.html[Antipattern]
+** https://www.heise.de/blog/Softwareentwicklung-Das-Design-Pattern-Fabrikmethode-zum-Erzeugen-von-Objekten-7252845.html[Fabrikmethode]
+** https://www.heise.de/blog/Patterns-in-der-Softwareentwicklung-Das-Singleton-Muster-7266995.html[Singleton]
+
+
+=== Pattern
+* visitor
+* observer
+* proxy
+
+* dependency injection
+
+
+=== Keywords
+* Dependency (Injection) Container

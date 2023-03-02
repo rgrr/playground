@@ -28,10 +28,18 @@
 ifeq '$(findstring ;,$(PATH))' ';'
     UNAME := Windows
 else
-    UNAME := $(shell uname 2>/dev/null || echo Unknown)
-    UNAME := $(patsubst CYGWIN%,Cygwin,$(UNAME))
-    UNAME := $(patsubst MSYS%,MSYS,$(UNAME))
-    UNAME := $(patsubst MINGW%,MSYS,$(UNAME))
+    _UNAME := $(shell /bin/mount 2>/dev/null || echo Unknown)
+    ifeq ($(_UNAME),Unknown)
+        UNAME := Unknown
+    endif
+    ifeq ($(UNAME),)
+        ifneq ($(findstring cygdrive,$(_UNAME)),)
+            UNAME := Cygwin
+        endif
+    endif
+    ifeq ($(UNAME),)
+        UNAME := MSYS
+    endif
 endif
 
 ifeq ($(UNAME),Cygwin)
@@ -45,21 +53,10 @@ BUILD_DIR            ?= _build
 CMAKE_BUILD_TYPE     ?= Debug
 CMAKE_GENERATOR      ?= Ninja
 
-ifeq ($(OS),Windows_NT)
-    # compiler: ".exe" required for MSYS2-cmake
-    CLANG            := clang.exe
-    CLANGXX          := clang++.exe
-    GCC              := gcc.exe
-    GCCXX            := g++.exe
-else
-    # Linux?
-    CLANG            := clang
-    CLANGXX          := clang++
-    GCC              := gcc
-    GCCXX            := g++
-    MSYS_ROOT        :=
-    MSYS_ARCH_FOLDER :=
-endif
+CLANG                := clang
+CLANGXX              := clang++
+GCC                  := gcc
+GCCXX                := g++
 
 CMAKE                := cmake
 CTEST                := ctest
@@ -78,39 +75,44 @@ ifneq ($(target),)
 endif
 
 
+.PHONY: aaa
+aaa:
+	@echo $(SHELL)
+	echo $(UNAME)
+	echo $(PATH_EXT)
+	echo $(MSYS_ROOT)
+	echo $(MSYS_ARCH_FOLDER)
+
+
 .PHONY: create-makefiles-clang
 create-makefiles-clang:
-	@export PATH=$(PATH_EXT)$$PATH
-	export CC=$(CLANG)
-	export CXX=$(CLANGXX)
+	@export PATH=$(PATH_EXT):$$PATH
 	$(RM) -rf $(BUILD_DIR)
-	$(CMAKE) $(CMAKE_BUILD_OPT) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) -DCMAKE_C_COMPILER=$$CC -DCMAKE_CXX_COMPILER=$$CXX -B $(BUILD_DIR) -G "$(CMAKE_GENERATOR)"
+	$(CMAKE) $(CMAKE_BUILD_OPT) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) -DCMAKE_C_COMPILER=$(CLANG) -DCMAKE_CXX_COMPILER=$(CLANGXX) -B $(BUILD_DIR) -G "$(CMAKE_GENERATOR)"
 
 
 .PHONY: create-makefiles-gcc
 create-makefiles-gcc:
-	@export PATH=$(PATH_EXT)$$PATH
-	export CC=$(GCC)
-	export CXX=$(GCCXX)
+	@export PATH=$(PATH_EXT):$$PATH
 	$(RM) -rf $(BUILD_DIR)
-	$(CMAKE) $(CMAKE_BUILD_OPT) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) -DCMAKE_C_COMPILER=$$CC -DCMAKE_CXX_COMPILER=$$CXX -B $(BUILD_DIR) -G "$(CMAKE_GENERATOR)"
+	$(CMAKE) $(CMAKE_BUILD_OPT) -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) -DCMAKE_C_COMPILER=$(GCC)   -DCMAKE_CXX_COMPILER=$(GCCXX)   -B $(BUILD_DIR) -G "$(CMAKE_GENERATOR)"
 
 
 # works only if there is a _build.  But otherwise there is nothing to clean...
 .PHONY: clean
 clean:
-	@export PATH=$(PATH_EXT)$$PATH
+	@export PATH=$(PATH_EXT):$$PATH
 	$(CMAKE) --build $(BUILD_DIR) --target clean $(CMAKE_OPT) -- -v
 
 
 .PHONY: build
 build:
-	@export PATH=$(PATH_EXT)$$PATH
+	@export PATH=$(PATH_EXT):$$PATH
 	$(CMAKE) --build $(BUILD_DIR) $(CMAKE_OPT) -- -k 0 -v
 
 
 .PHONY: exec
 exec:
-	@export PATH=$(PATH_EXT)$$PATH
+	@export PATH=$(PATH_EXT):$$PATH
 	$(CMAKE) --build    $(BUILD_DIR) $(CMAKE_OPT) -- -k 0 -v                                      &&  \
 	$(CTEST) --test-dir $(BUILD_DIR) --output-on-failure $(CTEST_OPT)

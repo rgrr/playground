@@ -57,7 +57,7 @@ bool Null(const BigInt& a){
 int Length(const BigInt & a){
 	return a.digits.size();
 }
-int BigInt::operator[](const int index)const{
+int BigInt::operator[](const unsigned int index)const{
 	if(digits.size() <= index || index < 0)
 		throw("ERROR");
 	return digits[index];
