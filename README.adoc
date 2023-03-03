@@ -50,6 +50,9 @@ The following exercises are targeted:
 . https://en.wikibooks.org/wiki/C%2B%2B_Programming/Code/Design_Patterns[C++ Programming: Code patterns design (Wikibooks)]...
 .. and the corresponding https://en.wikibooks.org/wiki/C%2B%2B_Programming[C++ Programming] book
 
+=== LLVM
+Several topics concerning link:llvm-games/README.adoc[LLVM].
+
 
 [[setup-eclipse]]
 == Setup

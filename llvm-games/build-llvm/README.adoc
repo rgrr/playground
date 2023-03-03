@@ -1,0 +1,91 @@
+== Build (parts of) LLVM for Embedded Targets
+
+Description how to build an Arm toolchain on Linux.
+
+NOTE: Both procedures can also output toolchains for Windows
+
+
+=== Building from scratch
+
+Here the important parts for BlueConnect (fielddevice side) of the LLVM
+toolchain are built.
+
+The corresponding link:Makefile[Makefile] is taken from `BlueConnect_Tools`.  Note
+that the most recent version can be found there.
+
+Important targets are:
+
+* `clean-linux`
+* `cmake-linux`
+* `build-linux`
+* `install-linux`
+
+The Makefile creates several binaries of LLVM and some headers.
+Installation goes to `~/bin/clang-arm-none-eabi`.
+
+
+=== Building the LLVM embedded toolchain for Arm
+
+As an alternative https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm
+can be used.  This is more complete, because it contains Picolib and runtime as well.
+But note that this toolchain does not include `llvm-link` / `opt` / `llc` without
+modification.
+
+==== Patching...
+To create those files, `CMakeLists.txt` has to be patched/edited as below: 
+
+[source, diff]
+----
+diff -p -r1.1 ./CMakeLists.txt
+*** ./CMakeLists.txt    2023/02/20 18:09:47     1.1
+--- ./CMakeLists.txt    2023/02/25 10:06:32
+*************** set(LLVM_DISTRIBUTION_COMPONENTS
+*** 142,153 ****
+      llvm-size
+      llvm-strip
+      llvm-symbolizer
+      LTO
+      CACHE STRING ""
+  )
+  set(LLVM_ENABLE_PROJECTS clang;lld CACHE STRING "")
+  set(LLVM_TARGETS_TO_BUILD AArch64;ARM CACHE STRING "")
+! set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-linux-gnu CACHE STRING "")
+  set(CLANG_DEFAULT_LINKER lld CACHE STRING "")
+  
+  # Default to a release build
+--- 142,157 ----
+      llvm-size
+      llvm-strip
+      llvm-symbolizer
++     llvm-link
++     llc
++     opt
+      LTO
+      CACHE STRING ""
+  )
+  set(LLVM_ENABLE_PROJECTS clang;lld CACHE STRING "")
+  set(LLVM_TARGETS_TO_BUILD AArch64;ARM CACHE STRING "")
+! set(LLVM_DEFAULT_TARGET_TRIPLE arm-none-eabi CACHE STRING "")
+! set(LLVM_TARGET_ARCH arm CACHE STRING "")
+  set(CLANG_DEFAULT_LINKER lld CACHE STRING "")
+  
+  # Default to a release build
+----
+
+
+==== Building...
+
+* fetch https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm.git
+* patch as above
+* `mkdir build && cd build && cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF`
+* `ninja llvm-toolchain`
+* `ninja package-llvm-toolchain`
+* unpack the created archive to e.g. `~/bin/llvm-arm-none-eabi`
+
+
+=== Using the toolchains with BlueConnect
+
+I.e. compile under Linux...  this is currently not integrated into the BlueConnect build process.
+
+NOTE: Not the whole build process can be done under Linux because some tools only exists for Windows.
+This is especially true for SFU image creation.
