@@ -1,7 +1,15 @@
-== Bug in Optimizer in LLVM?
+== Incorrect code generation in conjunction with linker scripts?
 
-First I thought that there is a bug in the LTO of lld.  Now I think
-it's a general optimizer problem.
+=== Summary
+
+It seems that the optimizer does not consider symbols created during link time under
+certain circumstances.
+
+The problem appeared first in a project during link time optimization.  Digging
+deeper with the test program showed that the problem must be caused by
+the optimizer.
+
+Linker scripts are part of the problem.
 
 
 === About the test program
@@ -44,3 +52,11 @@ leads to a crash.
 === Environment
 I have tested on Debian with clang 15.0.7.  lld-15 has to be installed as
 well.
+
+NOTE: first I thought that the bug is LTO related.  That's the reason for
+the name of this subdirectory.
+
+=== Bug report
+
+https://github.com/llvm/llvm-project/issues/61173
+
