@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include "mod.h"
 
 
@@ -10,47 +9,30 @@ void stack_observer(void * p_ctx)
     printf("    stack_observer(%p)\n", p_ctx);
 }
 
-NRF_SDH_STACK_OBSERVER( m_stack_observer_0, 0 ) = {
+static nrf_sdh_req_observer_t const m_stack_observer_0 __attribute__ ((section(".sdh_stack_observers"))) __attribute__((used)) = {
         .handler = stack_observer,
         .p_context = (void *)NULL,
 };
 
-NRF_SDH_STACK_OBSERVER( m_stack_observer_1, 0 ) = {
+static nrf_sdh_req_observer_t const m_stack_observer_1 __attribute__ ((section(".sdh_stack_observers"))) __attribute__((used)) = {
         .handler = stack_observer,
         .p_context = (void *)1,
 };
 
-NRF_SDH_STACK_OBSERVER( m_stack_observer_9, 0 ) = {
+static nrf_sdh_req_observer_t const m_stack_observer_9 __attribute__ ((section(".sdh_stack_observers"))) __attribute__((used)) = {
         .handler = stack_observer,
         .p_context = (void *)9,
 };
 
 
-
-void req_observer(void * p_ctx)
+#if defined(TEST_WITH_ONE_OBSERVER_IS_OK)
+void soc_observer(void * p_ctx)
 {
-    printf("    req_observer(%p)\n", p_ctx);
+    printf("    soc_observer(%p)\n", p_ctx);
 }
 
-NRF_SDH_REQUEST_OBSERVER( m_req_observer_0, 0 ) = {
-        .handler = req_observer,
+static nrf_sdh_req_observer_t const m_soc_observer_0 __attribute__ ((section(".sdh_soc_observers"))) __attribute__((used)) = {
+        .handler = soc_observer,
         .p_context = (void *)NULL,
 };
-
-
-void state_observer(void * p_ctx)
-{
-    printf("    state_observer(%p)\n", p_ctx);
-}
-
-NRF_SDH_STATE_OBSERVER( m_state_observer_0, 0 ) = {
-        .handler = state_observer,
-        .p_context = (void *)NULL,
-};
-
-
-
-void hello_mod(void)
-{
-    printf("Hello mod\n");
-}
+#endif
