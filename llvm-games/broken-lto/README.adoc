@@ -1,0 +1,16 @@
+= LTO optimizes code away
+
+Here I'm trying to create a simple example of a `ld.lld` bug happening in
+conjuntion with the Nordic SDK:
+
+* there can be several types of  `NRF_SDH_*_OBSERVER` handler
+* the (multiple) handler go into special link sections, one section per type
+* the link section definitions contain __start/__stop symbols
+* during runtime the handlers are called by an iterator
+  which calls all handler definitions between the __start/__stop symbols
+* empty handler sections are legal
+
+It seems that the LTO transforms the corresponding for-loop of the code into
+a do-while-loop, so it works if there is one handler per type, but crashes
+if there is no handler definition. 
+
