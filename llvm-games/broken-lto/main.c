@@ -76,6 +76,7 @@ static void sdh_observer_notify(const char *name, nrf_section_set_t const *obser
     nrf_section_iter_t iter;
 
     printf("%s ------------ %p %p\n", name, observer->section.p_start, observer->section.p_end);
+    fflush(stdout);
 
     for (nrf_section_iter_init(&iter, observer);
          nrf_section_iter_get(&iter) != NULL;
@@ -89,6 +90,7 @@ static void sdh_observer_notify(const char *name, nrf_section_set_t const *obser
 
         handler(p_observer->p_context);
     }
+    fflush(stdout);
 }   // sdh_request_observer_notify
 
 

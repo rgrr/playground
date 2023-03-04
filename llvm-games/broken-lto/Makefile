@@ -43,8 +43,8 @@ test-O0-ok:
 	$(MAKE) rerun P_CFLAGS=-O0
 
 
-.PHONY: test-O0-fail-compile-error
-test-O0-fail-compile-error:
+.PHONY: test-O0-fail-link-error
+test-O0-fail-link-error:
 	$(MAKE) rerun P_CFLAGS="-O0 -DTEST_INLINE_ITER_GET=1"
 
 

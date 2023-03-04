@@ -37,17 +37,21 @@ leads to a crash.
 
 === Testing
 
+==== Actual problem
 . `make test-O0-ok` - compiles with '-O0' and sends some output to the terminal
 . `make test-O1-fail` - compiles with '-O1' and crashes on output of the empty
   `soc_observer`
 . `make test-O1-ok-with-observer` - compiles with '-O1' successfully to show
-  that the problem is with an empty list
-. `make test-O0-fail-compile-error` - compiles with '-O0' and generates a compile time
-  error I actually do not understand (different story)
-. `make test-O1-fail-with-inline-iter-get` - compiles with '-O1' and failes
-  during runtime.  Just to show, that compilation succeeds.
+  that the problem is with an empty observer list
 
 **(2.) is the actual problem where wrong code is generated.**
+  
+==== Some other thing...
+. `make test-O0-fail-link-error` - compiles with '-O0' and generates a link time
+  error I actually do not understand (different story)
+. `make test-O1-fail-with-inline-iter-get` - compiles with '-O1' and fails
+  during runtime.  Just to show, that compilation succeeds.
+
 
 === Environment
 I have tested on Debian with clang 15.0.7.  lld-15 has to be installed as
