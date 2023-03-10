@@ -1,0 +1,66 @@
+== Incorrect code generation in conjunction with linker scripts?
+
+=== Summary
+
+It seems that the optimizer does not consider symbols created during link time under
+certain circumstances.
+
+The problem appeared first in a project during link time optimization.  Digging
+deeper with the test program showed that the problem must be caused by
+the optimizer.
+
+Linker scripts are part of the problem.
+
+
+=== About the test program
+
+The code has been taken more or less from a real life example but very much 
+stripped down: in the Nordic SDK
+observers can be defined in the application for certain events.
+The number of observers is not limited.
+
+Pointers/parameters to the observers are collected in special link section.
+The linker (script) generates `__start` / `__stop` symbols for each segments
+and a function `sdh_observer_notify()` iterates over those sections
+calling the defined observers.  Empty sections (i.e. no observer defined)
+are pretty legal.
+
+In the test program there are two types of observers: `stack_observer` and
+`soc_observer` (names are actually irrelevant).  There are four `stack_observer`
+and no `soc_observer` (except in a special testcase).
+In the test program the observers are doing simple output to stdout.
+
+The program runs successful with '-O0' and fails with '-O1'.  Debugging shows
+that '-O1' has altered the loop in TMO illegal way: the for-loop seems to
+be transformed into a do-while-loop.  So an empty list of observers
+leads to a crash.
+
+=== Testing
+
+==== Actual problem
+. `make test-O0-ok` - compiles with '-O0' and sends some output to the terminal
+. `make test-O1-fail` - compiles with '-O1' and crashes on output of the empty
+  `soc_observer`
+. `make test-O1-ok-with-observer` - compiles with '-O1' successfully to show
+  that the problem is with an empty observer list
+
+**(2.) is the actual problem where wrong code is generated.**
+  
+==== Some other thing...
+. `make test-O0-fail-link-error` - compiles with '-O0' and generates a link time
+  error I actually do not understand (different story)
+. `make test-O1-fail-with-inline-iter-get` - compiles with '-O1' and fails
+  during runtime.  Just to show, that compilation succeeds.
+
+
+=== Environment
+I have tested on Debian with clang 15.0.7.  lld-15 has to be installed as
+well.
+
+NOTE: first I thought that the bug is LTO related.  That's the reason for
+the name of this subdirectory.
+
+=== Bug report
+
+https://github.com/llvm/llvm-project/issues/61173
+
