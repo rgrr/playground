@@ -5,7 +5,7 @@
 
 BUILD_DIR       := _build
 PICO_BOARD      := pico_w
-PROJECT         := boilerplate
+PROJECT         := boilerplate_rp2040
 USE_CLANG       := 1
 
 
