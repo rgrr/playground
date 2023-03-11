@@ -14,9 +14,7 @@ project(${PROJECT} C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-set(BUILD_FOLDER ./_build)
-set(EXECUTABLE ${PROJECT}.elf)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/_build)
+set(PROJECT_ELF ${PROJECT}.elf)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -27,45 +25,44 @@ message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 # List of source files
 set(SRC_FILES
         main.cpp
-        )
+)
 
 # Build the executable based on the source files
-add_executable(${EXECUTABLE} ${SRC_FILES})
+add_executable(${PROJECT_ELF} ${SRC_FILES})
 
 # List of compiler defines, prefix with -D compiler option
-target_compile_definitions(${EXECUTABLE} PRIVATE
-        )
+target_compile_definitions(${PROJECT_ELF} PRIVATE
+)
 
-# List of includ directories
-target_include_directories(${EXECUTABLE} PRIVATE
-        )
+# List of include directories
+target_include_directories(${PROJECT_ELF} PRIVATE
+)
 
 # Compiler options
-target_compile_options(${EXECUTABLE} PRIVATE
+target_compile_options(${PROJECT_ELF} PRIVATE
         --config armv6m_soft_nofp_semihost.cfg
         -fdata-sections
         -ffunction-sections
         -Wall
-        -g3
-        )
+)
 
 # Linker options
-target_link_options(${EXECUTABLE} PRIVATE
+target_link_options(${PROJECT_ELF} PRIVATE
         --config armv6m_soft_nofp_semihost.cfg
-        -T../nrf52840.ld
-        -lc
-        -lm
-        -g3
-        )
+        -fdata-sections
+        -ffunction-sections
+        -T${CMAKE_SOURCE_DIR}/nrf52840.ld
+)
 
 # Optional: Print executable size as part of the post build process
-add_custom_command(TARGET ${EXECUTABLE}
+add_custom_command(TARGET ${PROJECT_ELF}
         POST_BUILD
-        COMMAND ${CMAKE_SIZE_UTIL} ${EXECUTABLE_OUTPUT_PATH}/${EXECUTABLE})
+        COMMAND ${CMAKE_SIZE_UTIL} ${PROJECT}.elf
+)
 
 # Optional: Create hex and bin files after the build
-add_custom_command(TARGET ${EXECUTABLE}
+add_custom_command(TARGET ${PROJECT_ELF}
         POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O ihex "${EXECUTABLE_OUTPUT_PATH}/${EXECUTABLE}" "${EXECUTABLE_OUTPUT_PATH}/${PROJECT}.hex"
-        COMMAND ${CMAKE_OBJCOPY} -O binary "${EXECUTABLE_OUTPUT_PATH}/${EXECUTABLE}" "${EXECUTABLE_OUTPUT_PATH}/${PROJECT}.bin" 
-        )
+        COMMAND ${CMAKE_OBJCOPY} -O ihex   "${PROJECT}.elf" "${PROJECT}.hex"
+        COMMAND ${CMAKE_OBJCOPY} -O binary "${PROJECT}.elf" "${PROJECT}.bin" 
+)
