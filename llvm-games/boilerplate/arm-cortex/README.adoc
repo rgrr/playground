@@ -11,6 +11,10 @@ semihosting of OpenOCD has to be enabled.
 nRF52840 is used as the target.  Only target dependency is within the
 linker file.
 
+For the Pico this kind of bare program isn't that simple, because the Picos
+bootloader expects a certain structure of the program so it's easier to
+rely on the Pico-SDK, see link:../rp2040/README.adoc[RP2040]
+
 Compiler ist clang from 
 https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM-embedded-toolchain-for-Arm]. 
 
