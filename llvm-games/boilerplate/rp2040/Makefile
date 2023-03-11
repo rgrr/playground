@@ -13,7 +13,9 @@ CMAKE_FLAGS += -DPROJECT=$(PROJECT)
 CMAKE_FLAGS += -DPICO_BOARD=$(PICO_BOARD)
 ifeq ($(USE_CLANG),1)
     CMAKE_FLAGS += -DPICO_COMPILER=pico_arm_clang
-    export PICO_TOOLCHAIN_PATH=~/bin/llvm-15.0.2-arm-none-eabi/bin
+    #export PICO_TOOLCHAIN_PATH=~/bin/llvm-15.0.2-arm-none-eabi/bin
+    # currently pico_arm_clang.cmake has to be patched to make this work
+    export PICO_TOOLCHAIN_PATH=~/bin/llvm-arm-none-eabi/bin
 endif
 
 

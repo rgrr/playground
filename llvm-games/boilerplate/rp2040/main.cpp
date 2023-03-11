@@ -45,6 +45,7 @@ int main()
     }
 #endif
     while (true) {
+        printf("-- %u\n", cnt++);
         led(1);
         sleep_ms(250);
         led(0);

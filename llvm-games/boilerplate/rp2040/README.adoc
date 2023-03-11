@@ -15,6 +15,14 @@ Used compiler can be gcc or clang.
 Configuration takes place in the Makefile where `PROJECT`, `PICO_BOARD` and 
 `USE_CLANG` can be set.
 
+[NOTE]
+====
+Configuration for clang needs setup of the proper path in `PICO_TOOLCHAIN_PATH`.
+Default SDK-clang handling will work for https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM-embedded-toolchain-for-Arm]
+until version 15.0.2.  Above the SDKs `cmake/preload/toolchains/pico_arm_clang.cmake`
+has to be modified so that `sysroot --sysroot ${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi/armv6m_soft_nofp`.
+====
+
 
 === Debugging
 For best debugging result, OpenOCD from PlatformIO should be used.  The original
