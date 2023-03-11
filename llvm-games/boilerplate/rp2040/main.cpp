@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <stdio.h>
+#include <stdint.h>
 #include <pico/stdlib.h>
 #ifdef CYW43_LWIP
     #include "pico/cyw43_arch.h"
@@ -32,9 +34,14 @@ static void led(uint8_t state)
 
 int main()
 {
+    uint32_t cnt = 0;
+
+    stdio_init_all();
+    printf("Hello %s\n", PICO_TARGET_NAME);
+
 #ifdef CYW43_LWIP
     if (cyw43_arch_init()) {
-        //printf("failed to initialize WiFi\n");
+        printf("failed to initialize WiFi\n");
     }
 #endif
     while (true) {

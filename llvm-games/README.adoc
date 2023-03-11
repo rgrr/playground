@@ -2,7 +2,7 @@
 
 Here are several things concerning LLVM.
 
-* link:boilerplate.README.adoc[Boilerplate for Embedded Experiments]
+* link:boilerplate/README.adoc[Boilerplate for Embedded Experiments]
 * link:build-llvm/README.adoc[Build (parts of) LLVM for Embedded Targets]
 * link:broken-lto/README.adoc[Broken LTO]
 * link:semihosting/README.adoc[Semihosting]

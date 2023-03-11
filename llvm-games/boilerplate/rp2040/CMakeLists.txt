@@ -24,7 +24,9 @@ add_executable(${PROJECT}
 )
 
 
-target_link_libraries(${PROJECT} PRIVATE pico_stdlib)
+target_link_libraries(${PROJECT} PRIVATE pico_stdlib hardware_uart)
+
+pico_enable_stdio_uart(${PROJECT} 1)
 
 if(PICO_BOARD STREQUAL "pico_w")
     target_link_libraries(${PROJECT} PRIVATE

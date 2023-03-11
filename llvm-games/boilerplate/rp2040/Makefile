@@ -52,5 +52,6 @@ flash: all
 	openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
 
 
+.PHONY: $(BUILD_DIR)/$(PROJECT).elf
 $(BUILD_DIR)/$(PROJECT).elf:
 	ninja -C $(BUILD_DIR) -v all

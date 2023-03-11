@@ -1,0 +1,26 @@
+== Boilerplate for RP2040 Experiments
+
+=== Links
+* https://github.com/raspberrypi/pico-sdk
+* RTT is close: https://github.com/raspberrypi/pico-sdk/pull/775
+
+
+=== Example Project
+The example project initializes stdio, prints out a message and does some
+LED blinking.  Selected board can be either `pico` or `pico_w`.
+Used compiler can be gcc or clang.
+
+
+=== Configuration
+Configuration takes place in the Makefile where `PROJECT`, `PICO_BOARD` and 
+`USE_CLANG` can be set.
+
+
+=== Debugging
+For best debugging result, OpenOCD from PlatformIO should be used.  The original
+OpenOCD (0.12) has some issues with the dual cores of the RP2040.
+
+Debug configuration in Eclipse thus uses on my machine the OpenOCD path
+`~/.platformio/packages/tool-openocd-rp2040-earlephilhower/bin/openocd`
+and `-s ~/.platformio/packages/tool-openocd-rp2040-earlephilhower/share/openocd/scripts -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 8000"`
+in the configuration options.
