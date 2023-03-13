@@ -5,5 +5,5 @@
 * https://github.com/fredrikasberg/pico_boilerplate
 
 === Subdirectories
-There are boilerplates for the link:rp2040/README.adoc[RP2040] and one which only depends
-on link:arm-cortex/README.adoc[ARM-Cortex-Mx].
+There are boilerplates for the link:rp2040[RP2040] and one which only depends
+on link:arm-cortex[ARM-Cortex-Mx].

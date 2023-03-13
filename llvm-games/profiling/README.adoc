@@ -1,0 +1,20 @@
+== Profiling on the Embedded Target
+
+=== Links
+* https://wiki.segger.com/Semihosting
+* https://mcuoneclipse.com/2023/03/09/using-semihosting-the-direct-way/
+* https://github.com/picolibc/picolibc
+
+
+=== Remarks
+First compilation trials fail, because `__llvm_profile_runtime` cannot be found.
+It seems, that `libclang_rt.profile-*.a` is missing / not built.  One common file
+for the compiler and the runtime is `InstrProfData.inc`.
+
+
+=== Toolchain
+https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
+is used.  This includes Picolib which knows semihosting.
+
+
+=== Example
