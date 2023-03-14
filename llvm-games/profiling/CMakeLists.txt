@@ -25,6 +25,12 @@ message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 # List of source files
 set(SRC_FILES
         main.cpp
+        profiling/InstrProfiling.c
+        profiling/InstrProfilingBuffer.c
+        profiling/InstrProfilingInternal.c
+        profiling/InstrProfilingPlatformOther.c
+        profiling/InstrProfilingVersionVar.c
+        profiling/InstrProfilingWriter.c
 )
 
 # Build the executable based on the source files

@@ -16,7 +16,7 @@ Mirror of the repo can be found at https://github.com/rgrr/playground[github].
 
 
 == Games
-Games should not be understood literally... instead these are finger exercises for the software developer.
+Games should not be understood literally... instead these are finger exercises for the (embedded) software developer.
 
 The following exercises are targeted:
 
