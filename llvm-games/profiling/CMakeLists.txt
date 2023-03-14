@@ -22,15 +22,11 @@ set(CMAKE_C_EXTENSIONS OFF)
 # Optional: issue a message to be sure it uses the correct toolchain file.
 message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 
+add_subdirectory(profiling)
+
 # List of source files
 set(SRC_FILES
         main.cpp
-        profiling/InstrProfiling.c
-        profiling/InstrProfilingBuffer.c
-        profiling/InstrProfilingInternal.c
-        profiling/InstrProfilingPlatformOther.c
-        profiling/InstrProfilingVersionVar.c
-        profiling/InstrProfilingWriter.c
 )
 
 # Build the executable based on the source files
@@ -47,17 +43,24 @@ target_include_directories(${PROJECT_ELF} PRIVATE
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
         --config armv6m_soft_nofp_semihost.cfg
-        -fdata-sections -ffunction-sections
+        #-fdata-sections -ffunction-sections
         -fprofile-instr-generate -fcoverage-mapping
+        -g3 -O0
         -Wall
+)
+
+target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+        rt-profile
 )
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
         --config armv6m_soft_nofp_semihost.cfg
-        -fdata-sections -ffunction-sections
+        #-fdata-sections -ffunction-sections
         -fprofile-instr-generate -fcoverage-mapping
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
+        -Wl,-Map=${PROJECT_ELF}.map
+        -g3 -O0
         -v
 )
 
