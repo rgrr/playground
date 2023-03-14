@@ -1,8 +1,9 @@
 add_library(rt-profile 
         InstrProfiling.c
-        InstrProfilingBuffer.c
+        InstrProfilingFileOther.c
         InstrProfilingInternal.c
         InstrProfilingPlatformOther.c
+        InstrProfilingRuntime.cpp
         InstrProfilingVersionVar.c
         InstrProfilingWriter.c
 )
