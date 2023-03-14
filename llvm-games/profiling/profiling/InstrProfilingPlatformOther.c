@@ -6,10 +6,6 @@
 |*
 \*===----------------------------------------------------------------------===*/
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(__FreeBSD__) &&     \
-    !defined(__Fuchsia__) && !(defined(__sun__) && defined(__svr4__)) &&       \
-    !defined(__NetBSD__) && !defined(_WIN32) && !defined(_AIX)
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -106,4 +102,6 @@ COMPILER_RT_VISIBILITY int __llvm_write_binary_ids(ProfDataWriter *Writer) {
   return 0;
 }
 
-#endif
+// TODO not sure about this
+int INSTR_PROF_PROFILE_RUNTIME_VAR = 1;
+
