@@ -11,6 +11,13 @@ First compilation trials fail, because `__llvm_profile_runtime` cannot be found.
 It seems, that `libclang_rt.profile-*.a` is missing / not built.  One common file
 for the compiler and the runtime is `InstrProfData.inc`.
 
+It seems that there is no generic approach for `libclang_rt.profile`, so our
+own version has to be provided which can be found link:profiling[here]. 
+
+
+=== XRay
+For time based measurements XRay instrumentation could be used, see https://llvm.org/docs/XRay.html
+
 
 === Toolchain
 https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
