@@ -28,6 +28,7 @@ Minor configuration takes place in `Makefile`.
 
 
 === Debugging
+==== OpenOCD / RP2040
 For best debugging result, OpenOCD from PlatformIO should be used.  The original
 OpenOCD (0.12) has some issues with the dual cores of the RP2040.
 
@@ -41,4 +42,13 @@ Semihosting must be enabled for the example to work.
 [NOTE]
 ====
 Output speed is perhaps not as expected, actually low speed.
+But output speed can be increased by using your own `printf()` which outputs
+blocks and not just characters.
 ====
+
+
+==== pyOCD / nRF52840
+pyOCD gives much better performance for semihosting.  Take care to select the correct chip, 
+otherwise no breakpoints will work.
+
+But if `write(STDOUT_FILENO,...)` is chosen for output, then nothing appears.
