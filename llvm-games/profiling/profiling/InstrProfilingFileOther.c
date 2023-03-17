@@ -21,13 +21,13 @@
 static uint32_t fileWriter(ProfDataWriter *This, ProfDataIOVec *IOVecs, uint32_t NumIOVecs)
 {
     uint32_t I;
-    FILE *File = (FILE *)This->WriterCtx;
+    int fd = (int)This->WriterCtx;
     char Zeroes[sizeof(uint64_t)] = {0};
     for (I = 0; I < NumIOVecs; I++)
     {
         if (IOVecs[I].Data)
         {
-            if (fwrite(IOVecs[I].Data, IOVecs[I].ElmSize, IOVecs[I].NumElm, File) != IOVecs[I].NumElm)
+            if (write(fd, IOVecs[I].Data, IOVecs[I].ElmSize * IOVecs[I].NumElm) != IOVecs[I].ElmSize * IOVecs[I].NumElm)
                 return 1;
         }
         else if (IOVecs[I].UseZeroPadding)
@@ -36,7 +36,7 @@ static uint32_t fileWriter(ProfDataWriter *This, ProfDataIOVec *IOVecs, uint32_t
             while (BytesToWrite > 0)
             {
                 size_t PartialWriteLen = (sizeof(uint64_t) > BytesToWrite) ? BytesToWrite : sizeof(uint64_t);
-                if (fwrite(Zeroes, sizeof(uint8_t), PartialWriteLen, File) != PartialWriteLen)
+                if (write(fd, Zeroes, PartialWriteLen) != PartialWriteLen)
                 {
                     return 1;
                 }
@@ -45,7 +45,7 @@ static uint32_t fileWriter(ProfDataWriter *This, ProfDataIOVec *IOVecs, uint32_t
         }
         else
         {
-            if (fseek(File, IOVecs[I].ElmSize * IOVecs[I].NumElm, SEEK_CUR) == -1)
+            if (lseek(fd, IOVecs[I].ElmSize * IOVecs[I].NumElm, SEEK_CUR) == -1)
                 return 1;
         }
     }
@@ -54,11 +54,11 @@ static uint32_t fileWriter(ProfDataWriter *This, ProfDataIOVec *IOVecs, uint32_t
 
 
 
-static void initFileWriter(ProfDataWriter *This, FILE *File)
+static void initFileWriter(ProfDataWriter *This, int fd)
 {
-  This->Write = fileWriter;
-  This->WriterCtx = File;
-}
+    This->Write = fileWriter;
+    This->WriterCtx = (void *)fd;
+}   // initFileWriter
 
 
 
@@ -71,13 +71,13 @@ void __llvm_profile_initialize_file(void)
 int __llvm_profile_write_file(void)
 {
     ProfDataWriter fileWriter;
-    FILE *f;
+    int fd;
     int r;
 
-    f = fopen(FILE_NAME, "wb");
-    initFileWriter(&fileWriter, f);
+    fd = open(FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    initFileWriter(&fileWriter, fd);
     r = lprofWriteData(&fileWriter, 0, 0);
-    fclose(f);
+    close(fd);
     return r;
 }   // __llvm_profile_write_file
 
