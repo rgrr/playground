@@ -52,3 +52,7 @@ pyOCD gives much better performance for semihosting.  Take care to select the co
 otherwise no breakpoints will work.
 
 But if `write(STDOUT_FILENO,...)` is chosen for output, then nothing appears.
+Writing to "fd=2" does the output.
+
+See https://github.com/pyocd/pyOCD/issues/1515.
+

@@ -28,7 +28,11 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
     va_start(arglist, format);
     vsnprintf(buf, sizeof(buf), format, arglist);
     va_end(arglist);
+#ifdef F_PYOCD
+    write(2, buf, strlen(buf));
+#else
     write(STDOUT_FILENO, buf, strlen(buf));
+#endif
 }   // _printf
 
 
