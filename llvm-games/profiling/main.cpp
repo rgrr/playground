@@ -18,6 +18,7 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
  /**
   * With this printf helper semihosting output is much faster because then blocks and not characters
   * are written.
+  * \note pyocd needs "2" as the file descriptor.
   */
 {
     static char buf[128];
@@ -29,6 +30,9 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
     write(STDOUT_FILENO, buf, strlen(buf));
 }   // _printf
 
+
+
+extern "C" int __llvm_profile_write_buffer(char *Buffer);
 
 
 int main()
@@ -62,5 +66,12 @@ int main()
     _printf("r=%d\n", r);
     r = close(f);
     _printf("r=%d\n", r);
+#endif
+#if 0
+    {
+        static char out[4096];
+        r = __llvm_profile_write_buffer(out);
+        _printf("r=%d\n", r);
+    }
 #endif
 }   // main
