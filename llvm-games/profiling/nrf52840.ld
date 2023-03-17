@@ -125,6 +125,7 @@ SECTIONS
 	} >flash AT>flash :text
 	*/
 
+/*
 	.except_unordered : {
 		. = ALIGN(8);
 
@@ -132,10 +133,12 @@ SECTIONS
 		*(.ARM.exidx*)
 		PROVIDE(__exidx_end = .);
 	} >flash AT>flash :text
+	*/
 
     /*
      * llvm profiling sections
      */
+     /*
     /DISCARD/ :
     {
         *(__llvm_covmap)
@@ -147,14 +150,15 @@ SECTIONS
         PROVIDE(__start_llvm_prf_names = .);
         KEEP(*(__llvm_prf_names))
         PROVIDE(__stop_llvm_prf_names = .);
-    } >flash
+    } >flash AT>flash :text
     
     .llvm_prf_data :
     {
         PROVIDE(__start_llvm_prf_data = .);
         KEEP(*(__llvm_prf_data))
         PROVIDE(__stop_llvm_prf_data = .);
-    } >flash
+    } >flash AT>flash :text
+    */
 
 	/*
 	 * Data values which are preserved across reset
@@ -241,12 +245,14 @@ SECTIONS
     /*
      * llvm profiling counter (must be within __bss_start__ and __bss_end__ to get cleared on startup
      */
+     /*
     .llvm_prf_cnts :
     {
         PROVIDE(__start_llvm_prf_cnts = .);
         KEEP(*(__llvm_prf_cnts))
         PROVIDE(__stop_llvm_prf_cnts = .);
-    } > ram
+    } >ram AT>ram :ram
+    */
     
 	.bss (NOLOAD) : {
 		*(.sbss*)
