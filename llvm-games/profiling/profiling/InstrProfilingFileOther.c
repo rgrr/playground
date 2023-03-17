@@ -13,7 +13,7 @@
 
 
 
-#define FILE_NAME   "llvm-games/profiling/default.profraw"
+#define FILE_NAME   "default.profraw"
 
 
 

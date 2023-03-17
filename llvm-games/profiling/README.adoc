@@ -28,7 +28,7 @@ is used.  This includes Picolib which knows semihosting.
 ```bash
 # compile & run, output must be in default.profraw
 
-~/bin/clang-arm-none-eabi/bin/llvm-profdata merge -sparse default.profraw -o main.profdata
+~/bin/clang-arm-none-eabi/bin/llvm-profdata merge -sparse ../../default.profraw -o main.profdata
 
 ~/bin/clang-arm-none-eabi/bin/llvm-cov show $(find _build/CMakeFiles -iname "*.obj") -instr-profile=main.profdata
 ```
