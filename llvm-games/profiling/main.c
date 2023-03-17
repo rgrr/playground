@@ -32,7 +32,7 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
 
 
 
-extern "C" int __llvm_profile_write_buffer(char *Buffer);
+int __llvm_profile_write_buffer(char *Buffer);
 
 
 int main()

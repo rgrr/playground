@@ -26,7 +26,7 @@ add_subdirectory(profiling)
 
 # List of source files
 set(SRC_FILES
-        main.cpp
+        main.c
 )
 
 # Build the executable based on the source files
@@ -45,7 +45,7 @@ target_compile_options(${PROJECT_ELF} PRIVATE
         --config armv6m_soft_nofp_semihost.cfg
         #-fdata-sections -ffunction-sections
         -fprofile-instr-generate -fcoverage-mapping
-        -g3 -O0
+        -v
         -Wall
 )
 
@@ -60,7 +60,6 @@ target_link_options(${PROJECT_ELF} PRIVATE
         -fprofile-instr-generate -fcoverage-mapping
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
         -Wl,-Map=${PROJECT_ELF}.map
-        -g3 -O0
         -v
 )
 
