@@ -17,14 +17,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(PROJECT_ELF ${PROJECT}.elf)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_EXTENSIONS        OFF)
 
 # Optional: issue a message to be sure it uses the correct toolchain file.
 message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 
 # List of source files
 set(SRC_FILES
-        main.cpp
+        main.c
 )
 
 # Build the executable based on the source files
@@ -38,20 +38,50 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 target_include_directories(${PROJECT_ELF} PRIVATE
 )
 
+########################################################################################################################
+#
+# Some configurations
+#
+#
+if(0)
+    # profiling function from here
+    add_subdirectory(profiling)
+    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+            rt-profile
+    )
+else()
+    # profiling function from generated libclang_rt.profile.a
+    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+            clang_rt.profile
+    )
+endif()
+
+#
+# if no semihosting is used, __llvm_profile_write_file() must be called at end of main()
+# use either armv6m_soft_nofp_semihost.cfg or armv6m_soft_nofp.cfg
+#
+set(CONFIG armv6m_soft_nofp_semihost.cfg)
+
+#
+########################################################################################################################
+
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
-        --config armv6m_soft_nofp_semihost.cfg
-        -fdata-sections
-        -ffunction-sections
+        --config ${CONFIG}
+        -fdata-sections -ffunction-sections
+        -fprofile-instr-generate -fcoverage-mapping
+        -v
         -Wall
 )
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config armv6m_soft_nofp_semihost.cfg
-        -fdata-sections
-        -ffunction-sections
+        --config ${CONFIG}
+        -fdata-sections -ffunction-sections
+        -fprofile-instr-generate -fcoverage-mapping
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
+        -Wl,-Map=${PROJECT_ELF}.map
+        -v
 )
 
 # Optional: Print executable size as part of the post build process

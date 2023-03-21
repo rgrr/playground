@@ -11,9 +11,16 @@ semihosting of OpenOCD has to be enabled.
 nRF52840 is used as the target.  Only target dependency is within the
 linker file.
 
+For the Pico this kind of bare program isn't that simple, because the Picos
+bootloader expects a certain structure of the program so it's easier to
+rely on the Pico-SDK, see link:../rp2040[RP2040]
+
 Compiler ist clang from 
 https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM-embedded-toolchain-for-Arm]. 
 
+=== TODO
+* program should run without debugger attached
+* boilerplate with RTT
 
 
 === Configuration
@@ -21,6 +28,7 @@ Minor configuration takes place in `Makefile`.
 
 
 === Debugging
+==== OpenOCD / RP2040
 For best debugging result, OpenOCD from PlatformIO should be used.  The original
 OpenOCD (0.12) has some issues with the dual cores of the RP2040.
 
@@ -34,4 +42,17 @@ Semihosting must be enabled for the example to work.
 [NOTE]
 ====
 Output speed is perhaps not as expected, actually low speed.
+But output speed can be increased by using your own `printf()` which outputs
+blocks and not just characters.
 ====
+
+
+==== pyOCD / nRF52840
+pyOCD gives much better performance for semihosting.  Take care to select the correct chip, 
+otherwise no breakpoints will work.
+
+But if `write(STDOUT_FILENO,...)` is chosen for output, then nothing appears.
+Writing to "fd=2" does the output.
+
+See https://github.com/pyocd/pyOCD/issues/1515.
+

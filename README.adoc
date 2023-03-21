@@ -6,14 +6,17 @@
 This is mailto:reinhard.griech@endress.com[Hardy's, Playground on egit] personal playground.
 But everyone is free to contribute.
 
+Mirror of the repo can be found at https://github.com/rgrr/playground[github].
+
 
 == Playground
 
-* link:cpp/README.adoc[C/C++]
+* link:cpp[C/C++]
+* link:rp2040[RP2040 stuff]
 
 
 == Games
-Games should not be understood literally... instead these are finger exercises for the software developer.
+Games should not be understood literally... instead these are finger exercises for the (embedded) software developer.
 
 The following exercises are targeted:
 
@@ -26,7 +29,7 @@ The following exercises are targeted:
 .. Boost
 
 === Unittesting
-. GoogleTest [link:cpp/unittest/README.adoc[subdir]]
+. GoogleTest [link:cpp/unittest[subdir]]
 .. introduction with a simple example
 .. mocking
 . test driven development with a simple bag module
@@ -51,7 +54,7 @@ The following exercises are targeted:
 .. and the corresponding https://en.wikibooks.org/wiki/C%2B%2B_Programming[C++ Programming] book
 
 === LLVM
-Several topics concerning link:llvm-games/README.adoc[LLVM].
+Several topics concerning link:llvm-games[LLVM].
 
 
 [[setup-eclipse]]

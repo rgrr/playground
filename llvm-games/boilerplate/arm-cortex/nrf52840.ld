@@ -35,10 +35,11 @@
 
 ENTRY(_start)
 
-/*
- * These values should be provided by the application. We'll include
- * some phony values here to make things link for testing
- */
+/********************************************************************************
+ *
+ * THIS FILE IS ACTUALLY picolibc.ld EXCEPT THAT THE MEMORY MAPPING IS DIFFERENT
+ *
+ ********************************************************************************/
 
 MEMORY
 {
