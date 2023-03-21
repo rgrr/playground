@@ -1,22 +1,21 @@
 == Profiling on the Embedded Target
 
 === Links
-* https://wiki.segger.com/Semihosting
-* https://mcuoneclipse.com/2023/03/09/using-semihosting-the-direct-way/
-* https://github.com/picolibc/picolibc
+* https://wiki.segger.com/Semihosting[Segger Semihosting]
+* https://mcuoneclipse.com/2023/03/09/using-semihosting-the-direct-way/[Using Semihosting the Direct Way]
+* https://github.com/picolibc/picolibc[picolibc on github]
+* https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
 
 
-=== Remarks
-First compilation trials fail, because `__llvm_profile_runtime` cannot be found.
-It seems, that `libclang_rt.profile-*.a` is missing / not built.  One common file
-for the compiler and the runtime is `InstrProfData.inc`.
+=== Profiling
+Simple test program which demonstrates profiling.  Coverage data is written to the host via semihosting.
 
-It seems that there is no generic approach for `libclang_rt.profile`, so our
-own version has to be provided which can be found link:profiling[here]. 
+The test program
 
-
-=== XRay
-For time based measurements XRay instrumentation could be used, see https://llvm.org/docs/XRay.html
+* provides it own set of profiling runtime to allow a look under the hood and
+  to allow testing of the profiling runtime
+* uses libclang_rt.profile.a provided by
+  https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
 
 
 === Toolchain
