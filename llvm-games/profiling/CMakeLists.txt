@@ -38,7 +38,12 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 target_include_directories(${PROJECT_ELF} PRIVATE
 )
 
-if(1)
+########################################################################################################################
+#
+# Some configurations
+#
+#
+if(0)
     # profiling function from here
     add_subdirectory(profiling)
     target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
@@ -51,8 +56,14 @@ else()
     )
 endif()
 
+#
 # if no semihosting is used, __llvm_profile_write_file() must be called at end of main()
-set(CONFIG armv6m_soft_nofp.cfg)
+# use either armv6m_soft_nofp_semihost.cfg or armv6m_soft_nofp.cfg
+#
+set(CONFIG armv6m_soft_nofp_semihost.cfg)
+
+#
+########################################################################################################################
 
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE

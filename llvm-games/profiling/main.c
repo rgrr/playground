@@ -21,6 +21,7 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
   * \note pyocd needs "2" as the file descriptor.
   */
 {
+#if 1
     static char buf[128];
     va_list arglist;
 
@@ -28,21 +29,24 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
     vsnprintf(buf, sizeof(buf), format, arglist);
     va_end(arglist);
     write(STDOUT_FILENO, buf, strlen(buf));
+#endif
 }   // _printf
 
 
 
-int __llvm_profile_write_buffer(char *Buffer);
+extern int __llvm_profile_write_buffer(char *Buffer);
+extern int __llvm_profile_write_file(void);
 
 
 int main()
 {
     uint32_t cnt = 0;
 
-    for (int i = 0;  i < 2;  ++i) {
+    for (int i = 0;  i < 97;  ++i) {
         _printf("-- %u\n", cnt++);
     }
 
+#if 0
     static const uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 #if 0
     FILE *f;
@@ -67,6 +71,7 @@ int main()
     r = close(f);
     _printf("r=%d\n", r);
 #endif
+#endif
 #if 0
     {
         static char out[4096];
@@ -74,4 +79,5 @@ int main()
         _printf("r=%d\n", r);
     }
 #endif
+    __llvm_profile_write_file();
 }   // main
