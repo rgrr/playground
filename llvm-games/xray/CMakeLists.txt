@@ -60,8 +60,26 @@ target_include_directories(${PROJECT_ELF} PRIVATE
 # if no semihosting is used, __llvm_profile_write_file() must be called at end of main()
 # use either armv6m_soft_nofp_semihost.cfg or armv6m_soft_nofp.cfg
 #
-set(CONFIG armv6m_soft_nofp_semihost.cfg)
-set(XRAY_CONFIG)
+set(CONFIG armv7em_soft_nofp_semihost.cfg)
+
+# -> __cyg_profile_func_enter() and __cyg_profile_func_exit()
+# Instrument device library for HIP, which is a LLVM bitcode containing __cyg_profile_func_enter and __cyg_profile_func_exit
+set(XRAY_CONFIG -finstrument-functions)
+
+# -> __cyg_profile_func_enter_bare()
+#set(XRAY_CONFIG -finstrument-function-entry-bare)
+
+# -> nothing required!?
+#set(XRAY_CONFIG -pg)
+
+# regular profiling
+#set(XRAY_CONFIG -fprofile-instr-generate -fcoverage-mapping)
+
+# -> does not work for thumb
+#set(XRAY_CONFIG -fxray-instrument)
+
+# -> does not work
+#set(XRAY_CONFIG -p)
 
 #
 ########################################################################################################################

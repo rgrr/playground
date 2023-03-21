@@ -14,7 +14,7 @@
 
 
 
-__attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
+__attribute__((no_instrument_function)) __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
  /**
   * With this printf helper semihosting output is much faster because then blocks and not characters
   * are written.
@@ -34,12 +34,30 @@ __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
 
 
 
+__attribute__((no_instrument_function)) void __cyg_profile_func_enter(void *this_fn, void *call_site)
+{
+    _printf("[+] %p %p\n", this_fn, call_site);
+}
+
+
+__attribute__((no_instrument_function)) void __cyg_profile_func_exit(void *this_fn, void *call_site)
+{
+    _printf("[-] %p %p\n", this_fn, call_site);
+}
+
+
+
 int main()
 {
     uint32_t cnt = 0;
 
-    for (int i = 0;  i < 17;  ++i) {
+    for (int i = 0;  i < 3;  ++i) {
         _printf("-- %u\n", cnt++);
+    }
+
+    for (int i = 0;  i < 7;  ++i) {
+        _printf("-- %u\n", cnt);
+        cnt *= 2;
     }
 
 #if 0
