@@ -1,0 +1,35 @@
+== Profiling on the Embedded Target
+
+=== Links
+* https://wiki.segger.com/Semihosting[Segger Semihosting]
+* https://mcuoneclipse.com/2023/03/09/using-semihosting-the-direct-way/[Using Semihosting the Direct Way]
+* https://github.com/picolibc/picolibc[picolibc on github]
+* https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
+
+
+=== Profiling
+Simple test program which demonstrates profiling.  Coverage data is written to the host via semihosting.
+
+The test program
+
+* provides it own set of profiling runtime to allow a look under the hood and
+  to allow testing of the profiling runtime
+* uses libclang_rt.profile.a provided by
+  https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
+
+
+=== Toolchain
+https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
+is used.  This includes Picolib which knows semihosting.
+
+
+=== Example
+```bash
+# compile & run, output must be in default.profraw
+
+~/bin/clang-arm-none-eabi/bin/llvm-profdata show ../../default.profraw --all-functions -counts
+
+~/bin/clang-arm-none-eabi/bin/llvm-profdata merge -sparse ../../default.profraw -o main.profdata
+
+~/bin/clang-arm-none-eabi/bin/llvm-cov show $(find _build -iname "*.elf") -instr-profile=main.profdata
+```

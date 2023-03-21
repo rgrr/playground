@@ -2,5 +2,7 @@
 
 Here are several things concerning LLVM.
 
-* link:build-llvm/README.adoc[Build (parts of) LLVM for Embedded Targets]
-* link:broken-lto/README.adoc[Broken LTO]
+* link:boilerplate[Boilerplate for Embedded Experiments]
+* link:build-llvm[Build (parts of) LLVM for Embedded Targets]
+* link:broken-lto[Broken LTO]
+* link:profiling[Profiling]

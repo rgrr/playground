@@ -77,6 +77,7 @@ diff -p -r1.1 ./CMakeLists.txt
 
 * fetch https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm.git
 * patch as above
+* `export CC=clang-15 && export CXX=clang++-15`
 * `mkdir build && cd build && cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF`
 * `ninja llvm-toolchain`
 * `ninja package-llvm-toolchain`
