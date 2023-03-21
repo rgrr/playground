@@ -1,0 +1,10 @@
+== XRay
+
+=== Links
+* https://llvm.org/docs/XRay.html
+
+Some XRay experiments.
+
+For time based measurements XRay instrumentation could be used, see 
+
+
