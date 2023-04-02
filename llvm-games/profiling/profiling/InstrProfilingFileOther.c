@@ -66,7 +66,7 @@ static inline uintptr_t __attribute__ ((always_inline)) prf_sys_semihost(uintptr
             "bkpt    0xab       \n"
             : "=r" (r0)                                /* output */
             : "r" (r0), "r" (r1)                       /* inputs */
-            : "r2", "r3", "ip", "lr", "memory", "cc"   /* clobber */
+            //: "r2", "r3", "ip", "lr", "memory", "cc"   /* clobber */
     );
     return r0;
 }   // prf_sys_semihost
