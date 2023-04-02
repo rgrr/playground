@@ -39,6 +39,7 @@ static void _Delay(int period)
 #else
     /**
      * Uses stdout handler from picolic
+     * See https://github.com/picolibc/picolibc/blob/main/doc/os.md
      */
 
     #include <stdio.h>

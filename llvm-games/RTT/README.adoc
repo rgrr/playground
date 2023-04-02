@@ -10,6 +10,6 @@
 === Varianten
 
 * SEGGER-Funktionen direkt aufrufen
-* stdout-Handler von picolibc verwenden
+* stdout-Handler von picolibc verwenden, siehe https://github.com/picolibc/picolibc/blob/main/doc/os.md
 
 Ausgewählt werden die beiden Methoden direkt in main.cpp.
