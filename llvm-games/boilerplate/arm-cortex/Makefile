@@ -5,7 +5,6 @@
 
 BUILD_DIR       := _build
 PROJECT         := boilerplate_generic
-USE_CLANG       := 1
 
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
