@@ -67,7 +67,7 @@ int main()
     {
         static char out[4096];
         r = __llvm_profile_write_buffer(out);
-        _printf("r=%d\n", r);
+        _printf("r=%d (__llvm_profile_write_buffer)\n", r);
     }
 #endif
 

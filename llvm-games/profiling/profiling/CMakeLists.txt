@@ -1,7 +1,7 @@
 add_library(rt-profile 
         InstrProfiling.c
         InstrProfilingBuffer.c
-        InstrProfilingFileOther.c
+        InstrProfilingFileSemihosting.c
         InstrProfilingInternal.c
         InstrProfilingVersionVar.c
         InstrProfilingWriter.c
