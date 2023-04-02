@@ -7,5 +7,9 @@
 * https://mcuoneclipse.com/2015/07/07/using-segger-real-time-terminal-rtt-with-eclipse/
 * https://github.com/adfernandes/segger-rtt
 
+=== Varianten
 
+* SEGGER-Funktionen direkt aufrufen
+* stdout-Handler von picolibc verwenden
 
+Ausgewählt werden die beiden Methoden direkt in main.cpp.

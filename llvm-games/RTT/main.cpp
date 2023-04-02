@@ -19,14 +19,54 @@ static void _Delay(int period)
 
 
 
-int main(void)
-{
-    uint32_t cnt = 0;
+#if 0
+    /**
+     * Directly call the SEGGER functions.
+     */
 
-    do {
-        //SEGGER_RTT_WriteString(0, "__Hello World from SEGGER!\n");
-        SEGGER_RTT_printf(0, "Hello %d\n", ++cnt);
-        _Delay(1);
-    } while (1);
-    return 0;
-}
+    int main(void)
+    {
+        uint32_t cnt = 0;
+
+        do {
+            SEGGER_RTT_printf(0, "Hello, veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long line %d\n", ++cnt);
+            _Delay(50);
+        } while (1);
+        return 0;
+    }
+
+
+#else
+    /**
+     * Uses stdout handler from picolic
+     */
+
+    #include <stdio.h>
+
+
+    static int rtt_putc(char c, FILE *file)
+    {
+        (void) file;
+        SEGGER_RTT_Write(0, &c, 1);
+        return c;
+    }
+
+
+    static FILE __stdio = FDEV_SETUP_STREAM(rtt_putc, NULL, NULL, _FDEV_SETUP_WRITE);
+
+    FILE *const stdout = &__stdio;
+
+
+    int main(void)
+    {
+        uint32_t cnt = 0;
+
+        do {
+            printf("Hello, veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long line %d\n", ++cnt);
+            _Delay(50);
+        } while (1);
+        return 0;
+    }
+
+
+#endif
