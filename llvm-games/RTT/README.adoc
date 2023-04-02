@@ -1,0 +1,11 @@
+== RTT
+
+=== Links
+* https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer
+* https://wiki.segger.com/RTT
+* https://mcuoneclipse.com/2022/09/04/tutorial-creating-bare-bare-embedded-projects-with-cmake-with-eclipse-included/
+* https://mcuoneclipse.com/2015/07/07/using-segger-real-time-terminal-rtt-with-eclipse/
+* https://github.com/adfernandes/segger-rtt
+
+
+

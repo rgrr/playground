@@ -1,0 +1,11 @@
+add_library(RTT
+        RTT/SEGGER_RTT_printf.c
+        RTT/SEGGER_RTT.c
+        RTT/SEGGER_RTT_ASM_ARMv7M.S
+)
+
+target_compile_options(RTT PRIVATE
+        --config armv7em_soft_nofp.cfg
+        -fdata-sections -ffunction-sections
+        -Wall
+)
