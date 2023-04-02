@@ -8,7 +8,7 @@ add_library(rt-profile
 )
 
 target_compile_options(rt-profile PRIVATE
-        --config armv6m_soft_nofp_semihost.cfg
+        --config armv7em_soft_nofp_semihost.cfg
         -fdata-sections -ffunction-sections
         -Wall
 )

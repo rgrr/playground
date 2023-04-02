@@ -43,10 +43,18 @@ target_include_directories(${PROJECT_ELF} PRIVATE
 # Some configurations
 #
 #
-# profiling function from generated libclang_rt.profile.a
-target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-        clang_rt.profile
-)
+if(1)
+    # profiling function from here
+    add_subdirectory(profiling)
+    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+            rt-profile
+    )
+else()
+    # profiling function from generated libclang_rt.profile.a
+    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+            clang_rt.profile
+    )
+endif()
 
 #
 # if no semihosting is used, __llvm_profile_write_file() must be called at end of main()
