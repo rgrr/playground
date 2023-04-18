@@ -34,6 +34,10 @@ __attribute__((no_instrument_function)) __attribute__ ((format (printf, 1, 2))) 
 
 
 
+//
+// this_fn holds the exact address of the current function, which may be looked up in the symbol table
+// (https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html)
+//
 __attribute__((no_instrument_function)) void __cyg_profile_func_enter(void *this_fn, void *call_site)
 {
     _printf("[+] %p %p\n", this_fn, call_site);

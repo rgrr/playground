@@ -63,8 +63,10 @@ static void _Delay(int period)
         uint32_t cnt = 0;
 
         do {
-            printf("Hello, veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long line %d\n", ++cnt);
-            _Delay(50);
+            printf("äöüÄÖÜßµ@€′¹²³¼½¬{[]}\\☻💋★ Helloho, veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long line %d\r\n", ++cnt);
+            _Delay(28);
+            if (cnt % 8 == 0)
+                _Delay(235);
         } while (1);
         return 0;
     }
