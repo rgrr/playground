@@ -15,7 +15,6 @@ from pyocd.core.helpers import ConnectHelper
 from pyocd.core.target import Target
 from pyocd.debug.elf.symbols import ELFSymbolProvider
 from pyocd.flash.file_programmer import FileProgrammer
-from pyocd.debug import semihost
 import time
 
 import traceback
@@ -23,39 +22,25 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-image_name = "../../llvm-games/profiling/_build/profiling.elf"
+image_name = "../../llvm-games/RTT/_build/RTT.elf"
 
 
-def wait_for_halt(target, semihost):
+def wait_for_halt(target):
     go_on = True
     while go_on:
         state = target.get_state()
         if state == Target.State.HALTED:
-            try:
-                # Handle semihosting
-                go_on = semihost.check_and_handle_semihost_request()
-                if go_on:
-                    # target was halted due to semihosting request
-                    target.resume()
-            except Exception as e:
-                print("semihost exception/resume------", e)
-                print(traceback.format_exc())
-                target.resume()
-                go_on = True
+            go_on = False
         else:
             time.sleep(0.01)
 
     
-session = ConnectHelper.session_with_chosen_probe(unique_id = "E6614103E7176A23", options = {"frequency": 4000000, 
-                                                                                             "target_override": "nrf52840",
-                                                                                             "enable_semihosting": True,
-                                                                                             "semihost_use_syscalls": False})
+session = ConnectHelper.session_with_chosen_probe(unique_id = "E6616407E3646B29", options = {"frequency": 4000000, 
+                                                                                             "target_override": "nrf52840"})
 
 with session:
     target = session.target
     target_context = target.get_target_context()
-    semihost_io_handler = semihost.InternalSemihostIOHandler()
-    semihost = semihost.SemihostAgent(target_context, io_handler=semihost_io_handler, console=semihost_io_handler)
 
     # Load firmware into device.
     FileProgrammer(session).program(image_name)
@@ -77,7 +62,7 @@ with session:
     target.resume()
 
     # Wait until breakpoint is hit.
-    wait_for_halt(target, semihost)
+    wait_for_halt(target)
 
     # Print PC.
     pc = target.read_core_register("pc")
@@ -92,7 +77,7 @@ with session:
     target.set_breakpoint(lr)
     print("execute")
     target.resume()
-    wait_for_halt(target, semihost)
+    wait_for_halt(target)
 
     pc = target.read_core_register("pc")
     print("  pc: 0x%X" % pc)
