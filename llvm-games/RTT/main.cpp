@@ -56,7 +56,7 @@ static void _Delay(int period)
         (void) file;
         uint8_t buf;
         unsigned r = SEGGER_RTT_Read(0, &buf, sizeof(buf));
-        return (r == 0) ? EOF : r;
+        return (r == 0) ? EOF : buf;
     }   // rtt_getc
 
     static FILE __stdio = FDEV_SETUP_STREAM(rtt_putc, rtt_getc, NULL, _FDEV_SETUP_RW);
@@ -69,7 +69,9 @@ static void _Delay(int period)
     int main(void)
     {
         uint32_t cnt = 0;
-        int ch;
+
+        printf("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n");
+        _Delay(32);
 
 #if 0
         for (int i = 0;  i < 10;  ++i) {
@@ -88,10 +90,16 @@ static void _Delay(int period)
             {
                 _Delay(235);
             }
-            ch = getchar();
-            if (ch != EOF)
+
+            for (;;)
             {
-                printf("received char: 0x%04x\n", ch);
+                int ch;
+                ch = getchar();
+                if (ch == EOF)
+                {
+                    break;
+                }
+                printf("received char: 0x%04x %c\n", ch, ch);
             }
         }
         printf("finished\n");

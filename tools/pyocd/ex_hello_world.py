@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from pyocd.core.helpers import ConnectHelper
 from pyocd.flash.file_programmer import FileProgrammer
 import time
@@ -5,7 +6,7 @@ import time
 import logging
 logging.basicConfig(level=logging.INFO)
 
-session = ConnectHelper.session_with_chosen_probe(unique_id = "E6614103E7176A23", options = {"frequency": 4000000, "target_override": "nrf52840"})
+session = ConnectHelper.session_with_chosen_probe(unique_id = "E6616407E3646B29", options = {"frequency": 4000000, "target_override": "nrf52840"})
 
 with session:
     board = session.board
