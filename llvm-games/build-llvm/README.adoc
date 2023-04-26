@@ -75,13 +75,66 @@ diff -p -r1.1 ./CMakeLists.txt
 
 ==== Building...
 
-* fetch https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm.git
+* fetch https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm.git, branch feature/contrib
+  (https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm.git[original])
 * patch as above
-* `export CC=clang-15 && export CXX=clang++-15`
-* `mkdir build && cd build && cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF`
-* `ninja llvm-toolchain`
-* `ninja package-llvm-toolchain`
+* build as below
+* create package as below
 * unpack the created archive to e.g. `~/bin/llvm-arm-none-eabi`
+
+.Build steps with several options
+[source,bash]
+----
+# optional: use clang for compilation
+export CC=clang-15 && export CXX=clang++-15
+
+# create build directory
+mkdir build; cd build
+
+# create build files
+cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF
+
+# create build files including profiling offline
+cmake .. -GNinja -DLLVM_TOOLCHAIN_CONTRIB_PROFILE=ON -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+
+# create build files for parts of the toolchain offline
+cmake .. -GNinja -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="aarch64;armv6m_soft_nofp"
+
+# create build files and specify sources
+cmake .. -GNinja -DFETCHCONTENT_SOURCE_DIR_LLVMPROJECT=_deps/llvmproject-src -DFETCHCONTENT_SOURCE_DIR_PICOLIBC=_deps/picolibc-src
+
+# build toolchain
+time nice ninja llvm-toolchain
+
+# package the result
+ninja package-llvm-toolchain
+
+# clean build
+rm -rf [a-zA-Z]* _CPack_Packages
+----
+
+.Important config options
+[source,bash]
+----
+# important config options:
+# -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="aarch64;armv6m_soft_nofp"
+# -DLLVM_TOOLCHAIN_CONTRIB_PROFILE=ON
+# -DLLVM_TOOLCHAIN_CONTRIB_RTT=ON
+----
+
+.Important targets for LLVM_TOOLCHAIN_LIBRARY_VARIANTS
+[source,bash]
+----
+# armv6m_soft_nofp
+# armv7m_soft_nofp
+# armv7em_soft_nofp
+# armv7em_hard_fpv4_sp_d16
+# armv7em_hard_fpv5_d16
+
+# -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16"
+----
+
+NOTE: 25.04.2023: currently aarch64 does not compile because of libunwind.
 
 
 === Using the toolchains with BlueConnect
