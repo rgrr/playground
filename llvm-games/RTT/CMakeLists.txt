@@ -3,6 +3,14 @@
 
 cmake_minimum_required(VERSION 3.15.3)
 
+# 0: call SEGGER_RTT_printf() directly
+# 1: use picolib stdio
+# 2: use librtt
+if(NOT RTT_TYPE)
+    set(RTT_TYPE 2)
+endif()
+
+
 # Optional: print out extra messages to see what is going on. Comment it to have less verbose messages
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -22,13 +30,26 @@ set(CMAKE_C_EXTENSIONS OFF)
 # Optional: issue a message to be sure it uses the correct toolchain file.
 message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 
-# List of source files
-set(SRC_FILES
-        main.cpp
-)
+#
+# depending on RTT_TYPE use different source files
+#
+message(STATUS "RTT_TYPE is: ${RTT_TYPE}")
+add_executable(${PROJECT_ELF})
+if(RTT_TYPE EQUAL 0)
+    set(SRC_FILES main-0-rtt-printf.cpp)
+    add_subdirectory(SEGGER)
+    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC RTT)
+elseif(RTT_TYPE EQUAL 1)
+    set(SRC_FILES main-1-rtt-picolib-stdio.cpp)
+    add_subdirectory(SEGGER)
+    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC RTT)
+elseif(RTT_TYPE EQUAL 2)
+    set(SRC_FILES main-2-librtt.cpp)
+    target_link_libraries(${PROJECT_ELF} librtt.a) 
+endif()
 
-# Build the executable based on the source files
-add_executable(${PROJECT_ELF} ${SRC_FILES})
+# TODO is there a better way?
+target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 
 # List of compiler defines, prefix with -D compiler option
 target_compile_definitions(${PROJECT_ELF} PRIVATE
@@ -37,17 +58,6 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 # List of include directories
 target_include_directories(${PROJECT_ELF} PRIVATE
 )
-
-
-######################################################################
-#
-add_subdirectory(SEGGER)
-target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-        RTT
-)
-#
-######################################################################
-
 
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
