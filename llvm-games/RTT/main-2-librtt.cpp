@@ -19,6 +19,7 @@ static void _Delay(int period)
 
 /**
  * Uses librtt.a from toolchain
+ * toolchain must be built with https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib
  */
 int main(void)
 {

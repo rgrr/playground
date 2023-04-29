@@ -45,7 +45,7 @@ elseif(RTT_TYPE EQUAL 1)
     target_link_libraries(${PROJECT_ELF} LINK_PUBLIC RTT)
 elseif(RTT_TYPE EQUAL 2)
     set(SRC_FILES main-2-librtt.cpp)
-    target_link_libraries(${PROJECT_ELF} librtt.a) 
+    target_link_libraries(${PROJECT_ELF} librtt_stdio.a) 
 endif()
 
 # TODO is there a better way?
