@@ -17,18 +17,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(PROJECT_ELF ${PROJECT}.elf)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS        OFF)
+set(CMAKE_C_EXTENSIONS OFF)
 
 # Optional: issue a message to be sure it uses the correct toolchain file.
 message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 
-# List of source files
-set(SRC_FILES
-        main.c
-)
+#
+# depending on RTT_TYPE use different source files
+#
+message(STATUS "RTT_TYPE is: ${RTT_TYPE}")
+add_executable(${PROJECT_ELF})
+set(SRC_FILES main.c)
+add_subdirectory(SEGGER)
+target_link_libraries(${PROJECT_ELF} LINK_PUBLIC sysview)
 
-# Build the executable based on the source files
-add_executable(${PROJECT_ELF} ${SRC_FILES})
+target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 
 # List of compiler defines, prefix with -D compiler option
 target_compile_definitions(${PROJECT_ELF} PRIVATE
@@ -40,30 +43,20 @@ target_include_directories(${PROJECT_ELF} PRIVATE
     SEGGER/Sysview
 )
 
-add_subdirectory(SEGGER)
-target_link_libraries(${PROJECT_ELF} LINK_PUBLIC sysview)
-
-set(CONFIG armv7em_soft_nofp_semihost.cfg)
-
-#
-########################################################################################################################
-
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
-        --config ${CONFIG}
+        --config armv7em_soft_nofp.cfg
         -fdata-sections
         -ffunction-sections
-        -v
         -Wall
 )
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config ${CONFIG}
-        -fdata-sections -ffunction-sections
+        --config armv7em_soft_nofp.cfg
+        -fdata-sections
+        -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
-        -Wl,-Map=${PROJECT_ELF}.map
-        -v
 )
 
 # Optional: Print executable size as part of the post build process

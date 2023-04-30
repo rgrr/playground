@@ -4,7 +4,7 @@ add_library(${LIB_SYSVIEW}
         Sysview/SEGGER_RTT.c
         Sysview/SEGGER_RTT_printf.c
         Sysview/SEGGER_RTT_ASM_ARMv7M.S
-        #Sysview/SEGGER_SYSVIEW.c
+        Sysview/SEGGER_SYSVIEW.c
 )
 
 target_compile_options(${LIB_SYSVIEW} PRIVATE
