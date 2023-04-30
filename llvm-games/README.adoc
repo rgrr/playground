@@ -7,4 +7,9 @@ Here are several things concerning LLVM.
 * link:broken-lto[Broken LTO]
 * link:profiling[Profiling]
 * link:RTT[RTT]
-* link:xray[XRay] - WIP
+
+As toolchain I'm using the https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
+or better my flavor of it, because this one also integrates profiling and RTT.
+
+Probe used is my own based on https://github.com/rgrr/yapicoprobe[picoprobe]
+because it supports RTT console IO smoothly.

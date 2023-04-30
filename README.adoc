@@ -13,6 +13,8 @@ Mirror of the repo can be found at https://github.com/rgrr/playground[github].
 
 * link:cpp[C/C++]
 * link:rp2040[RP2040 stuff]
+* link:llvm-games[LLVM games]
+* link:tools[some tools]
 
 
 == Games

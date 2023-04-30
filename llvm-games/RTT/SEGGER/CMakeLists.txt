@@ -9,3 +9,8 @@ target_compile_options(RTT PRIVATE
         -fdata-sections -ffunction-sections
         -Wall
 )
+
+
+target_include_directories(RTT PRIVATE
+    Config
+)

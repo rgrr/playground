@@ -10,6 +10,7 @@
 === Varianten
 
 * SEGGER-Funktionen direkt aufrufen
-* stdout-Handler von picolibc verwenden, siehe https://github.com/picolibc/picolibc/blob/main/doc/os.md
+* stdio-Handler von picolibc verwenden, siehe https://github.com/picolibc/picolibc/blob/main/doc/os.md
+* Verwendung von librtt_stdio der LLVM Embedded Toolchain (mein privater contrib)
 
-Ausgewählt werden die beiden Methoden direkt in main.cpp.
+Ausgewählt werden die drei Methoden in CMakeLists.txt.
