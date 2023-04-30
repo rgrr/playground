@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#if 0
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
@@ -12,89 +13,75 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "SEGGER_RTT.h"
+#include "SEGGER_SYSVIEW.h"
 
 
-__attribute__((no_instrument_function)) __attribute__ ((format (printf, 1, 2))) void _printf(const char *format, ...)
- /**
-  * With this printf helper semihosting output is much faster because then blocks and not characters
-  * are written.
-  * \note pyocd needs "2" as the file descriptor.
-  */
+
+static void _Delay(int period)
 {
-#if 1
-    static char buf[128];
-    va_list arglist;
-
-    va_start(arglist, format);
-    vsnprintf(buf, sizeof(buf), format, arglist);
-    va_end(arglist);
-    write(STDOUT_FILENO, buf, strlen(buf));
-#endif
-}   // _printf
+    volatile int i = (100000 / 17) * period;
+    do {
+        ;
+    } while (i--);
+}   // _Delay
 
 
 
-//
-// this_fn holds the exact address of the current function, which may be looked up in the symbol table
-// (https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html)
-//
-__attribute__((no_instrument_function)) void __cyg_profile_func_enter(void *this_fn, void *call_site)
+void SEGGER_SYSVIEW_Conf(void)
 {
-    _printf("[+] %p %p\n", this_fn, call_site);
-}
 
-
-__attribute__((no_instrument_function)) void __cyg_profile_func_exit(void *this_fn, void *call_site)
-{
-    _printf("[-] %p %p\n", this_fn, call_site);
-}
+}   // SEGGER_SYSVIEW_Conf
 
 
 
 int main()
 {
+    SEGGER_RTT_Init();
+    SEGGER_RTT_printf(0, "Hello Sysview\n");
+
+#if 0
+    SEGGER_SYSVIEW_Conf();
+
+    SEGGER_SYSVIEW_Start();
+
+    for (int i = 0;  i < 10;  ++i) {
+        _Delay(122);
+    }
+
+    SEGGER_SYSVIEW_Stop();
+#endif
+
+    for (;;) {
+
+    }
+}   // main
+#else
+#include <stdint.h>
+#include "SEGGER/RTT/SEGGER_RTT.h"
+
+
+static void _Delay(int period)
+{
+    volatile int i = (100000 / 17) * period;
+    do {
+        ;
+    } while (i--);
+}   // _Delay
+
+
+
+/**
+ * Directly call the SEGGER functions.
+ */
+int main(void)
+{
     uint32_t cnt = 0;
 
-    for (int i = 0;  i < 3;  ++i) {
-        _printf("-- %u\n", cnt++);
-    }
-
-    for (int i = 0;  i < 7;  ++i) {
-        _printf("-- %u\n", cnt);
-        cnt *= 2;
-    }
-
-#if 0
-    static const uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-#if 0
-    FILE *f;
-    size_t r;
-
-    f = fopen("test.bin", "wb");
-    _printf("f=%p\n", f);
-    r = fwrite(buf, sizeof(buf), 1, f);
-    _printf("r=%d\n", r);
-    r = fclose(f);
-    _printf("r=%d\n", r);
-#else
-    int f;
-    int r;
-
-    write(STDOUT_FILENO, "Aber Hallo\n", 11);
-
-    f = open("llvm-games/profiling/test.binx", O_WRONLY | O_APPEND | O_CREAT, 0644);
-    _printf("f=%d\n", f);
-    r = write(f, buf, sizeof(buf));
-    _printf("r=%d\n", r);
-    r = close(f);
-    _printf("r=%d\n", r);
+    do {
+        SEGGER_RTT_printf(0, "Hello, veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long line %d\n", ++cnt);
+        _Delay(50);
+    } while (1);
+    return 0;
+}
 #endif
-#endif
-#if 0
-    {
-        static char out[4096];
-        r = __llvm_profile_write_buffer(out);
-        _printf("r=%d\n", r);
-    }
-#endif
-}   // main

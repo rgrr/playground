@@ -4,7 +4,7 @@
 #
 
 BUILD_DIR       := _build
-PROJECT         := xray
+PROJECT         := systemview
 
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
@@ -43,7 +43,12 @@ cmake-create-release:
 
 .PHONY: flash
 flash: all
-	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 4000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
+	pyocd flash -t nrf52840 $(BUILD_DIR)/$(PROJECT).elf
+
+
+.PHONY: reset
+reset: all
+	pyocd reset -t nrf52840
 
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf
