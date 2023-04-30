@@ -134,6 +134,7 @@ int main()
         SEGGER_SYSVIEW_TASKINFO Info;
 
         SEGGER_SYSVIEW_OnTaskCreate(TASKID_PRINT);
+        memset( &Info, 0, sizeof(Info));
         Info.TaskID = TASKID_PRINT;
         Info.sName = "PrintCycCnt";
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
@@ -142,6 +143,7 @@ int main()
         SEGGER_SYSVIEW_TASKINFO Info;
 
         SEGGER_SYSVIEW_OnTaskCreate(TASKID_DELAY);
+        memset( &Info, 0, sizeof(Info));
         Info.TaskID = TASKID_DELAY;
         Info.sName = "Delay";
         SEGGER_SYSVIEW_SendTaskInfo( &Info);

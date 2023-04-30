@@ -1,3 +1,5 @@
+:imagesdir: doc
+
 == SystemView
 
 === Links
@@ -23,4 +25,20 @@ NOTE: V3.30 is the last version which allows continuous recording via UART under
 === First Steps
 For the first steps, SystemViews UART recording is used.  Therefor yapicoprobe
 is used as connection to the target which redirects RTT output to a UART.
+Yapicoprobe had to be patched so that RTT channel #1 was redirected to the
+CDC.
+
+End result can be found in link:main.c[main.c].
+
+To show the capabilities of SystemView, the following timing diagrams show the difference
+between debug and optimized compilation:
+
+.Debug Version
+[.text-center]
+image::PrintCycCnt-Debug.png[Debug Version, 90%]
+
+
+.Optimized Version
+[.text-center]
+image::PrintCycCnt-Optimized.png[Debug Version, 90%]
 
