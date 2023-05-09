@@ -89,9 +89,9 @@ void SEGGER_SYSVIEW_Conf(void)
 static void _Delay(int period)
 {
     SEGGER_SYSVIEW_OnTaskStartExec(TASKID_DELAY);
-    volatile int i = (100000 / (17*6+2)) * period + 100;
+    volatile int i = (600000 / (17*6+2)) * period + 100;
     do {
-        SEGGER_SYSVIEW_IsStarted();
+        //SEGGER_SYSVIEW_IsStarted();
     } while (i--);
     SEGGER_SYSVIEW_OnTaskStopExec();
 }   // _Delay
@@ -120,16 +120,32 @@ static void PrintCycCnt(int i)
 
 int main()
 {
-    _Delay(2000);                                                            // this delay is required to have a running CYCCNT after reset with pyocd
+    //printf("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n");
+
+    // TODO hierdurch wird die Probe gekillt
+#if 1
+    printf("012345678901234567123456789012345678901234567890123456789\n");
+#endif
+
+#if 1
+    for (int i = 0;  i < 200;  ++i) {        // this delay is required to have a running CYCCNT after reset with pyocd
+        _Delay(10);
+    }
+#endif
+
+    printf("012345678901234567123456789012345678901234567890123456789\n");
 
     SEGGER_SYSVIEW_Conf();
+    _Delay(100);
     SEGGER_SYSVIEW_Start();
-
+    _Delay(100);
     SEGGER_SYSVIEW_NameMarker(0x2222, "Print");
+    _Delay(100);
 
     //
     // name "tasks"
     //
+    _Delay(100);
     {
         SEGGER_SYSVIEW_TASKINFO Info;
 
@@ -139,6 +155,7 @@ int main()
         Info.sName = "PrintCycCnt";
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
+    _Delay(100);
     {
         SEGGER_SYSVIEW_TASKINFO Info;
 
@@ -149,9 +166,11 @@ int main()
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
 
+    _Delay(100);
+
     SEGGER_SYSVIEW_EnableEvents(0xffff);
 
-    for (int j = 0;  j < 10;  ++j) {
+    for (int j = 0;  j < 5000000;  ++j) {
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
         SEGGER_SYSVIEW_OnIdle();
         for (int i = 0;  i < 5;  ++i) {
@@ -164,6 +183,10 @@ int main()
             SEGGER_SYSVIEW_OnIdle();
             _Delay(0);
         }
+#if 1
+        if (j % 10 == 0)
+            printf("0123456789012345678901234567890123456789 %d\n", j);
+#endif
         _Delay(15);
     }
 
@@ -171,7 +194,9 @@ int main()
     SEGGER_SYSVIEW_Print("Stop\n");
     SEGGER_SYSVIEW_Stop();
 
-    for (;;) {
+    printf("finished\n");
 
+    for (;;) {
+        //SEGGER_SYSVIEW_IsStarted();
     }
 }   // main

@@ -25,11 +25,13 @@ message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 #
 # depending on RTT_TYPE use different source files
 #
-message(STATUS "RTT_TYPE is: ${RTT_TYPE}")
 add_executable(${PROJECT_ELF})
 set(SRC_FILES main.c)
 add_subdirectory(SEGGER)
-target_link_libraries(${PROJECT_ELF} LINK_PUBLIC sysview)
+target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+    sysview
+    librtt_stdio.a
+)
 
 target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 
