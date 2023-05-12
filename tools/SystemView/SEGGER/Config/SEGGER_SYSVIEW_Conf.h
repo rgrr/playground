@@ -80,7 +80,7 @@ Additional information:
 */
 
 #define SEGGER_SYSVIEW_RTT_BUFFER_SIZE 16384
-
+#define SEGGER_SYSVIEW_ID_BASE         0x20000000
 
 #endif  // SEGGER_SYSVIEW_CONF_H
 

@@ -12,47 +12,64 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-//#include "SEGGER_RTT.h"
 #include "SEGGER_SYSVIEW.h"
 
 
+
+/*********************************************************************
+ *
+ *    Direct access to MCU registers
+ *
+ *********************************************************************/
+
+#define SYS_CLOCK_HZ              64000000
+
+#define DEMCR                     (*((volatile uint32_t *)0xE000EDFCuL))   // Debug Exception and Monitor Control Register
+#define TRACEENA_BIT              (1uL << 24)                                   // Trace enable bit
+#define DWT_CTRL                  (*((volatile uint32_t *)0xE0001000uL))   // DWT Control Register
+#define NOCYCCNT_BIT              (1uL << 25)                                   // Cycle counter support bit
+#define CYCCNTENA_BIT             (1uL << 0)                                    // Cycle counter enable bit
+#define DWT_CYCCNT()              (*((volatile uint32_t *)0xE0001004))
+#define SYSTICK                   ((SYSTICK_REGS *)0xE000E010)
+
+typedef struct {
+    volatile unsigned int CSR;
+    volatile unsigned int RVR;
+    volatile unsigned int CVR;
+    volatile unsigned int CALIB;
+} SYSTICK_REGS;
+
+
+void arm_systick_isr(void)
+{
+    static volatile U32 Cnt = 0;
+    SEGGER_SYSVIEW_RecordEnterISR();
+    //for (int i = 0;  i < 10;  ++i)
+        Cnt++;
+    SEGGER_SYSVIEW_RecordExitISR();
+}   // arm_systick_isr
+
+
+void arm_systick_init(uint ips)
+{
+    SYSTICK->RVR = (SYS_CLOCK_HZ / ips) - 1;     // set reload
+    SYSTICK->CVR = 0x00;      // set counter
+    SYSTICK->CSR = 0x07;      // enable systick
+}   // arm_systick_init
+
+
+/*********************************************************************
+ *
+ *    Sysview
+ *
+ *********************************************************************/
 
 #define SYSVIEW_DEVICE_NAME "PCA10056 Cortex-M4"
 #define SYSVIEW_APP_NAME "SysView Games"
 
 
-/* DWT (Data Watchpoint and Trace) registers, only exists on ARM Cortex with a DWT unit */
-#define KIN1_DWT_CONTROL             (*((volatile uint32_t*)0xE0001000))
-  /*!< DWT Control register */
-#define KIN1_DWT_CYCCNTENA_BIT       (1UL<<0)
-  /*!< CYCCNTENA bit in DWT_CONTROL register */
-#define KIN1_DWT_CYCCNT              (*((volatile uint32_t*)0xE0001004))
-  /*!< DWT Cycle Counter register */
-#define KIN1_DEMCR                   (*((volatile uint32_t*)0xE000EDFC))
-  /*!< DEMCR: Debug Exception and Monitor Control Register */
-#define KIN1_TRCENA_BIT              (1UL<<24)
-  /*!< Trace enable bit in DEMCR register */
-
-
-#define KIN1_InitCycleCounter()      KIN1_DEMCR |= KIN1_TRCENA_BIT
-  /*!< TRCENA: Enable trace and debug block DEMCR (Debug Exception and Monitor Control Register */
-
-#define KIN1_ResetCycleCounter()     KIN1_DWT_CYCCNT = 0
-  /*!< Reset cycle counter */
-
-#define KIN1_EnableCycleCounter()    KIN1_DWT_CONTROL |= KIN1_DWT_CYCCNTENA_BIT
-  /*!< Enable cycle counter */
-
-#define KIN1_DisableCycleCounter()   KIN1_DWT_CONTROL &= ~KIN1_DWT_CYCCNTENA_BIT
-  /*!< Disable cycle counter */
-
-#define KIN1_GetCycleCounter()       KIN1_DWT_CYCCNT
-  /*!< Read cycle counter register */
-
-
-
 static void _cbSendSystemDesc(void) {
-    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",O=None");
+    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",O=NoOS");
     SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
 }
 
@@ -70,13 +87,28 @@ SEGGER_SYSVIEW_MODULE IPModule = {
 
 void SEGGER_SYSVIEW_Conf(void)
 {
-    KIN1_InitCycleCounter();
-    KIN1_ResetCycleCounter();
-    KIN1_EnableCycleCounter();
+    //
+    // If no debugger is connected, the DWT must be enabled by the application
+    //
+    if ((DEMCR & TRACEENA_BIT) == 0) {
+        DEMCR |= TRACEENA_BIT;
+    }
 
-    SEGGER_SYSVIEW_Init(64000000, 64000000, NULL, _cbSendSystemDesc);
+    //
+    //  The cycle counter must be activated in order
+    //  to use time related functions.
+    //
+    if ((DWT_CTRL & NOCYCCNT_BIT) == 0) {           // Cycle counter supported?
+        if ((DWT_CTRL & CYCCNTENA_BIT) == 0) {      // Cycle counter not enabled?
+            DWT_CTRL |= CYCCNTENA_BIT;              // Enable Cycle counter
+        }
+    }
 
-    SEGGER_SYSVIEW_RegisterModule( &IPModule);
+    SEGGER_SYSVIEW_Init(SYS_CLOCK_HZ, SYS_CLOCK_HZ, NULL, _cbSendSystemDesc);
+
+    //SEGGER_SYSVIEW_RegisterModule( &IPModule);
+
+    //arm_systick_init(10);
 }   // SEGGER_SYSVIEW_Conf
 
 
@@ -91,7 +123,6 @@ static void _Delay(int period)
     SEGGER_SYSVIEW_OnTaskStartExec(TASKID_DELAY);
     volatile int i = (600000 / (17*6+2)) * period + 100;
     do {
-        //SEGGER_SYSVIEW_IsStarted();
     } while (i--);
     SEGGER_SYSVIEW_OnTaskStopExec();
 }   // _Delay
@@ -101,8 +132,8 @@ static void _Delay(int period)
 static void PrintCycCnt(int i)
 {
     SEGGER_SYSVIEW_OnTaskStartExec(TASKID_PRINT);
-    SEGGER_SYSVIEW_RecordU32(IPModule.EventOffset + 0, i);
-    SEGGER_SYSVIEW_WarnfTarget("cyccnt %d %u\n", i, KIN1_GetCycleCounter());
+    //SEGGER_SYSVIEW_RecordU32(IPModule.EventOffset + 0, i);
+    SEGGER_SYSVIEW_WarnfTarget("cyccnt %d %u\n", i, DWT_CYCCNT());
 
     //
     // small demo, that even small runtime differences are visible, task runtimes:
@@ -120,9 +151,6 @@ static void PrintCycCnt(int i)
 
 int main()
 {
-    //printf("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n");
-
-    // TODO hierdurch wird die Probe gekillt
 #if 1
     printf("012345678901234567123456789012345678901234567890123456789\n");
 #endif
@@ -168,13 +196,12 @@ int main()
 
     _Delay(100);
 
-    SEGGER_SYSVIEW_EnableEvents(0xffff);
+    SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
     for (int j = 0;  j < 5000000;  ++j) {
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
         SEGGER_SYSVIEW_OnIdle();
         for (int i = 0;  i < 5;  ++i) {
-            //SEGGER_SYSVIEW_RecordU32(0x99, KIN1_GetCycleCounter());
             SEGGER_SYSVIEW_MarkStart(MARKER_PRINT);
             SEGGER_SYSVIEW_OnIdle();
             PrintCycCnt(i);
@@ -190,7 +217,7 @@ int main()
         _Delay(15);
     }
 
-    SEGGER_SYSVIEW_DisableEvents(0xffff);
+    SEGGER_SYSVIEW_DisableEvents(0xffffffff);
     SEGGER_SYSVIEW_Print("Stop\n");
     SEGGER_SYSVIEW_Stop();
 
