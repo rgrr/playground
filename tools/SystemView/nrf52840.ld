@@ -57,8 +57,16 @@ PHDRS
 
 SECTIONS
 {
-	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
-
+    /* really do not change this mapping! */
+    
+    .isr_vector :
+    {
+        PROVIDE(__start_isr_vector = .);
+        KEEP(*(.isr_vector))
+        PROVIDE(__stop_isr_vector = .);
+    } > flash
+    
+    
 	.init : {
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
@@ -232,19 +240,38 @@ SECTIONS
     PROVIDE( end = __bss_end );
     PROVIDE( __bss_size = __bss_end - __bss_start );
 
-    /* Make the rest of memory available for heap storage */
-    PROVIDE (__heap_start = __end);
-    PROVIDE (__heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : 0x00001000));
-    PROVIDE (__heap_size = __heap_end - __heap_start);
 
-    /* Define a stack region to make sure it fits in memory */
-    .stack (NOLOAD) : {
-        . += (DEFINED(__stack_size) ? __stack_size : 0x00001000);
+    .heap :
+    {
+        __end__ = .;
+        PROVIDE(end = .);
+        __HeapBase = .;
+        *(.heap*)
+        __HeapLimit = .;
     } >ram :ram
 
-    /* Throw away C++ exception handling information */
+    /* .stack_dummy section doesn't contains any symbols. It is only
+     * used for linker to calculate size of stack sections, and assign
+     * values to stack symbols later */
+   
+    .stack_dummy :
+    {
+        *(.stack*)
+    } >ram :ram
 
+    /* Set stack top to end of RAM, and stack limit move down by
+     * size of stack_dummy section */
+    __StackTop = ORIGIN(ram) + LENGTH(ram) - 0x5000;
+    __StackLimit = __StackTop - SIZEOF(.stack_dummy);
+    __StackSize = SIZEOF(.stack_dummy);
+    PROVIDE(__stack = __StackTop);
     
+    /* Check if data + heap + stack exceeds RAM limit */
+    ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+
+
+
+    /* Throw away C++ exception handling information */
 
     /DISCARD/ : {
         *(.note .note.*)
@@ -253,7 +280,6 @@ SECTIONS
         *(.ARM.exidx*)
     }
 
-    
 
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }

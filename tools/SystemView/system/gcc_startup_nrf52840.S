@@ -23,54 +23,41 @@ NOTICE: This file has been modified by Nordic Semiconductor ASA.
     .syntax unified
     .arch armv7e-m
 
-#ifdef __STARTUP_CONFIG
-#include "startup_config.h"
-#ifndef __STARTUP_CONFIG_STACK_ALIGNEMENT
-#define __STARTUP_CONFIG_STACK_ALIGNEMENT 3
-#endif
-#endif
-
-    .section .stack
-#if defined(__STARTUP_CONFIG)
-    .align __STARTUP_CONFIG_STACK_ALIGNEMENT
-    .equ    Stack_Size, __STARTUP_CONFIG_STACK_SIZE
-#elif defined(__STACK_SIZE)
+    .section .stack,"awR",%nobits
     .align 3
-    .equ    Stack_Size, __STACK_SIZE
-#else
-    .align 3
-    .equ    Stack_Size, 16384
-#endif
-    .globl __StackTop
-    .globl __StackLimit
-__StackLimit:
+    #if defined(__STACK_SIZE)
+        .equ    Stack_Size, __STACK_SIZE
+    #else
+        .equ    Stack_Size, 8192
+    #endif
     .space Stack_Size
-    .size __StackLimit, . - __StackLimit
-__StackTop:
-    .size __StackTop, . - __StackTop
 
-    .section .heap
+
+    // this is actually a dummy, important values are set via linker script
+    .section .heap,"awR",%nobits
     .align 3
-#if defined(__STARTUP_CONFIG)
-    .equ Heap_Size, __STARTUP_CONFIG_HEAP_SIZE
-#elif defined(__HEAP_SIZE)
-    .equ Heap_Size, __HEAP_SIZE
-#else
-    .equ Heap_Size, 16384
-#endif
-    .globl __HeapBase
-    .globl __HeapLimit
-__HeapBase:
+    #if defined(__HEAP_SIZE)
+        .equ    Heap_Size, __HEAP_SIZE
+    #else
+        .equ    Heap_Size, 8192
+    #endif
     .if Heap_Size
-    .space Heap_Size
+        .space Heap_Size
     .endif
-    .size __HeapBase, . - __HeapBase
-__HeapLimit:
-    .size __HeapLimit, . - __HeapLimit
 
-    .section .isr_vector, "ax"
-    .align 2
+
+    //
+    // LLD: correct __isr_vector
+    //
+    .text
+    .type   isr_vector,%object
+    .section    .isr_vector,"ax",%progbits
+    .p2align    2
+
     .globl __isr_vector
+    .extern __StackTop                  // actually externals seem to be imported automatically
+
+
 __isr_vector:
     .long   __StackTop                  /* Top of Stack */
     .long   Reset_Handler

@@ -40,14 +40,14 @@ typedef struct {
 } SYSTICK_REGS;
 
 
-void arm_systick_isr(void)
+void SysTick_Handler(void)
 {
     static volatile U32 Cnt = 0;
     SEGGER_SYSVIEW_RecordEnterISR();
-    //for (int i = 0;  i < 10;  ++i)
+    for (int i = 0;  i < 1000;  ++i)
         Cnt++;
     SEGGER_SYSVIEW_RecordExitISR();
-}   // arm_systick_isr
+}   // SysTick_Handler
 
 
 void arm_systick_init(uint ips)
@@ -108,7 +108,7 @@ void SEGGER_SYSVIEW_Conf(void)
 
     //SEGGER_SYSVIEW_RegisterModule( &IPModule);
 
-    //arm_systick_init(10);
+    arm_systick_init(20);
 }   // SEGGER_SYSVIEW_Conf
 
 
@@ -214,7 +214,7 @@ int main()
         if (j % 10 == 0)
             printf("0123456789012345678901234567890123456789 %d\n", j);
 #endif
-        _Delay(15);
+        _Delay(50);
     }
 
     SEGGER_SYSVIEW_DisableEvents(0xffffffff);
