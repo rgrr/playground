@@ -53,7 +53,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #elif defined (NRF52833_XXAA)
     #include "nrf52833_peripherals.h"
 #elif defined(NRF52840_XXAA)
-    #include "../nordic/nrf52840_peripherals.h"
+    #include "nrf52840_peripherals.h"
 
 #elif defined (NRF5340_XXAA_APPLICATION)
     #include "nrf5340_application_peripherals.h"

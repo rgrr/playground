@@ -32,4 +32,4 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "../nordic/system_nrf52.c"
+#include "system_nrf52.c"

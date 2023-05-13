@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../nordic/compiler_abstraction.h"
+#include "compiler_abstraction.h"
 
 static bool nrf52_errata_1(void) __UNUSED;
 static bool nrf52_errata_2(void) __UNUSED;
