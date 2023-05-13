@@ -23,43 +23,20 @@ NOTICE: This file has been modified by Nordic Semiconductor ASA.
     .syntax unified
     .arch armv7e-m
 
-    .section .stack,"awR",%nobits
-    .align 3
-    #if defined(__STACK_SIZE)
-        .equ    Stack_Size, __STACK_SIZE
-    #else
-        .equ    Stack_Size, 8192
-    #endif
-    .space Stack_Size
-
-
-    // this is actually a dummy, important values are set via linker script
-    .section .heap,"awR",%nobits
-    .align 3
-    #if defined(__HEAP_SIZE)
-        .equ    Heap_Size, __HEAP_SIZE
-    #else
-        .equ    Heap_Size, 8192
-    #endif
-    .if Heap_Size
-        .space Heap_Size
-    .endif
-
-
     //
-    // LLD: correct __isr_vector
+    // LLD: correct __interrupt_vector
     //
     .text
-    .type   isr_vector,%object
-    .section    .isr_vector,"ax",%progbits
+    .type   interrupt_vector,%object
+    .section    .text.init.enter,"ax",%progbits
     .p2align    2
 
-    .globl __isr_vector
-    .extern __StackTop                  // actually externals seem to be imported automatically
+    .globl __interrupt_vector
+    .extern __stack                  // actually externals seem to be imported automatically
 
 
-__isr_vector:
-    .long   __StackTop                  /* Top of Stack */
+__interrupt_vector:
+    .long   __stack                  // Top of Stack
     .long   Reset_Handler
     .long   NMI_Handler
     .long   HardFault_Handler

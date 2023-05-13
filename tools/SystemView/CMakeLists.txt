@@ -19,14 +19,17 @@ set(PROJECT_ELF ${PROJECT}.elf)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-# Optional: issue a message to be sure it uses the correct toolchain file.
-message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
-message(STATUS "TOOLCHAIN_PATH is: ${TOOLCHAIN_PATH}")
+#########################################################
+#
+# Several options
+#
+set(STACK_SIZE  0x2000)
 
 #
-# depending on RTT_TYPE use different source files
-#
+#########################################################
+
 add_executable(${PROJECT_ELF})
+
 set(SRC_FILES 
     main.c
     system/gcc_startup_nrf52840.S
@@ -46,8 +49,6 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
     -DNRF52840_XXAA
     -D__STARTUP_SKIP_ETEXT
     -D__STARTUP_CLEAR_BSS          # actually not required, because done in crt0.c
-    -D__STACK_SIZE=16384
-    -D__HEAP_SIZE=0
 )
 
 # List of include directories
@@ -77,6 +78,7 @@ target_link_options(${PROJECT_ELF} PRIVATE
         -fdata-sections
         -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/system/nrf52840.ld
+        -Wl,--defsym=__stack_size=${STACK_SIZE}
         -Wl,-Map=${PROJECT_ELF}.map
 )
 
