@@ -44,7 +44,7 @@ void SysTick_Handler(void)
 {
     static volatile U32 Cnt = 0;
     SEGGER_SYSVIEW_RecordEnterISR();
-    for (int i = 0;  i < 1000;  ++i)
+//    for (int i = 0;  i < 1000;  ++i)
         Cnt++;
     SEGGER_SYSVIEW_RecordExitISR();
 }   // SysTick_Handler
@@ -108,7 +108,7 @@ void SEGGER_SYSVIEW_Conf(void)
 
     //SEGGER_SYSVIEW_RegisterModule( &IPModule);
 
-    arm_systick_init(20);
+    arm_systick_init(10);
 }   // SEGGER_SYSVIEW_Conf
 
 

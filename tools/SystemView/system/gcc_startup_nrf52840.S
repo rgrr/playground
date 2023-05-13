@@ -271,17 +271,17 @@ copy_etext_done:
  * All addresses must be aligned to 4 bytes boundary.
  */
 #ifdef __STARTUP_CLEAR_BSS
-    ldr r1, =__bss_start__
-    ldr r2, =__bss_end__
+    ldr r1, =__bss_start
+    ldr r2, =__bss_end
     bl clear_region
 
-    ldr r1, =__tbss_start__
-    ldr r2, =__tbss_end__
+    ldr r1, =__tbss_start
+    ldr r2, =__tbss_end
     bl clear_region
 
-    ldr r1, =__sbss_start__
-    ldr r2, =__sbss_end__
-    bl clear_region
+//    ldr r1, =__sbss_start
+//    ldr r2, =__sbss_end
+//    bl clear_region
 
     b clear_bss_done
 

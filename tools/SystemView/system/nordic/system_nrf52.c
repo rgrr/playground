@@ -23,13 +23,15 @@ NOTICE: This file has been modified by Nordic Semiconductor ASA.
 /* NOTE: Template files (including this one) are application specific and therefore expected to
    be copied into the application project folder prior to its use! */
 
+#include "../nordic/system_nrf52.h"
+
 #include <stdint.h>
 #include <stdbool.h>
-#include "nrf.h"
-#include "nrf_peripherals.h"
-#include "nrf52_erratas.h"
-#include "system_nrf52.h"
-#include "system_nrf52_approtect.h"
+
+#include "../nordic/nrf.h"
+#include "../nordic/nrf_peripherals.h"
+#include "../nordic/nrf52_erratas.h"
+#include "../nordic/system_nrf52_approtect.h"
 
 #define __SYSTEM_CLOCK_DEFAULT      (64000000UL)
 

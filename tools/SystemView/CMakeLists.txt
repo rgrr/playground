@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.15.3)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Path to toolchain file. This one has to be before 'project()' below
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/arm-none-eabi-clang.cmake)
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/system/arm-none-eabi-clang.cmake)
 
 # Setup project, output and linker file
 project(${PROJECT} C CXX ASM)
@@ -30,7 +30,7 @@ add_executable(${PROJECT_ELF})
 set(SRC_FILES 
     main.c
     system/gcc_startup_nrf52840.S
-    system/system_nrf52840.c
+    system/nordic/system_nrf52840.c
 )
 
 add_subdirectory(SEGGER)
@@ -45,6 +45,7 @@ target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 target_compile_definitions(${PROJECT_ELF} PRIVATE
     -DNRF52840_XXAA
     -D__STARTUP_SKIP_ETEXT
+    -D__STARTUP_CLEAR_BSS
     -D__STACK_SIZE=16384
     -D__HEAP_SIZE=8192
 )
@@ -53,6 +54,7 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 target_include_directories(${PROJECT_ELF} PRIVATE
     SEGGER/Config
     SEGGER/Sysview
+    system/cmsis
 )
 
 # Compiler options
@@ -73,7 +75,7 @@ target_link_options(${PROJECT_ELF} PRIVATE
         
         -fdata-sections
         -ffunction-sections
-        -T${CMAKE_SOURCE_DIR}/nrf52840.ld
+        -T${CMAKE_SOURCE_DIR}/system/nrf52840.ld
         -Wl,-Map=${PROJECT_ELF}.map
 )
 
