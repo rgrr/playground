@@ -101,7 +101,7 @@ void SEGGER_SYSVIEW_Conf(void)
 
     //SEGGER_SYSVIEW_RegisterModule( &IPModule);
 
-    SysTick_Init(10);
+    SysTick_Init(123);
 }   // SEGGER_SYSVIEW_Conf
 
 
@@ -142,6 +142,34 @@ static void PrintCycCnt(int i)
 
 
 
+//======================================================================================================================
+#include "SEGGER_RTT.h"
+
+static int rtt_putc(char c, FILE *file)
+{
+    (void) file;
+    SEGGER_RTT_Write(0, &c, 1);
+    return c;
+}   // rtt_putc
+
+static int rtt_getc(FILE *file)
+{
+    (void) file;
+    uint8_t buf;
+    unsigned r = SEGGER_RTT_Read(0, &buf, sizeof(buf));
+    return (r == 0) ? EOF : buf;
+}   // rtt_getc
+
+static FILE __stdio = FDEV_SETUP_STREAM(rtt_putc, rtt_getc, NULL, _FDEV_SETUP_RW);
+
+//FILE *const stdout = &__stdio;
+FILE *const stdin = &__stdio;
+__strong_reference(stdin, stdout);
+__strong_reference(stdin, stderr);
+//======================================================================================================================
+
+
+
 int main()
 {
 #if 1
@@ -157,8 +185,8 @@ int main()
     printf("012345678901234567123456789012345678901234567890123456789\n");
 
     SEGGER_SYSVIEW_Conf();
-    _Delay(100);
     SEGGER_SYSVIEW_Start();
+    _Delay(100);
     _Delay(100);
     SEGGER_SYSVIEW_NameMarker(0x2222, "Print");
     _Delay(100);
@@ -207,7 +235,7 @@ int main()
         if (j % 10 == 0)
             printf("0123456789012345678901234567890123456789 %d\n", j);
 #endif
-        _Delay(50);
+        _Delay(20);
     }
 
     SEGGER_SYSVIEW_DisableEvents(0xffffffff);

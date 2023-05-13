@@ -57,10 +57,6 @@ Revision: $Rev: 24316 $
 #ifndef SEGGER_RTT_CONF_H
 #define SEGGER_RTT_CONF_H
 
-#ifdef __IAR_SYSTEMS_ICC__
-  #include <intrinsics.h>
-#endif
-
 /*********************************************************************
 *
 *       Defines, configurable
@@ -146,6 +142,29 @@ Revision: $Rev: 24316 $
   #define SEGGER_RTT_MAX_INTERRUPT_PRIORITY         (0x20)   // Interrupt priority to lock on SEGGER_RTT_LOCK on Cortex-M3/4 (Default: 0x20)
 #endif
 
+#ifndef SEGGER_RTT_ASM
+    __attribute__((always_inline)) static inline void __enable_irqXX(void)
+    {
+      __asm volatile ("cpsie i" : : : "memory");
+    }
+
+    __attribute__((always_inline)) static inline void __disable_irqXX(void)
+    {
+      __asm volatile ("cpsid i" : : : "memory");
+    }
+
+    __attribute__((always_inline)) static inline unsigned __get_PRIMASKXX(void)
+    {
+      unsigned result;
+
+      __asm volatile ("MRS %0, primask" : "=r" (result) );
+      return(result);
+    }
+
+    #define SEGGER_RTT_LOCK()      unsigned __prim = __get_PRIMASKXX(); __disable_irqXX();
+    #define SEGGER_RTT_UNLOCK()    if (!__prim) { __enable_irqXX(); }
+#endif
+
 /*********************************************************************
 *
 *       RTT lock configuration for SEGGER Embedded Studio,
@@ -173,7 +192,7 @@ Revision: $Rev: 24316 $
     #ifndef   SEGGER_RTT_MAX_INTERRUPT_PRIORITY
       #define SEGGER_RTT_MAX_INTERRUPT_PRIORITY   (0x20)
     #endif
-    #define SEGGER_RTT_LOCK()   {                                                                   \
+    #define xxSEGGER_RTT_LOCK()   {                                                                   \
                                     unsigned int _SEGGER_RTT__LockState;                                         \
                                   __asm volatile ("mrs   %0, basepri  \n\t"                         \
                                                   "mov   r1, %1       \n\t"                         \
@@ -183,7 +202,7 @@ Revision: $Rev: 24316 $
                                                   : "r1", "cc"                                      \
                                                   );
 
-    #define SEGGER_RTT_UNLOCK()   __asm volatile ("msr   basepri, %0  \n\t"                         \
+    #define xxSEGGER_RTT_UNLOCK()   __asm volatile ("msr   basepri, %0  \n\t"                         \
                                                   :                                                 \
                                                   : "r" (_SEGGER_RTT__LockState)                                 \
                                                   :                                                 \

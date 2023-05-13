@@ -79,8 +79,14 @@ Additional information:
 **********************************************************************
 */
 
-#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE 16384
-#define SEGGER_SYSVIEW_ID_BASE         0x20000000
+#define SEGGER_SYSVIEW_RTT_CHANNEL         1
+#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE     2048
+
+#define SEGGER_SYSVIEW_USE_STATIC_BUFFER   0
+#define SEGGER_SYSVIEW_MAX_PACKET_SIZE     256
+#define SEGGER_SYSVIEW_MAX_STRING_LEN      256
+
+#define SEGGER_SYSVIEW_ID_BASE             0x20000000
 
 #endif  // SEGGER_SYSVIEW_CONF_H
 

@@ -36,7 +36,7 @@ set(SRC_FILES
 add_subdirectory(SEGGER)
 target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
     sysview
-    librtt_stdio.a
+    #librtt_stdio.a
 )
 
 target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
@@ -45,9 +45,9 @@ target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 target_compile_definitions(${PROJECT_ELF} PRIVATE
     -DNRF52840_XXAA
     -D__STARTUP_SKIP_ETEXT
-    -D__STARTUP_CLEAR_BSS
+    -D__STARTUP_CLEAR_BSS          # actually not required, because done in crt0.c
     -D__STACK_SIZE=16384
-    -D__HEAP_SIZE=8192
+    -D__HEAP_SIZE=0
 )
 
 # List of include directories
