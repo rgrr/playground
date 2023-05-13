@@ -21,12 +21,18 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 # Optional: issue a message to be sure it uses the correct toolchain file.
 message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
+message(STATUS "TOOLCHAIN_PATH is: ${TOOLCHAIN_PATH}")
 
 #
 # depending on RTT_TYPE use different source files
 #
 add_executable(${PROJECT_ELF})
-set(SRC_FILES main.c)
+set(SRC_FILES 
+    main.c
+    system/gcc_startup_nrf52840.S
+    system/system_nrf52840.c
+)
+
 add_subdirectory(SEGGER)
 target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
     sysview
@@ -37,6 +43,10 @@ target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 
 # List of compiler defines, prefix with -D compiler option
 target_compile_definitions(${PROJECT_ELF} PRIVATE
+    -DNRF52840_XXAA
+    -D__STARTUP_SKIP_ETEXT
+    -D__STACK_SIZE=16384
+    -D__HEAP_SIZE=8192
 )
 
 # List of include directories
@@ -55,10 +65,16 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config armv7em_soft_nofp.cfg
+        #--config armv7em_soft_nofp.cfg
+        --target=arm-none-eabi -mfloat-abi=soft -march=armv7m+nofp
+        -fno-exceptions -fno-rtti
+        --sysroot ${TOOLCHAIN_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp
+        -lcrt0
+        
         -fdata-sections
         -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
+        -Wl,-Map=${PROJECT_ELF}.map
 )
 
 # Optional: Print executable size as part of the post build process

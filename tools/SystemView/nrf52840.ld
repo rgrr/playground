@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-ENTRY(_start)
+ENTRY(Reset_Handler)
 
 /********************************************************************************
  *
