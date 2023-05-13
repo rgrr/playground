@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "nrf.h"
+
 #include "SEGGER_SYSVIEW.h"
 
 
@@ -22,22 +24,7 @@
  *
  *********************************************************************/
 
-#define SYS_CLOCK_HZ              64000000
-
-#define DEMCR                     (*((volatile uint32_t *)0xE000EDFCuL))   // Debug Exception and Monitor Control Register
-#define TRACEENA_BIT              (1uL << 24)                                   // Trace enable bit
-#define DWT_CTRL                  (*((volatile uint32_t *)0xE0001000uL))   // DWT Control Register
-#define NOCYCCNT_BIT              (1uL << 25)                                   // Cycle counter support bit
-#define CYCCNTENA_BIT             (1uL << 0)                                    // Cycle counter enable bit
-#define DWT_CYCCNT()              (*((volatile uint32_t *)0xE0001004))
-#define SYSTICK                   ((SYSTICK_REGS *)0xE000E010)
-
-typedef struct {
-    volatile unsigned int CSR;
-    volatile unsigned int RVR;
-    volatile unsigned int CVR;
-    volatile unsigned int CALIB;
-} SYSTICK_REGS;
+#define DWT_CYCCNT()              (DWT->CYCCNT)
 
 
 void SysTick_Handler(void)
@@ -50,12 +37,33 @@ void SysTick_Handler(void)
 }   // SysTick_Handler
 
 
-void arm_systick_init(uint ips)
+void SysTick_Init(uint32_t ips)
 {
-    SYSTICK->RVR = (SYS_CLOCK_HZ / ips) - 1;     // set reload
-    SYSTICK->CVR = 0x00;      // set counter
-    SYSTICK->CSR = 0x07;      // enable systick
-}   // arm_systick_init
+    SysTick->LOAD = (SystemCoreClock / ips) - 1;
+    SysTick->VAL = 0;
+    SysTick->CTRL = SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_CLKSOURCE_Msk;
+}   // SysTick_Init
+
+
+void CycCnt_Init(void)
+{
+    //
+    // If no debugger is connected, the DWT must be enabled by the application
+    //
+    if ((CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk) == 0) {
+        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    }
+
+    //
+    //  The cycle counter must be activated in order
+    //  to use time related functions.
+    //
+    if ((DWT->CTRL & DWT_CTRL_NOCYCCNT_Msk) == 0) {           // Cycle counter supported?
+        if ((DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk) == 0) {      // Cycle counter not enabled?
+            DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;              // Enable Cycle counter
+        }
+    }
+}   // CycCnt_Init
 
 
 /*********************************************************************
@@ -87,28 +95,13 @@ SEGGER_SYSVIEW_MODULE IPModule = {
 
 void SEGGER_SYSVIEW_Conf(void)
 {
-    //
-    // If no debugger is connected, the DWT must be enabled by the application
-    //
-    if ((DEMCR & TRACEENA_BIT) == 0) {
-        DEMCR |= TRACEENA_BIT;
-    }
+    CycCnt_Init();
 
-    //
-    //  The cycle counter must be activated in order
-    //  to use time related functions.
-    //
-    if ((DWT_CTRL & NOCYCCNT_BIT) == 0) {           // Cycle counter supported?
-        if ((DWT_CTRL & CYCCNTENA_BIT) == 0) {      // Cycle counter not enabled?
-            DWT_CTRL |= CYCCNTENA_BIT;              // Enable Cycle counter
-        }
-    }
-
-    SEGGER_SYSVIEW_Init(SYS_CLOCK_HZ, SYS_CLOCK_HZ, NULL, _cbSendSystemDesc);
+    SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL, _cbSendSystemDesc);
 
     //SEGGER_SYSVIEW_RegisterModule( &IPModule);
 
-    arm_systick_init(10);
+    SysTick_Init(10);
 }   // SEGGER_SYSVIEW_Conf
 
 

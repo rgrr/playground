@@ -55,6 +55,7 @@ target_include_directories(${PROJECT_ELF} PRIVATE
     SEGGER/Config
     SEGGER/Sysview
     system/cmsis
+    system/nordic
 )
 
 # Compiler options
