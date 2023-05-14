@@ -1,4 +1,10 @@
 :imagesdir: doc
+:source-highlighter: rouge
+:toc:
+:toclevels: 5
+
+Jump directly to the <<rtt-lock-problem,SEGGER_RTT_LOCK() problem>>.
+
 
 == SystemView
 
@@ -16,19 +22,27 @@ IMPORTANT: SystemView is free for non-commercial use only.
 
 
 === Installation
+
 Installation is a simple download and install from
 https://www.segger.com/downloads/systemview/[Segger].
 
-NOTE: V3.30 is the last version which allows continuous recording via UART under Debian/Testing.
+NOTE: V3.30 is the last version which allows continuous recording via UART under Debian/Testing,
+see https://forum.segger.com/index.php/Thread/8898-Recent-linux-SystemView-version-missing-serial-port-dialog/[Segger forum].
 
 
-=== First Steps
-For the first steps, SystemViews UART recording is used.  Therefor yapicoprobe
+=== Probe Configuration
+
+For the first steps, SystemViews UART recording is used.  Therefor YAPicoprobe
 is used as connection to the target which redirects RTT output to a UART.
-Yapicoprobe had to be patched so that RTT channel #1 was redirected to the
-CDC.
 
-End result can be found in link:main.c[main.c].
+In the meantime I have integrated TinyUSB RNDIS/ECM/NCM into YAPicoprobe.  This raises some
+new compatibility issues, but via CMakeLists.txt the best fitting probe setup can be
+chosen.  At least SystemView 3.50a can now be used on Linux.
+
+
+=== Test Program on the Target
+
+End result can be found in link:.[main.c].
 
 To show the capabilities of SystemView, the following timing diagrams show the difference
 between debug and optimized compilation:
@@ -41,4 +55,53 @@ image::PrintCycCnt-Debug.png[Debug Version, 90%]
 .Optimized Version
 [.text-center]
 image::PrintCycCnt-Optimized.png[Debug Version, 90%]
+
+
+=== Another SystemView Issue: SEGGER_RTT_LOCK() [[rtt-lock-problem]]
+
+Introducing SysTick monitoring in the test program revealed some hick ups in the
+data sent to SystemView.  Randomly wrong names appeared in the context window
+like `ISR 17` or `Timer 0x63`, in the worst case SystemView crashes, see issue also in
+https://forum.segger.com/index.php/Thread/9061-SEGGER-RTT-LOCK-UNLOCK-code-wrong/[Segger forum].
+
+Solution was TMO wrong lock code in `SEGGER_RTT_LOCK()` / `SEGGER_RTT_UNLOCK()`.
+Replacing it with the following experimental code fragment solves the issue (for me):
+
+.Code Corrections in SEGGER_RTT_Conf.h
+[source, C]
+----
+#ifndef SEGGER_RTT_ASM
+    __attribute__((always_inline)) static inline void __enable_irqXX(void)
+    {
+      __asm volatile ("cpsie i" : : : "memory");
+    }
+
+    __attribute__((always_inline)) static inline void __disable_irqXX(void)
+    {
+      __asm volatile ("cpsid i" : : : "memory");
+    }
+
+    __attribute__((always_inline)) static inline unsigned __get_PRIMASKXX(void)
+    {
+      unsigned result;
+
+      __asm volatile ("MRS %0, primask" : "=r" (result) );
+      return(result);
+    }
+
+    #define SEGGER_RTT_LOCK()      unsigned __prim = __get_PRIMASKXX(); __disable_irqXX();
+    #define SEGGER_RTT_UNLOCK()    if (!__prim) { __enable_irqXX(); }
+#endif
+----
+
+.Comparing Unpatched/Patched
+[%autowidth]
+[%header]
+|===
+| Unpatched | Patched
+
+a|image::SystemView_nok.png[Unpatched SEGGER_RTT_Conf.h, 90%]
+a|image::SystemView_ok.png[Patched SEGGER_RTT_Conf.h, 90%]
+
+|===
 

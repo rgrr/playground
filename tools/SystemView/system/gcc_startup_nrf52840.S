@@ -25,9 +25,10 @@ NOTICE: This file has been modified by Nordic Semiconductor ASA.
 
     //
     // LLD: correct __interrupt_vector
+    // original code from picolib in newlib/libc/picolib/machine/arm/interrupt.c
     //
     .text
-    .type   interrupt_vector,%object
+    .type       interrupt_vector,%object
     .section    .text.init.enter,"ax",%progbits
     .p2align    2
 
