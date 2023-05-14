@@ -106,3 +106,13 @@ a|image::SystemView_ok.png[Patched SEGGER_RTT_Conf.h, 90%]
 
 |===
 
+.System Load
+[%autowidth]
+[%header]
+|===
+|  | 
+
+| Overall system was not very much loaded during testing
+a|image::SystemView_load.png[System Load]
+
+|===
