@@ -66,46 +66,6 @@ void CycCnt_Init(void)
 }   // CycCnt_Init
 
 
-/*********************************************************************
- *
- *    Sysview
- *
- *********************************************************************/
-
-#define SYSVIEW_DEVICE_NAME "PCA10056 Cortex-M4"
-#define SYSVIEW_APP_NAME "SysView Games"
-
-
-static void _cbSendSystemDesc(void) {
-    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",O=NoOS");
-    SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
-}
-
-
-SEGGER_SYSVIEW_MODULE IPModule = {
-    "M=TestSysView,"                       \
-    "S=This just a test for SystemView,"   \
-    "0 Print cnt=%d",                             // sModule
-    2,                                            // NumEvents
-    0,                                            // EventOffset, Set by SEGGER_SYSVIEW_RegisterModule()
-    NULL,                                         // pfSendModuleDesc, NULL: No additional module description
-    NULL,                                         // pNext, Set by SEGGER_SYSVIEW_RegisterModule()
-};
-
-
-void SEGGER_SYSVIEW_Conf(void)
-{
-    CycCnt_Init();
-
-    SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL, _cbSendSystemDesc);
-
-    //SEGGER_SYSVIEW_RegisterModule( &IPModule);
-
-    SysTick_Init(123);
-}   // SEGGER_SYSVIEW_Conf
-
-
-
 //======================================================================================================================
 #include "SEGGER_RTT.h"
 
@@ -134,9 +94,29 @@ __strong_reference(stdin, stderr);
 
 
 
+/*********************************************************************
+ *
+ *    Sysview
+ *
+ *********************************************************************/
+
+#define SYSVIEW_DEVICE_NAME "PCA10056 Cortex-M4"
+#define SYSVIEW_APP_NAME "SysView Games"
+
 #define MARKER_PRINT   0x2222
 #define TASKID_PRINT   0x22
 #define TASKID_DELAY   0x11
+
+
+SEGGER_SYSVIEW_MODULE IPModule = {
+    "M=TestSysView,"                       \
+    "S=This just a test for SystemView,"   \
+    "0 Print cnt=%d",                             // sModule
+    2,                                            // NumEvents
+    0,                                            // EventOffset, Set by SEGGER_SYSVIEW_RegisterModule()
+    NULL,                                         // pfSendModuleDesc, NULL: No additional module description
+    NULL,                                         // pNext, Set by SEGGER_SYSVIEW_RegisterModule()
+};
 
 
 static void _Delay(int period)
@@ -147,6 +127,53 @@ static void _Delay(int period)
     } while (i--);
     SEGGER_SYSVIEW_OnTaskStopExec();
 }   // _Delay
+
+
+static void _cbSendSystemDesc(void)
+{
+    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",O=NoOS");
+    SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
+
+    //
+    // name "tasks"
+    //
+    _Delay(5);
+    {
+        SEGGER_SYSVIEW_TASKINFO Info;
+
+        SEGGER_SYSVIEW_OnTaskCreate(TASKID_PRINT);
+        memset( &Info, 0, sizeof(Info));
+        Info.TaskID = TASKID_PRINT;
+        Info.sName = "PrintCycCnt";
+        SEGGER_SYSVIEW_SendTaskInfo( &Info);
+    }
+
+    _Delay(5);
+    {
+        SEGGER_SYSVIEW_TASKINFO Info;
+
+        SEGGER_SYSVIEW_OnTaskCreate(TASKID_DELAY);
+        memset( &Info, 0, sizeof(Info));
+        Info.TaskID = TASKID_DELAY;
+        Info.sName = "Delay";
+        SEGGER_SYSVIEW_SendTaskInfo( &Info);
+    }
+
+    _Delay(5);
+    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "Print");
+}   // _cbSendSystemDesc
+
+
+void SEGGER_SYSVIEW_Conf(void)
+{
+    CycCnt_Init();
+
+    SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL, _cbSendSystemDesc);
+
+    //SEGGER_SYSVIEW_RegisterModule( &IPModule);
+
+    SysTick_Init(123);
+}   // SEGGER_SYSVIEW_Conf
 
 
 
@@ -166,15 +193,13 @@ static void PrintCycCnt(int i)
         __asm volatile ("nop\n" : : :);
     }
     SEGGER_SYSVIEW_OnTaskStopExec();
-}   // PrintC
+}   // PrintCycCnt
 
 
 
 int main()
 {
-#if 1
     printf("012345678901234567123456789012345678901234567890123456789\n");
-#endif
 
 #if 1
     for (int i = 0;  i < 200;  ++i) {        // this delay is required to have a running CYCCNT after reset with pyocd
@@ -186,36 +211,7 @@ int main()
 
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
-    _Delay(100);
-    _Delay(100);
-    SEGGER_SYSVIEW_NameMarker(0x2222, "Print");
-    _Delay(100);
-
-    //
-    // name "tasks"
-    //
-    _Delay(100);
-    {
-        SEGGER_SYSVIEW_TASKINFO Info;
-
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_PRINT);
-        memset( &Info, 0, sizeof(Info));
-        Info.TaskID = TASKID_PRINT;
-        Info.sName = "PrintCycCnt";
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-    _Delay(100);
-    {
-        SEGGER_SYSVIEW_TASKINFO Info;
-
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_DELAY);
-        memset( &Info, 0, sizeof(Info));
-        Info.TaskID = TASKID_DELAY;
-        Info.sName = "Delay";
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-
-    _Delay(100);
+    _Delay(10);
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
