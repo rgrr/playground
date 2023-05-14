@@ -3,7 +3,8 @@
 :toc:
 :toclevels: 5
 
-Jump directly to the <<rtt-lock-problem,SEGGER_RTT_LOCK() problem>>.
+
+NOTE: Jump directly to the <<rtt-lock-problem,SEGGER_RTT_LOCK() problem>>.
 
 
 == SystemView
@@ -61,7 +62,7 @@ image::PrintCycCnt-Optimized.png[Debug Version, 90%]
 
 Introducing SysTick monitoring in the test program revealed some hick ups in the
 data sent to SystemView.  Randomly wrong names appeared in the context window
-like `ISR 17` or `Timer 0x63`, in the worst case SystemView crashes, see issue also in
+like `ISR 17` or `Timer 0x63`, in the worst case SystemView crashes, see issue also on
 https://forum.segger.com/index.php/Thread/9061-SEGGER-RTT-LOCK-UNLOCK-code-wrong/[Segger forum].
 
 Solution was TMO wrong lock code in `SEGGER_RTT_LOCK()` / `SEGGER_RTT_UNLOCK()`.
