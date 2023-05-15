@@ -38,10 +38,15 @@ void SysTick_Handler(void)
 
 
 void SysTick_Init(uint32_t ips)
+/**
+ * Init SysTick interrupt.
+ * SysTick interrupt is also set to lowest priority.
+ *
+ * \note
+ *    nRF52840 has 3 bits for priority level.  __NVIC_SetPriority() sets the upper bits of an 8bit register.
+ */
 {
-    SysTick->LOAD = (SystemCoreClock / ips) - 1;
-    SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_CLKSOURCE_Msk;
+    SysTick_Config((SystemCoreClock / ips) - 1);
 }   // SysTick_Init
 
 
@@ -171,8 +176,6 @@ void SEGGER_SYSVIEW_Conf(void)
     SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL, _cbSendSystemDesc);
 
     //SEGGER_SYSVIEW_RegisterModule( &IPModule);
-
-    SysTick_Init(123);
 }   // SEGGER_SYSVIEW_Conf
 
 
@@ -181,7 +184,7 @@ static void PrintCycCnt(int i)
 {
     SEGGER_SYSVIEW_OnTaskStartExec(TASKID_PRINT);
     //SEGGER_SYSVIEW_RecordU32(IPModule.EventOffset + 0, i);
-    SEGGER_SYSVIEW_WarnfTarget("cyccnt %d %u\n", i, DWT_CYCCNT());
+    //SEGGER_SYSVIEW_WarnfTarget("cyccnt %d %u\n", i, DWT_CYCCNT());
 
     //
     // small demo, that even small runtime differences are visible, task runtimes:
@@ -212,6 +215,8 @@ int main()
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
     _Delay(10);
+
+    SysTick_Init(1100);
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 

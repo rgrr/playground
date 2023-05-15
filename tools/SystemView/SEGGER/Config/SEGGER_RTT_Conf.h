@@ -87,7 +87,7 @@ Revision: $Rev: 24316 $
 #endif
 
 #ifndef   BUFFER_SIZE_UP
-  #define BUFFER_SIZE_UP                            (1024)  // Size of the buffer for terminal output of target, up to host (Default: 1k)
+  #define BUFFER_SIZE_UP                            (4096)  // Size of the buffer for terminal output of target, up to host (Default: 1k)
 #endif
 
 #ifndef   BUFFER_SIZE_DOWN
@@ -140,7 +140,7 @@ Revision: $Rev: 24316 $
 //
 
 
-#define USE_PATCHED_LOCK   1
+#define USE_PATCHED_LOCK   0
 
 
 #if USE_PATCHED_LOCK
@@ -257,8 +257,8 @@ Revision: $Rev: 24316 $
                                                 );                             \
                                }
   #else
-    #define SEGGER_RTT_LOCK()
-    #define SEGGER_RTT_UNLOCK()
+//    #define SEGGER_RTT_LOCK()
+//    #define SEGGER_RTT_UNLOCK()
   #endif
 #endif
 
