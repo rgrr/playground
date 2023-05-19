@@ -216,7 +216,7 @@ int main()
     SEGGER_SYSVIEW_Start();
     _Delay(10);
 
-    SysTick_Init(1100);
+    SysTick_Init(800);      // ~32000 with ECM, <1000 with NCM (transfer stutters)
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
