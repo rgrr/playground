@@ -2,10 +2,11 @@
 
 Here are several things concerning LLVM.
 
-* link:build-llvm[Build LLVM for Embedded Targets]
 * link:boilerplate[Boilerplate for Embedded Experiments]
 * link:broken-lto[Broken LTO]
+* link:build-llvm[Build LLVM for Embedded Targets]
 * link:profiling[Profiling]
+* link:register-access[Register Access]
 * link:RTT[RTT]
 
 As toolchain I'm using the https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]

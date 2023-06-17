@@ -1,0 +1,25 @@
+== Register Access
+
+=== Idea
+The bootstrapper of BlueConnect needs to do some low power wait on startup to avoid current peaks.
+For the low power wait, the watchdog is used in a very early state.
+
+The problem is, that the application is thus invoked always with watchdog set in `RESETREAS`
+and thus the application set the "watchdog" flag.
+
+To avoid this, the idea is to use an MCU register to track, if the watchdog
+bit was set by the low power wait or by other circumstances.
+
+=== Algorithm
+
+* if `RESETREAS` == 0 (power up!), then set R12 to 0x11223344 and make the low power wait
+  with the watchdog (this ends the control flow below)
+* else if R12 == 0x11223344, then clear the watchdog bit from `RESETREAS`
+  (because it was induced by the above watchdog wait)
+* else leave `RESETREAS` as it is
+* set R12 to 0
+* start application
+  
+
+=== Example Project
+Write some value to R12 and read it back from R12.
