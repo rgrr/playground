@@ -4,9 +4,6 @@
 :toclevels: 5
 
 
-NOTE: Jump directly to the <<rtt-lock-problem,SEGGER_RTT_LOCK() problem>>.
-
-
 == SystemView
 
 === Links
@@ -43,7 +40,12 @@ chosen.  At least SystemView 3.50a can now be used on Linux.
 
 === Test Program on the Target
 
-End result can be found in link:.[main.c].
+End result can be found in link:.[main.c].  The test program runs on a Nordic PCA10056 (nRF52840).
+Test program includes all the required startup code and linker files, so can be seen as another boiler
+plate for development.
+
+NOTE: not so nice is, that there is RTT console code contained.  This will be removed in the future
+and replaced by the RTT lib code (or there will be a SysView library).
 
 To show the capabilities of SystemView, the following timing diagrams show the difference
 between debug and optimized compilation:
@@ -58,7 +60,10 @@ image::PrintCycCnt-Debug.png[Debug Version, 90%]
 image::PrintCycCnt-Optimized.png[Debug Version, 90%]
 
 
-=== Another SystemView Issue: SEGGER_RTT_LOCK() [[rtt-lock-problem]]
+=== Another SystemView Issue: SEGGER_RTT_LOCK()? [[rtt-lock-problem]]
+
+NOTE: as it turns out, the bug was on my side of the screen.  SysTick interrupt priority was higher
+in my first test program than the SEGGER macros were locking.  So no surprising hickups after all.
 
 Introducing SysTick monitoring in the test program revealed some hick ups in the
 data sent to SystemView.  Randomly wrong names appeared in the context window
