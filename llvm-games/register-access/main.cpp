@@ -44,7 +44,7 @@ static inline uint32_t get_r12(void)
 int main()
 {
     set_r12(0xaaaa5555);
-    printf("Hello world %d\n", get_r12());
+    printf("Hello world 0x%08x\n", get_r12());
     set_r12(0x99aabbcc);
-    printf("Hello world %d\n", get_r12());
+    printf("Hello world 0x%08x\n", get_r12());
 }
