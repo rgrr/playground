@@ -13,9 +13,7 @@ target_compile_options(${LIB_SYSVIEW} PRIVATE
         -Wall
 )
 
-target_include_directories(${LIB_SYSVIEW} PRIVATE
+target_include_directories(${LIB_SYSVIEW} PUBLIC
     Config
     Sysview
-    ../system/cmsis
-    ../system/nordic
 )

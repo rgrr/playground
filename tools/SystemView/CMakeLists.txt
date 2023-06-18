@@ -53,8 +53,6 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 
 # List of include directories
 target_include_directories(${PROJECT_ELF} PRIVATE
-    SEGGER/Config
-    SEGGER/Sysview
     system/cmsis
     system/nordic
 )
