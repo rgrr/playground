@@ -216,7 +216,7 @@ int main()
     SEGGER_SYSVIEW_Start();
     _Delay(10);
 
-    SysTick_Init(800);      // ~32000 with ECM, <1000 with NCM (transfer stutters)
+    SysTick_Init(25000);      // 25000 and _Delay(2) below works with NCM
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
@@ -233,10 +233,10 @@ int main()
             _Delay(0);
         }
 #if 1
-        if (j % 10 == 0)
+        if (j % 1000 == 0)
             printf("0123456789012345678901234567890123456789 %d\n", j);
 #endif
-        _Delay(20);
+        _Delay(2);        // 2 & 3 works as well
     }
 
     SEGGER_SYSVIEW_DisableEvents(0xffffffff);

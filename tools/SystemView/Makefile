@@ -43,19 +43,21 @@ cmake-create-release:
 
 .PHONY: flash
 flash: all
-	#pyocd flash -t nrf52840 -f 8M $(BUILD_DIR)/$(PROJECT).elf
 	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
 
 
+.PHONY: flash-pyocd
+flash-pyocd: all
+	pyocd flash -t nrf52840 -f 10M $(BUILD_DIR)/$(PROJECT).elf
+
 .PHONY: reset
 reset: all
-	#pyocd reset -t nrf52840
 	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 8000" -c "init; reset run; exit"
 
 
 .PHONY: reset-pyocd
 reset-pyocd: all
-	pyocd reset -t nrf52840
+	pyocd reset -t nrf52840 -f 10M
 
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf
