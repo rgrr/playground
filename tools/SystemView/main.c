@@ -105,23 +105,33 @@ __strong_reference(stdin, stderr);
  *
  *********************************************************************/
 
-#define SYSVIEW_DEVICE_NAME "PCA10056 Cortex-M4"
-#define SYSVIEW_APP_NAME "SysView Games"
+#define SYSVIEW_APP_NAME    "SysView Games"
+#define SYSVIEW_DEVICE_NAME "PCA10056 nRF52840"
+#define SYSTEM_CORE_NAME    "Cortex-M4"
 
 #define MARKER_PRINT   0x2222
 #define TASKID_PRINT   0x22
 #define TASKID_DELAY   0x11
+#define EV_ID          (IPModule.EventOffset + 0) // event ids must be >= 32
 
+
+static void _cbSendIPModuleDesc(void);
 
 SEGGER_SYSVIEW_MODULE IPModule = {
     "M=TestSysView,"                       \
-    "S=This just a test for SystemView,"   \
-    "0 Print cnt=%d",                             // sModule
-    2,                                            // NumEvents
+    "0 XXXXXXXX cnt=%d",                             // sModule
+    1,                                            // NumEvents
     0,                                            // EventOffset, Set by SEGGER_SYSVIEW_RegisterModule()
-    NULL,                                         // pfSendModuleDesc, NULL: No additional module description
+    _cbSendIPModuleDesc,                          // pfSendModuleDesc, NULL: No additional module description
     NULL,                                         // pNext, Set by SEGGER_SYSVIEW_RegisterModule()
 };
+
+static void _cbSendIPModuleDesc(void)
+{
+    SEGGER_SYSVIEW_NameResource(0x99991111, "Rx FIFO");
+    SEGGER_SYSVIEW_NameResource(0x11119999, "Tx FIFO");
+    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "T=IP, S='embOS/IP V12.09'");
+}
 
 
 static void _Delay(int period)
@@ -136,13 +146,16 @@ static void _Delay(int period)
 
 static void _cbSendSystemDesc(void)
 {
-    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",O=NoOS");
+    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",C=" SYSTEM_CORE_NAME ",O=NoOS");
     SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
+
+//    SEGGER_SYSVIEW_RegisterModule( &IPModule );
+    printf("aaaaa %lu\n", IPModule.EventOffset);
 
     //
     // name "tasks"
     //
-    _Delay(5);
+//    _Delay(5);
     {
         SEGGER_SYSVIEW_TASKINFO Info;
 
@@ -153,7 +166,7 @@ static void _cbSendSystemDesc(void)
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
 
-    _Delay(5);
+//    _Delay(5);
     {
         SEGGER_SYSVIEW_TASKINFO Info;
 
@@ -164,27 +177,30 @@ static void _cbSendSystemDesc(void)
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
 
-    _Delay(5);
-    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "Print");
+//    _Delay(5);
+    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "MarkerPrint");
 }   // _cbSendSystemDesc
 
 
 void SEGGER_SYSVIEW_Conf(void)
 {
+    static uint8_t buffer[32768];    // just playing around...
     CycCnt_Init();
 
     SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL, _cbSendSystemDesc);
+    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", buffer, sizeof(buffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    //SEGGER_SYSVIEW_SetRAMBase(0x20000000);    // effect??
 
-    //SEGGER_SYSVIEW_RegisterModule( &IPModule);
+//    SEGGER_SYSVIEW_RegisterModule( &IPModule );
+    printf("xxxxx %lu\n", IPModule.EventOffset);
 }   // SEGGER_SYSVIEW_Conf
 
 
 
 static void PrintCycCnt(int i)
 {
+//    SEGGER_SYSVIEW_RecordU32(EV_ID, i);
     SEGGER_SYSVIEW_OnTaskStartExec(TASKID_PRINT);
-    //SEGGER_SYSVIEW_RecordU32(IPModule.EventOffset + 0, i);
-    //SEGGER_SYSVIEW_WarnfTarget("cyccnt %d %u\n", i, DWT_CYCCNT());
 
     //
     // small demo, that even small runtime differences are visible, task runtimes:
@@ -196,6 +212,7 @@ static void PrintCycCnt(int i)
         __asm volatile ("nop\n" : : :);
     }
     SEGGER_SYSVIEW_OnTaskStopExec();
+//    SEGGER_SYSVIEW_RecordEndCallU32(EV_ID, (U32)DWT_CYCCNT());
 }   // PrintCycCnt
 
 
@@ -213,10 +230,10 @@ int main()
     printf("012345678901234567123456789012345678901234567890123456789\n");
 
     SEGGER_SYSVIEW_Conf();
-    SEGGER_SYSVIEW_Start();
+//    SEGGER_SYSVIEW_Start();
     _Delay(10);
 
-    SysTick_Init(25000);      // 25000 and _Delay(2) below works with NCM
+    SysTick_Init(30);      // 25000 and _Delay(2) below works with NCM (SWD freq=10M)
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
@@ -226,6 +243,7 @@ int main()
         for (int i = 0;  i < 5;  ++i) {
             SEGGER_SYSVIEW_MarkStart(MARKER_PRINT);
             SEGGER_SYSVIEW_OnIdle();
+            SEGGER_SYSVIEW_Mark(MARKER_PRINT);
             PrintCycCnt(i);
             SEGGER_SYSVIEW_OnIdle();
             SEGGER_SYSVIEW_MarkStop(MARKER_PRINT);
@@ -236,7 +254,7 @@ int main()
         if (j % 1000 == 0)
             printf("0123456789012345678901234567890123456789 %d\n", j);
 #endif
-        _Delay(2);        // 2 & 3 works as well
+        _Delay(20);        // 2 & 3 works as well
     }
 
     SEGGER_SYSVIEW_DisableEvents(0xffffffff);
