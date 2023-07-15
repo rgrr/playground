@@ -42,7 +42,7 @@
 *                                                                    *
 **********************************************************************
 *                                                                    *
-*       SystemView version: 3.50a                                    *
+*       SystemView version: 3.52                                    *
 *                                                                    *
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
@@ -79,14 +79,17 @@ Additional information:
 **********************************************************************
 */
 
+// the probe expects SysView data in RTT channel #1
 #define SEGGER_SYSVIEW_RTT_CHANNEL         1
-#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE     2048
 
+// override this setting with "SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", buffer, sizeof(buffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);"
+#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE     1024
+
+// this offers shorter lock times
 #define SEGGER_SYSVIEW_USE_STATIC_BUFFER   0
-#define SEGGER_SYSVIEW_MAX_PACKET_SIZE     256
-#define SEGGER_SYSVIEW_MAX_STRING_LEN      256
 
-#define SEGGER_SYSVIEW_ID_BASE             0x20000000
+// with the line below required bandwidth goes from 60KByte/s -> 69KByte/s!
+//#define SEGGER_SYSVIEW_ID_BASE             0x20000000
 
 #endif  // SEGGER_SYSVIEW_CONF_H
 

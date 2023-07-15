@@ -42,7 +42,7 @@
 *                                                                    *
 **********************************************************************
 *                                                                    *
-*       SystemView version: 3.50a                                    *
+*       SystemView version: 3.52                                    *
 *                                                                    *
 **********************************************************************
 ---------------------------END-OF-HEADER------------------------------
@@ -56,6 +56,10 @@ Revision: $Rev: 24316 $
 
 #ifndef SEGGER_RTT_CONF_H
 #define SEGGER_RTT_CONF_H
+
+#ifdef __IAR_SYSTEMS_ICC__
+  #include <intrinsics.h>
+#endif
 
 /*********************************************************************
 *
@@ -138,34 +142,8 @@ Revision: $Rev: 24316 $
 // In case of doubt mask all interrupts: 1 << (8 - BASEPRI_PRIO_BITS) i.e. 1 << 5 when 3 bits are implemented in NVIC
 // or define SEGGER_RTT_LOCK() to completely disable interrupts.
 //
-
-
-#define USE_PATCHED_LOCK   0
-
-
-#if USE_PATCHED_LOCK
-    #ifndef SEGGER_RTT_ASM
-        __attribute__((always_inline)) static inline void __enable_irqXX(void)
-        {
-          __asm volatile ("cpsie i" : : : "memory");
-        }
-
-        __attribute__((always_inline)) static inline void __disable_irqXX(void)
-        {
-          __asm volatile ("cpsid i" : : : "memory");
-        }
-
-        __attribute__((always_inline)) static inline unsigned __get_PRIMASKXX(void)
-        {
-          unsigned result;
-
-          __asm volatile ("MRS %0, primask" : "=r" (result) );
-          return(result);
-        }
-
-        #define SEGGER_RTT_LOCK()      unsigned __prim = __get_PRIMASKXX(); __disable_irqXX();
-        #define SEGGER_RTT_UNLOCK()    if (!__prim) { __enable_irqXX(); }
-    #endif
+#ifndef   SEGGER_RTT_MAX_INTERRUPT_PRIORITY
+  #define SEGGER_RTT_MAX_INTERRUPT_PRIORITY         (0x20)   // Interrupt priority to lock on SEGGER_RTT_LOCK on Cortex-M3/4 (Default: 0x20)
 #endif
 
 /*********************************************************************
@@ -173,8 +151,6 @@ Revision: $Rev: 24316 $
 *       RTT lock configuration for SEGGER Embedded Studio,
 *       Rowley CrossStudio and GCC
 */
-#if !USE_PATCHED_LOCK
-  #warning "using unpatched version"
 #if ((defined(__SES_ARM) || defined(__SES_RISCV) || defined(__CROSSWORKS_ARM) || defined(__GNUC__) || defined(__clang__)) && !defined (__CC_ARM) && !defined(WIN32))
   #if (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__))
     #define SEGGER_RTT_LOCK()   {                                                                   \
@@ -257,8 +233,8 @@ Revision: $Rev: 24316 $
                                                 );                             \
                                }
   #else
-//    #define SEGGER_RTT_LOCK()
-//    #define SEGGER_RTT_UNLOCK()
+    #define SEGGER_RTT_LOCK()
+    #define SEGGER_RTT_UNLOCK()
   #endif
 #endif
 
@@ -436,23 +412,15 @@ void OS_SIM_LeaveCriticalSection(void);
                                 }
 #endif
 
-#endif
-
 /*********************************************************************
 *
 *       RTT lock configuration fallback
 */
 #ifndef   SEGGER_RTT_LOCK
-  #ifndef SEGGER_RTT_ASM
-    #error "Should not happen"
-  #endif
   #define SEGGER_RTT_LOCK()                // Lock RTT (nestable)   (i.e. disable interrupts)
 #endif
 
 #ifndef   SEGGER_RTT_UNLOCK
-  #ifndef SEGGER_RTT_ASM
-    #error "Should not happen"
-  #endif
   #define SEGGER_RTT_UNLOCK()              // Unlock RTT (nestable) (i.e. enable previous interrupt lock state)
 #endif
 
