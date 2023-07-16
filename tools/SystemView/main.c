@@ -103,65 +103,101 @@ __strong_reference(stdin, stderr);
  *
  *    Sysview
  *
+ *    To give the SEGGER_SYSVIEW_Record*() calls symbolic names and correct parameter printout,
+ *    define /opt/SEGGER/SystemView_V352/Description/SYSVIEW_NoOS.txt with the following content:
+
+33    Delay                               delay_us=%u
+50    _TestFunc0_STATE_INIT
+51    _TestFunc0_STATE_WAIT_FOR_DATA
+52    _TestFunc0_STATE_PROCESS_DATA
+53    _TestFunc0_STATE_SEND_DATA
+
+    OR
+
+33    Delay                               delay_us=%Time
+50    _TestFunc0_STATE_INIT
+51    _TestFunc0_STATE_WAIT_FOR_DATA
+52    _TestFunc0_STATE_PROCESS_DATA
+53    _TestFunc0_STATE_SEND_DATA
+
+NamedType Time 0=NULL 200=0.2ms 500=0.5ms
+NamedType Time 1000=1ms 40000=40ms
+NamedType Time 20=20us 30=30us 40=40us 50=50us
+
+ *
  *********************************************************************/
 
 #define SYSVIEW_APP_NAME    "SysView Games"
 #define SYSVIEW_DEVICE_NAME "PCA10056 nRF52840"
-#define SYSTEM_CORE_NAME    "Cortex-M4"
+#define SYSVIEW_CORE_NAME   "Cortex-M4"
+#define SYSVIEW_OS_NAME     "NoOS"                 // this decides about the above name
 
 #define MARKER_PRINT        0x2222
 #define TASKID_PRINT        0x22
 #define TASKID_DELAY        0x11
 #define TASKID_TESTFUNC0    0x99
-
-
-static void _cbSendTaskList(void)
-{
-    printf("_cbSendTaskList()\n");
-
-    {
-        SEGGER_SYSVIEW_TASKINFO Info;
-
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_PRINT);
-        memset( &Info, 0, sizeof(Info));
-        Info.TaskID = TASKID_PRINT;
-        Info.sName = "PrintCycCnt";
-        Info.StackBase = 0x20004000;
-        Info.StackSize = 0x2000;
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-
-    {
-        SEGGER_SYSVIEW_TASKINFO Info;
-
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_TESTFUNC0);
-        memset( &Info, 0, sizeof(Info));
-        Info.TaskID = TASKID_TESTFUNC0;
-        Info.sName = "_TestFunc0";
-        Info.StackBase = 0x20006000;
-        Info.StackSize = 0x4000;
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-
-    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "MarkerPrint");
-
-    SEGGER_SYSVIEW_NameResource(0x99991111, "Rx FIFO");
-    SEGGER_SYSVIEW_NameResource(0x11119999, "Tx FIFO");
-
-    SEGGER_SYSVIEW_NameResource(33, "XXXXXXXXXXX");
-}   // _cbSendTaskList
-
-static const SEGGER_SYSVIEW_OS_API _NoOSAPI = {NULL, _cbSendTaskList};
+#define TASKID_MAINLOOP     0x1234
 
 
 static void _cbSendSystemDesc(void)
 {
     SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME);
     SEGGER_SYSVIEW_SendSysDesc("D=" SYSVIEW_DEVICE_NAME);
-    SEGGER_SYSVIEW_SendSysDesc("C=" SYSTEM_CORE_NAME);
-    SEGGER_SYSVIEW_SendSysDesc("O=NoOS");
+    SEGGER_SYSVIEW_SendSysDesc("C=" SYSVIEW_CORE_NAME);
+    SEGGER_SYSVIEW_SendSysDesc("O=" SYSVIEW_OS_NAME);
     SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
 }   // _cbSendSystemDesc
+
+
+static void _cbSendTaskList(void)
+{
+    {
+        SEGGER_SYSVIEW_TASKINFO Info = {
+                .TaskID = TASKID_PRINT,
+                .sName  = "PrintCycCnt",
+                .StackBase = 0x20004000,
+                .StackSize = 0x2000,
+                .Prio = 10,
+        };
+        SEGGER_SYSVIEW_OnTaskCreate(TASKID_PRINT);
+        SEGGER_SYSVIEW_SendTaskInfo( &Info);
+    }
+
+    {
+        SEGGER_SYSVIEW_TASKINFO Info = {
+                .TaskID = TASKID_TESTFUNC0,
+                .sName  = "_TestFunc0",
+                .StackBase = 0x20006000,
+                .StackSize = 0x4000,
+                .Prio = 12,
+        };
+        SEGGER_SYSVIEW_OnTaskCreate(TASKID_TESTFUNC0);
+        SEGGER_SYSVIEW_SendTaskInfo( &Info);
+    }
+
+    {
+        SEGGER_SYSVIEW_TASKINFO Info = {
+                .TaskID = TASKID_MAINLOOP,
+                .sName  = "mainloop",
+                .StackBase = 0x2000a000,
+                .StackSize = 0x2000,
+                .Prio = 4,
+        };
+        SEGGER_SYSVIEW_OnTaskCreate(TASKID_MAINLOOP);
+        SEGGER_SYSVIEW_SendTaskInfo( &Info);
+    }
+
+    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "MarkerPrint");
+
+    // named resources are referenced in the description file via %I
+    // or "NamedType" might be used (more flexibel)
+    SEGGER_SYSVIEW_NameResource(10,  "10us");
+    SEGGER_SYSVIEW_NameResource(100, "100us");
+    SEGGER_SYSVIEW_NameResource(200, "0.2ms");
+    SEGGER_SYSVIEW_NameResource(500, "0.5ms");
+}   // _cbSendTaskList
+
+static const SEGGER_SYSVIEW_OS_API _NoOSAPI = {NULL, _cbSendTaskList};
 
 
 void SEGGER_SYSVIEW_Conf(void)
@@ -220,13 +256,16 @@ static void PrintCycCnt(int i)
 
 
 typedef enum {
-  STATE_INIT = 0,
-  STATE_WAIT_FOR_DATA,
-  STATE_PROCESS_DATA,
-  STATE_SEND_DATA
+    STATE_INIT = 0,
+    STATE_WAIT_FOR_DATA,
+    STATE_PROCESS_DATA,
+    STATE_SEND_DATA
 } TASK_STATE_0;
 
 static void _TestFunc0(void)
+/**
+ * test function taken from https://wiki.segger.com/Use_SystemView_without_RTOS
+ */
 {
     static TASK_STATE_0 _State = STATE_INIT;
 
@@ -263,6 +302,18 @@ static void _TestFunc0(void)
 
 
 
+#define xFAST
+#ifdef FAST
+    // -> ~75000 events/s, 310 KByte/s
+    #define SYSTICKS    25000
+    #define IDLE_US     1000
+#else
+    // -> ~1800 events/s, 10 KByte/s
+    #define SYSTICKS    15
+    #define IDLE_US     40000
+#endif
+
+
 int main()
 {
     printf("012345678901234567123456789012345678901234567890123456789-----------------------------------\n");
@@ -278,33 +329,32 @@ int main()
     SEGGER_SYSVIEW_Start();
     _Delay(10000);
 
-    SysTick_Init(20000);      // 25000 and _Delay(2000) below works with NCM (SWD freq=10M)
+    SysTick_Init(SYSTICKS);
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
 #if 1
-    SEGGER_SYSVIEW_OnIdle();
     for (int j = 0;  j < 5000000;  ++j) {
+        SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
+        _Delay(200);
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
-        SEGGER_SYSVIEW_OnIdle();
         for (int i = 0;  i < 5;  ++i) {
-            SEGGER_SYSVIEW_OnIdle();
             _TestFunc0();
-            SEGGER_SYSVIEW_OnIdle();
             SEGGER_SYSVIEW_MarkStart(MARKER_PRINT);
-            SEGGER_SYSVIEW_OnIdle();
             SEGGER_SYSVIEW_Mark(MARKER_PRINT);
             PrintCycCnt(i);
-            SEGGER_SYSVIEW_OnIdle();
             SEGGER_SYSVIEW_MarkStop(MARKER_PRINT);
-            SEGGER_SYSVIEW_OnIdle();
             _Delay(0);
         }
 #if 1
         if (j % 1000 == 0)
             printf("0123456789012345678901234567890123456789 %d\n", j);
 #endif
-        _Delay(2000);        // 2000 & 3000 works as well
+        SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
+        _Delay(500);
+
+        SEGGER_SYSVIEW_OnIdle();
+        _Delay(IDLE_US);
     }
 
     SEGGER_SYSVIEW_DisableEvents(0xffffffff);
