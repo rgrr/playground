@@ -132,7 +132,8 @@ NamedType Time 20=20us 30=30us 40=40us 50=50us
 #define SYSVIEW_CORE_NAME   "Cortex-M4"
 #define SYSVIEW_OS_NAME     "NoOS"                 // this decides about the above name
 
-#define MARKER_PRINT        0x2222
+#define MARKER_PRINT        1
+#define MARKER_PRINT_MOD    3
 #define TASKID_PRINT        0x22
 #define TASKID_DELAY        0x11
 #define TASKID_TESTFUNC0    0x99
@@ -188,6 +189,7 @@ static void _cbSendTaskList(void)
     }
 
     SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "MarkerPrint");
+    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT_MOD, "MarkerPrintModulo");
 
     // named resources are referenced in the description file via %I
     // or "NamedType" might be used (more flexibel)
@@ -304,13 +306,15 @@ static void _TestFunc0(void)
 
 #define xFAST
 #ifdef FAST
-    // -> ~75000 events/s, 310 KByte/s
-    #define SYSTICKS    25000
+    // -> ~70000 events/s, 295 KByte/s
+    #define SYSTICKS    20000
     #define IDLE_US     1000
+    #define PRINT_MOD   1000
 #else
     // -> ~1800 events/s, 10 KByte/s
     #define SYSTICKS    15
     #define IDLE_US     40000
+    #define PRINT_MOD   100
 #endif
 
 
@@ -340,17 +344,22 @@ int main()
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
         for (int i = 0;  i < 5;  ++i) {
             _TestFunc0();
+            SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
             SEGGER_SYSVIEW_MarkStart(MARKER_PRINT);
             SEGGER_SYSVIEW_Mark(MARKER_PRINT);
             PrintCycCnt(i);
+            SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
             SEGGER_SYSVIEW_MarkStop(MARKER_PRINT);
             _Delay(0);
         }
-#if 1
-        if (j % 1000 == 0)
-            printf("0123456789012345678901234567890123456789 %d\n", j);
-#endif
         SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
+#if 1
+        if (j != 0  &&  j % PRINT_MOD == 0) {
+            SEGGER_SYSVIEW_MarkStart(MARKER_PRINT_MOD);
+            printf("0123456789012345678901234567890123456789 %d\n", j);
+            SEGGER_SYSVIEW_MarkStop(MARKER_PRINT_MOD);
+        }
+#endif
         _Delay(500);
 
         SEGGER_SYSVIEW_OnIdle();
