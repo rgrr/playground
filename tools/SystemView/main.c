@@ -30,10 +30,10 @@
 void SysTick_Handler(void)
 {
     static volatile U32 Cnt = 0;
-    SEGGER_SYSVIEW_RecordEnterISR();
+//    SEGGER_SYSVIEW_RecordEnterISR();
 //    for (int i = 0;  i < 1000;  ++i)
         Cnt++;
-    SEGGER_SYSVIEW_RecordExitISR();
+//    SEGGER_SYSVIEW_RecordExitISR();
 }   // SysTick_Handler
 
 
@@ -118,9 +118,8 @@ __strong_reference(stdin, stderr);
 static void _cbSendIPModuleDesc(void);
 
 SEGGER_SYSVIEW_MODULE IPModule = {
-    "M=TestSysView,"                       \
-    "0 XXXXXXXX cnt=%d",                             // sModule
-    1,                                            // NumEvents
+    "",
+    2,                                            // NumEvents
     0,                                            // EventOffset, Set by SEGGER_SYSVIEW_RegisterModule()
     _cbSendIPModuleDesc,                          // pfSendModuleDesc, NULL: No additional module description
     NULL,                                         // pNext, Set by SEGGER_SYSVIEW_RegisterModule()
@@ -130,7 +129,11 @@ static void _cbSendIPModuleDesc(void)
 {
     SEGGER_SYSVIEW_NameResource(0x99991111, "Rx FIFO");
     SEGGER_SYSVIEW_NameResource(0x11119999, "Tx FIFO");
-    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "T=IP, S='embOS/IP V12.09'");
+    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "M=TestSysView");
+    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "S='embOS/IP V12.09'");
+    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "T=IP");
+    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "0 XXXXXXXX cnt=%d");
+    SEGGER_SYSVIEW_RecordModuleDescription(&IPModule, "1 YYYY abs=%u");
 }
 
 
@@ -146,11 +149,14 @@ static void _Delay(int period)
 
 static void _cbSendSystemDesc(void)
 {
-    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME ",D=" SYSVIEW_DEVICE_NAME ",C=" SYSTEM_CORE_NAME ",O=NoOS");
+    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME);
+    SEGGER_SYSVIEW_SendSysDesc("D=" SYSVIEW_DEVICE_NAME);
+    SEGGER_SYSVIEW_SendSysDesc("C=" SYSTEM_CORE_NAME);
+    SEGGER_SYSVIEW_SendSysDesc("O=NoOS");
     SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
 
 //    SEGGER_SYSVIEW_RegisterModule( &IPModule );
-    printf("aaaaa %lu\n", IPModule.EventOffset);
+//    printf("aaaaa %lu\n", IPModule.EventOffset);
 
     //
     // name "tasks"
@@ -163,6 +169,8 @@ static void _cbSendSystemDesc(void)
         memset( &Info, 0, sizeof(Info));
         Info.TaskID = TASKID_PRINT;
         Info.sName = "PrintCycCnt";
+        Info.StackBase = 0x20004000;
+        Info.StackSize = 0x2000;
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
 
@@ -174,6 +182,8 @@ static void _cbSendSystemDesc(void)
         memset( &Info, 0, sizeof(Info));
         Info.TaskID = TASKID_DELAY;
         Info.sName = "Delay";
+        Info.StackBase = 0x20006000;
+        Info.StackSize = 0x4000;
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
 
@@ -189,7 +199,7 @@ void SEGGER_SYSVIEW_Conf(void)
 
     SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL, _cbSendSystemDesc);
     SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", buffer, sizeof(buffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
-    //SEGGER_SYSVIEW_SetRAMBase(0x20000000);    // effect??
+//    SEGGER_SYSVIEW_SetRAMBase(0x20000000);    // effect??
 
 //    SEGGER_SYSVIEW_RegisterModule( &IPModule );
     printf("xxxxx %lu\n", IPModule.EventOffset);
@@ -230,13 +240,14 @@ int main()
     printf("012345678901234567123456789012345678901234567890123456789\n");
 
     SEGGER_SYSVIEW_Conf();
-//    SEGGER_SYSVIEW_Start();
+    SEGGER_SYSVIEW_Start();
     _Delay(10);
 
     SysTick_Init(30);      // 25000 and _Delay(2) below works with NCM (SWD freq=10M)
 
     SEGGER_SYSVIEW_EnableEvents(0xffffffff);
 
+#if 1
     for (int j = 0;  j < 5000000;  ++j) {
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
         SEGGER_SYSVIEW_OnIdle();
@@ -262,8 +273,9 @@ int main()
     SEGGER_SYSVIEW_Stop();
 
     printf("finished\n");
-
+#else
     for (;;) {
-        //SEGGER_SYSVIEW_IsStarted();
+        SEGGER_SYSVIEW_IsStarted();
     }
+#endif
 }   // main

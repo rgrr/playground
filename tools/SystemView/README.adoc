@@ -8,8 +8,9 @@
 
 === Links
 
-* https://www.segger.com/products/development-tools/systemview/
-
+* https://www.segger.com/products/development-tools/systemview/[SystemView @ Segger]
+* https://www.codeinsideout.com/blog/stm32/segger-systemview/[J-Link SysView - Record and Visualize System Activities]
+* https://mcuoneclipse.com/2020/10/11/freertos-v10-4-1-with-segger-systemview-v3-12/[FreeRTOS V10.4.1 with SEGGER SystemView V3.12]
 
 === Aim
 
