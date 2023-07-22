@@ -19,11 +19,157 @@
 
 
 
-/*********************************************************************
+/**
  *
- *    Direct access to MCU registers
+ */
+
+typedef struct {
+    uint32_t    id;
+    const char *name;
+} SYSVIEW_INFO;
+
+#define NUM_TASKS    32
+static SYSVIEW_INFO  _aTasks[NUM_TASKS];
+static int           _NumTasks;
+
+#define NUM_MARKER   16
+static SYSVIEW_INFO  _aMarker[NUM_MARKER];
+static int           _NumMarker;
+
+#define NUM_INTS     16
+static SYSVIEW_INFO  _aInts[NUM_INTS];
+static int           _NumInts;
+
+static const char  *sysviewAppName;
+static const char  *sysviewDeviceName;
+static const char  *sysviewCoreName;
+static const char  *sysviewOsName;
+
+
+
+void SYSVIEW_AddTask(uint32_t taskId, const char *name)
+{
+    int n;
+
+    SEGGER_SYSVIEW_OnTaskCreate(taskId);
+
+    if (_NumTasks > NUM_TASKS) {
+        return;
+    }
+    n = _NumTasks;
+    _NumTasks++;
+
+    _aTasks[n].id   = taskId;
+    _aTasks[n].name = name;
+}   // SYSVIEW_AddTask
+
+
+void SYSVIEW_AddMarker(uint32_t markerId, const char *name)
+{
+    int n;
+
+    if (_NumMarker > NUM_MARKER) {
+        return;
+    }
+    n = _NumMarker;
+    _NumMarker++;
+
+    _aMarker[n].id   = markerId;
+    _aMarker[n].name = name;
+}   // SYSVIEW_AddMarker
+
+
+void SYSVIEW_AddInt(uint32_t intId, const char *name)
+{
+    int n;
+
+    if (_NumInts > NUM_INTS) {
+        return;
+    }
+    n = _NumInts;
+    _NumInts++;
+
+    _aInts[n].id   = intId;
+    _aInts[n].name = name;
+}   // SYSVIEW_AddInt
+
+
+void SYSVIEW_SetSystem(const char *appName, const char *deviceName, const char *coreName, const char *osName)
+/**
+ * Function descriptions go to /opt/SEGGER/SystemView_V<version>/Description/SYSVIEW_<osName>.txt
+ */
+{
+    sysviewAppName    = appName;
+    sysviewDeviceName = deviceName;
+    sysviewCoreName   = coreName;
+    sysviewOsName     = osName;
+}   // SYSVIEW_SetSystem
+
+
+static void _cbSendSystemDesc(void)
+{
+    char buf[128];
+
+    if (sysviewAppName != NULL) {
+        sprintf(buf, "N=%s", sysviewAppName);
+        SEGGER_SYSVIEW_SendSysDesc(buf);
+    }
+    if (sysviewDeviceName != NULL) {
+        sprintf(buf, "D=%s", sysviewDeviceName);
+        SEGGER_SYSVIEW_SendSysDesc(buf);
+    }
+    if (sysviewCoreName != NULL) {
+        sprintf(buf, "C=%s", sysviewCoreName);
+        SEGGER_SYSVIEW_SendSysDesc(buf);
+    }
+    if (sysviewOsName != NULL) {
+        sprintf(buf, "O=%s", sysviewOsName);
+        SEGGER_SYSVIEW_SendSysDesc(buf);
+    }
+
+    for (int n = 0; n < _NumInts; n++) {
+        sprintf(buf, "I#%d=%s", _aInts[n].id, _aInts[n].name);
+        SEGGER_SYSVIEW_SendSysDesc(buf);
+    }
+}   // _cbSendSystemDesc
+
+
+static void _cbSendTaskList(void)
+{
+    for (int n = 0; n < _NumTasks; n++) {
+        SEGGER_SYSVIEW_TASKINFO info;
+
+        memset(&info, 0, sizeof(info));
+        info.TaskID = _aTasks[n].id;
+        info.sName  = _aTasks[n].name;
+        SEGGER_SYSVIEW_SendTaskInfo(&info);
+    }
+    for (int n = 0; n < _NumMarker; n++) {
+        SEGGER_SYSVIEW_NameMarker(_aMarker[n].id, _aMarker[n].name);
+    }
+}   // _cbSendTaskList
+
+
+void SYSVIEW_Init(uint32_t sysFreq, uint32_t cpuFreq, uint64_t (*getTime)(void))
+{
+    static SEGGER_SYSVIEW_OS_API osAPI = {NULL, _cbSendTaskList};
+
+    osAPI.pfGetTime = getTime;
+    SEGGER_SYSVIEW_Conf();
+    SEGGER_SYSVIEW_Init(sysFreq, cpuFreq, &osAPI, _cbSendSystemDesc);
+}   // SYSVIEW_Init
+
+
+void SYSVIEW_ConfigUpBuffer(void* pBuffer, unsigned BufferSize)
+{
+    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", pBuffer, BufferSize, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+}   // SYSVIEW_ConfigUpBuffer
+
+
+/**
  *
- *********************************************************************/
+ */
+
 
 void SysTick_Handler(void)
 {
@@ -103,87 +249,20 @@ NamedType Time 20=20us 30=30us 40=40us 50=50us
  *
  *********************************************************************/
 
-#define SYSVIEW_APP_NAME    "SysView Games"
-#define SYSVIEW_DEVICE_NAME "PCA10056 nRF52840"
-#define SYSVIEW_CORE_NAME   "Cortex-M4"
-#define SYSVIEW_OS_NAME     "NoOS"                 // this decides about the above name
-
 #define MARKER_PRINT        1
 #define MARKER_PRINT_MOD    3
 #define TASKID_CYCLIC       0x22
-#define TASKID_DELAY        0x11
 #define TASKID_TESTFUNC0    0x99
 #define TASKID_MAINLOOP     0x1234
-
-
-static void _cbSendSystemDesc(void)
-{
-    SEGGER_SYSVIEW_SendSysDesc("N=" SYSVIEW_APP_NAME);
-    SEGGER_SYSVIEW_SendSysDesc("D=" SYSVIEW_DEVICE_NAME);
-    SEGGER_SYSVIEW_SendSysDesc("C=" SYSVIEW_CORE_NAME);
-    SEGGER_SYSVIEW_SendSysDesc("O=" SYSVIEW_OS_NAME);
-    SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
-}   // _cbSendSystemDesc
-
-
-static void _cbSendTaskList(void)
-{
-    {
-        SEGGER_SYSVIEW_TASKINFO Info = {
-                .TaskID = TASKID_CYCLIC,
-                .sName  = "TaskCyclic",
-                .StackBase = 0x20004000,
-                .StackSize = 0x2000,
-                .Prio = 10,
-        };
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_CYCLIC);
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-
-    {
-        SEGGER_SYSVIEW_TASKINFO Info = {
-                .TaskID = TASKID_TESTFUNC0,
-                .sName  = "_TestFunc0",
-                .StackBase = 0x20006000,
-                .StackSize = 0x4000,
-                .Prio = 12,
-        };
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_TESTFUNC0);
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-
-    {
-        SEGGER_SYSVIEW_TASKINFO Info = {
-                .TaskID = TASKID_MAINLOOP,
-                .sName  = "mainloop",
-                .StackBase = 0x2000a000,
-                .StackSize = 0x2000,
-                .Prio = 4,
-        };
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_MAINLOOP);
-        SEGGER_SYSVIEW_SendTaskInfo( &Info);
-    }
-
-    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT, "MarkerPrint");
-    SEGGER_SYSVIEW_NameMarker(MARKER_PRINT_MOD, "MarkerPrintModulo");
-
-    // named resources are referenced in the description file via %I
-    // or "NamedType" might be used (more flexibel)
-    SEGGER_SYSVIEW_NameResource(10,  "10us");
-    SEGGER_SYSVIEW_NameResource(100, "100us");
-    SEGGER_SYSVIEW_NameResource(200, "0.2ms");
-    SEGGER_SYSVIEW_NameResource(500, "0.5ms");
-}   // _cbSendTaskList
-
-static const SEGGER_SYSVIEW_OS_API _NoOSAPI = {NULL, _cbSendTaskList};
-
+#define FUNCID_DELAY        33                     // must be >= 32
+#define FUNCID_TESTBASE     50
 
 
 static void _Delay(uint32_t period_us)
 {
     volatile int i;
 
-    SEGGER_SYSVIEW_RecordU32(33, period_us);
+    SEGGER_SYSVIEW_RecordU32(FUNCID_DELAY, period_us);
 
 #if 0
     if (period_us == 10)
@@ -199,7 +278,7 @@ static void _Delay(uint32_t period_us)
     do {
         __asm volatile ("nop\n" : : :);
     } while (i--);
-    SEGGER_SYSVIEW_RecordEndCall(33);
+    SEGGER_SYSVIEW_RecordEndCall(FUNCID_DELAY);
 }   // _Delay
 
 
@@ -240,28 +319,28 @@ static void _TestFunc0(void)
 
     switch (_State) {
     case STATE_INIT:
-        SEGGER_SYSVIEW_RecordVoid(50 + STATE_INIT);
+        SEGGER_SYSVIEW_RecordVoid(FUNCID_TESTBASE + STATE_INIT);
         _Delay(20);
         _State = STATE_WAIT_FOR_DATA;
-        SEGGER_SYSVIEW_RecordEndCall(50 + STATE_INIT);
+        SEGGER_SYSVIEW_RecordEndCall(FUNCID_TESTBASE + STATE_INIT);
         break;
     case STATE_WAIT_FOR_DATA:
-        SEGGER_SYSVIEW_RecordVoid(50 + STATE_WAIT_FOR_DATA);
+        SEGGER_SYSVIEW_RecordVoid(FUNCID_TESTBASE + STATE_WAIT_FOR_DATA);
         _Delay(30);
         _State = STATE_PROCESS_DATA;
-        SEGGER_SYSVIEW_RecordEndCall(50 + STATE_WAIT_FOR_DATA);
+        SEGGER_SYSVIEW_RecordEndCall(FUNCID_TESTBASE + STATE_WAIT_FOR_DATA);
         break;
     case STATE_PROCESS_DATA:
-        SEGGER_SYSVIEW_RecordVoid(50 + STATE_PROCESS_DATA);
+        SEGGER_SYSVIEW_RecordVoid(FUNCID_TESTBASE + STATE_PROCESS_DATA);
         _Delay(40);
         _State = STATE_SEND_DATA;
-        SEGGER_SYSVIEW_RecordEndCall(50 + STATE_PROCESS_DATA);
+        SEGGER_SYSVIEW_RecordEndCall(FUNCID_TESTBASE + STATE_PROCESS_DATA);
         break;
     case STATE_SEND_DATA:
-        SEGGER_SYSVIEW_RecordVoid(50 + STATE_SEND_DATA);
+        SEGGER_SYSVIEW_RecordVoid(FUNCID_TESTBASE + STATE_SEND_DATA);
         _Delay(50);
         _State = STATE_WAIT_FOR_DATA;
-        SEGGER_SYSVIEW_RecordEndCall(50 + STATE_SEND_DATA);
+        SEGGER_SYSVIEW_RecordEndCall(FUNCID_TESTBASE + STATE_SEND_DATA);
         break;
     }
     SEGGER_SYSVIEW_OnTaskStopReady(TASKID_TESTFUNC0, 0);
@@ -296,11 +375,18 @@ int main()
     printf("012345678901234567123456789012345678901234567890123456789 - 1000\n");
 
     // initialize
-    SEGGER_SYSVIEW_Conf();
-    SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, &_NoOSAPI, _cbSendSystemDesc);
-    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", buffer, sizeof(buffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL);
+    SYSVIEW_ConfigUpBuffer(buffer, sizeof(buffer));
 
-    SEGGER_SYSVIEW_Start();
+    SYSVIEW_SetSystem("SysView Games", "PCA10056 nRF52840", "Cortex-M4", "NoOS");
+    SYSVIEW_AddMarker(MARKER_PRINT,     "MarkerPrint");
+    SYSVIEW_AddMarker(MARKER_PRINT_MOD, "MarkerPrintModulo");
+    SYSVIEW_AddTask(TASKID_CYCLIC,    "Cyclic");
+    SYSVIEW_AddTask(TASKID_MAINLOOP,  "Main");
+    SYSVIEW_AddTask(TASKID_TESTFUNC0, "TestFunc0");
+    SYSVIEW_AddInt(15, "SysTick");
+
+    //SEGGER_SYSVIEW_Start();
     _Delay(10000);
 
     SysTick_Init(SYSTICKS_PER_SEC);
