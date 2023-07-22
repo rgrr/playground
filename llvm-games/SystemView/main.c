@@ -8,6 +8,7 @@
 
 #include "nrf.h"
 
+#define xSEGGER_SYSVIEW_OFF
 #include "SEGGER/RTT/SYSVIEW.h"
 
 
@@ -188,7 +189,7 @@ static void _TestFunc0(void)
 
 
 
-#define xFAST
+#define FAST
 #ifdef FAST
     // -> ~70000 events/s, 295 KByte/s
     #define SYSTICKS_PER_SEC    20000

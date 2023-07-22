@@ -70,7 +70,6 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
         --config armv7em_soft_nofp.cfg
-        
         -fdata-sections
         -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/system/nrf52840.ld

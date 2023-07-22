@@ -6,37 +6,38 @@
 
 == SystemView
 
+IMPORTANT: SystemView is free for non-commercial use only.
+
+
 === Links
 
+Segger:
+
 * https://www.segger.com/products/development-tools/systemview/[SystemView @ Segger]
+* https://wiki.segger.com/Use_SystemView_without_RTOS[Use SystemView without RTOS]
+
+Other:
+
 * https://www.codeinsideout.com/blog/stm32/segger-systemview/[J-Link SysView - Record and Visualize System Activities]
 * https://mcuoneclipse.com/2020/10/11/freertos-v10-4-1-with-segger-systemview-v3-12/[FreeRTOS V10.4.1 with SEGGER SystemView V3.12]
+
 
 === Aim
 
 Some SystemView experiments.  Trying to integrate it into LLVM Embedded so that it
 can be used without headache.
 
-IMPORTANT: SystemView is free for non-commercial use only.
 
-
-=== Installation
+=== SystemView Installation
 
 Installation is a simple download and install from
 https://www.segger.com/downloads/systemview/[Segger].
 
-NOTE: V3.30 is the last version which allows continuous recording via UART under Debian/Testing,
-see https://forum.segger.com/index.php/Thread/8898-Recent-linux-SystemView-version-missing-serial-port-dialog/[Segger forum].
-
 
 === Probe Configuration
 
-For the first steps, SystemViews UART recording is used.  Therefor YAPicoprobe
-is used as connection to the target which redirects RTT output to a UART.
-
-In the meantime I have integrated TinyUSB RNDIS/ECM/NCM into YAPicoprobe.  This raises some
-new compatibility issues, but via CMakeLists.txt the best fitting probe setup can be
-chosen.  At least SystemView 3.50a can now be used on Linux.
+https://github.com/rgrr/yapicoprobe[YaPicoprobe] supports SystemView out of the box since
+v1.15.  IP address of the probe is 192.168.14.1.
 
 
 === Test Program on the Target
@@ -45,8 +46,9 @@ End result can be found in link:.[main.c].  The test program runs on a Nordic PC
 Test program includes all the required startup code and linker files, so can be seen as another boiler
 plate for development.
 
-NOTE: not so nice is, that there is RTT console code contained.  This will be removed in the future
-and replaced by the RTT lib code (or there will be a SysView library).
+Required toolchain is my fork of the
+https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib-16[LLVM Embedded].
+
 
 To show the capabilities of SystemView, the following timing diagrams show the difference
 between debug and optimized compilation:
@@ -60,65 +62,3 @@ image::PrintCycCnt-Debug.png[Debug Version, 90%]
 [.text-center]
 image::PrintCycCnt-Optimized.png[Debug Version, 90%]
 
-
-=== Another SystemView Issue: SEGGER_RTT_LOCK()? [[rtt-lock-problem]]
-
-NOTE: as it turns out, the bug was on my side of the screen.  SysTick interrupt priority was higher
-in my first test program than the SEGGER macros were locking.  So no surprising hickups after all.
-
-Introducing SysTick monitoring in the test program revealed some hick ups in the
-data sent to SystemView.  Randomly wrong names appeared in the context window
-like `ISR 17` or `Timer 0x63`, in the worst case SystemView crashes, see issue also on
-https://forum.segger.com/index.php/Thread/9061-SEGGER-RTT-LOCK-UNLOCK-code-wrong/[Segger forum].
-
-Solution was TMO wrong lock code in `SEGGER_RTT_LOCK()` / `SEGGER_RTT_UNLOCK()`.
-Replacing it with the following experimental code fragment solves the issue (for me):
-
-.Code Corrections in SEGGER_RTT_Conf.h
-[source, C]
-----
-#ifndef SEGGER_RTT_ASM
-    __attribute__((always_inline)) static inline void __enable_irqXX(void)
-    {
-      __asm volatile ("cpsie i" : : : "memory");
-    }
-
-    __attribute__((always_inline)) static inline void __disable_irqXX(void)
-    {
-      __asm volatile ("cpsid i" : : : "memory");
-    }
-
-    __attribute__((always_inline)) static inline unsigned __get_PRIMASKXX(void)
-    {
-      unsigned result;
-
-      __asm volatile ("MRS %0, primask" : "=r" (result) );
-      return(result);
-    }
-
-    #define SEGGER_RTT_LOCK()      unsigned __prim = __get_PRIMASKXX(); __disable_irqXX();
-    #define SEGGER_RTT_UNLOCK()    if (!__prim) { __enable_irqXX(); }
-#endif
-----
-
-.Comparing Unpatched/Patched
-[%autowidth]
-[%header]
-|===
-| Unpatched | Patched
-
-a|image::SystemView_nok.png[Unpatched SEGGER_RTT_Conf.h, 90%]
-a|image::SystemView_ok.png[Patched SEGGER_RTT_Conf.h, 90%]
-
-|===
-
-.System Load
-[%autowidth]
-[%header]
-|===
-|  | 
-
-| Overall system was not very much loaded during testing
-a|image::SystemView_load.png[System Load]
-
-|===
