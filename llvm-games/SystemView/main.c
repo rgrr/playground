@@ -25,9 +25,6 @@
  *
  *********************************************************************/
 
-#define DWT_CYCCNT()              (DWT->CYCCNT)
-
-
 void SysTick_Handler(void)
 {
     static volatile U32 Cnt = 0;
@@ -49,27 +46,6 @@ void SysTick_Init(uint32_t ips)
 {
     SysTick_Config((SystemCoreClock / ips) - 1);
 }   // SysTick_Init
-
-
-void CycCnt_Init(void)
-{
-    //
-    // If no debugger is connected, the DWT must be enabled by the application
-    //
-    if ((CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk) == 0) {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    }
-
-    //
-    //  The cycle counter must be activated in order
-    //  to use time related functions.
-    //
-    if ((DWT->CTRL & DWT_CTRL_NOCYCCNT_Msk) == 0) {           // Cycle counter supported?
-        if ((DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk) == 0) {      // Cycle counter not enabled?
-            DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;              // Enable Cycle counter
-        }
-    }
-}   // CycCnt_Init
 
 
 /*********************************************************************
@@ -107,7 +83,7 @@ NamedType Time 20=20us 30=30us 40=40us 50=50us
 
 #define MARKER_PRINT        1
 #define MARKER_PRINT_MOD    3
-#define TASKID_PRINT        0x22
+#define TASKID_CYCLIC       0x22
 #define TASKID_DELAY        0x11
 #define TASKID_TESTFUNC0    0x99
 #define TASKID_MAINLOOP     0x1234
@@ -127,13 +103,13 @@ static void _cbSendTaskList(void)
 {
     {
         SEGGER_SYSVIEW_TASKINFO Info = {
-                .TaskID = TASKID_PRINT,
-                .sName  = "PrintCycCnt",
+                .TaskID = TASKID_CYCLIC,
+                .sName  = "TaskCyclic",
                 .StackBase = 0x20004000,
                 .StackSize = 0x2000,
                 .Prio = 10,
         };
-        SEGGER_SYSVIEW_OnTaskCreate(TASKID_PRINT);
+        SEGGER_SYSVIEW_OnTaskCreate(TASKID_CYCLIC);
         SEGGER_SYSVIEW_SendTaskInfo( &Info);
     }
 
@@ -175,17 +151,6 @@ static void _cbSendTaskList(void)
 static const SEGGER_SYSVIEW_OS_API _NoOSAPI = {NULL, _cbSendTaskList};
 
 
-void SEGGER_SYSVIEW_Conf(void)
-{
-    static uint8_t buffer[32768];    // just playing around...
-    CycCnt_Init();
-
-    SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, &_NoOSAPI, _cbSendSystemDesc);
-    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", buffer, sizeof(buffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
-    //SEGGER_SYSVIEW_SetRAMBase(0x20000000);    // effect??
-}   // SEGGER_SYSVIEW_Conf
-
-
 
 static void _Delay(uint32_t period_us)
 {
@@ -212,9 +177,9 @@ static void _Delay(uint32_t period_us)
 
 
 
-static void PrintCycCnt(int i)
+static void TaskCyclic(int i)
 {
-    SEGGER_SYSVIEW_OnTaskStartExec(TASKID_PRINT);
+    SEGGER_SYSVIEW_OnTaskStartExec(TASKID_CYCLIC);
 
     //
     // small demo, that even small runtime differences are visible, task runtimes:
@@ -225,8 +190,8 @@ static void PrintCycCnt(int i)
     {
         __asm volatile ("nop\n" : : :);
     }
-    SEGGER_SYSVIEW_OnTaskStopReady(TASKID_PRINT, 0);
-}   // PrintCycCnt
+    SEGGER_SYSVIEW_OnTaskStopReady(TASKID_CYCLIC, 0);
+}   // TaskCyclic
 
 
 
@@ -293,6 +258,8 @@ static void _TestFunc0(void)
 
 int main()
 {
+    static uint8_t buffer[32768];    // just playing around...
+
     printf("012345678901234567123456789012345678901234567890123456789-----------------------------------\n");
 #if 1
     for (int i = 0;  i < 1000;  ++i) {        // this delay is required to have a running CYCCNT after reset with pyocd
@@ -301,7 +268,10 @@ int main()
 #endif
     printf("012345678901234567123456789012345678901234567890123456789 - 1000\n");
 
+    // initialize
     SEGGER_SYSVIEW_Conf();
+    SEGGER_SYSVIEW_Init(SystemCoreClock, SystemCoreClock, &_NoOSAPI, _cbSendSystemDesc);
+    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", buffer, sizeof(buffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 
     SEGGER_SYSVIEW_Start();
     _Delay(10000);
@@ -320,7 +290,7 @@ int main()
             SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
             SEGGER_SYSVIEW_MarkStart(MARKER_PRINT);
             SEGGER_SYSVIEW_Mark(MARKER_PRINT);
-            PrintCycCnt(i);
+            TaskCyclic(i);
             SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
             SEGGER_SYSVIEW_MarkStop(MARKER_PRINT);
             _Delay(0);

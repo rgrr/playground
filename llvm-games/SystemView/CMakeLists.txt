@@ -70,10 +70,6 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
         --config armv7em_soft_nofp.cfg
-        #--target=arm-none-eabi -mfloat-abi=soft -march=armv7m+nofp
-        -fno-exceptions -fno-rtti
-        #--sysroot ${TOOLCHAIN_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp
-        -lcrt0
         
         -fdata-sections
         -ffunction-sections
