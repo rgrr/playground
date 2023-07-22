@@ -27,10 +27,37 @@
 
 void SysTick_Handler(void)
 {
-    static volatile U32 Cnt = 0;
+    static int cnt;
+
     SEGGER_SYSVIEW_RecordEnterISR();
-//    for (int i = 0;  i < 1000;  ++i)
-        Cnt++;
+    if (++cnt % 2 == 0) {
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+        __asm volatile ("nop\n" : : :);
+    }
     SEGGER_SYSVIEW_RecordExitISR();
 }   // SysTick_Handler
 
@@ -245,14 +272,14 @@ static void _TestFunc0(void)
 #define xFAST
 #ifdef FAST
     // -> ~70000 events/s, 295 KByte/s
-    #define SYSTICKS    20000
-    #define IDLE_US     1000
-    #define PRINT_MOD   1000
+    #define SYSTICKS_PER_SEC    20000
+    #define IDLE_US             1000
+    #define PRINT_MOD           1000
 #else
     // -> ~1800 events/s, 10 KByte/s
-    #define SYSTICKS    15
-    #define IDLE_US     40000
-    #define PRINT_MOD   20
+    #define SYSTICKS_PER_SEC    15
+    #define IDLE_US             40000
+    #define PRINT_MOD           20
 #endif
 
 
@@ -276,9 +303,7 @@ int main()
     SEGGER_SYSVIEW_Start();
     _Delay(10000);
 
-    SysTick_Init(SYSTICKS);
-
-    SEGGER_SYSVIEW_EnableEvents(0xffffffff);
+    SysTick_Init(SYSTICKS_PER_SEC);
 
 #if 1
     for (int j = 0;  j < 5000000;  ++j) {
@@ -309,7 +334,6 @@ int main()
         _Delay(IDLE_US);
     }
 
-    SEGGER_SYSVIEW_DisableEvents(0xffffffff);
     SEGGER_SYSVIEW_Print("Stop\n");
     SEGGER_SYSVIEW_Stop();
 
