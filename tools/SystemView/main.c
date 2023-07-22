@@ -14,7 +14,7 @@
 
 #include "nrf.h"
 
-#include "SEGGER_SYSVIEW.h"
+#include "SEGGER/RTT/SEGGER_SYSVIEW.h"
 
 
 
@@ -72,7 +72,7 @@ void CycCnt_Init(void)
 
 
 //======================================================================================================================
-#include "SEGGER_RTT.h"
+#include "SEGGER/RTT/SEGGER_RTT.h"
 
 static int rtt_putc(char c, FILE *file)
 {
@@ -314,7 +314,7 @@ static void _TestFunc0(void)
     // -> ~1800 events/s, 10 KByte/s
     #define SYSTICKS    15
     #define IDLE_US     40000
-    #define PRINT_MOD   100
+    #define PRINT_MOD   20
 #endif
 
 

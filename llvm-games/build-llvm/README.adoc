@@ -91,6 +91,7 @@ export CC=clang-15 && export CXX=clang++-15
 # create build directory
 mkdir build; cd build
 
+# versions.json can be changed up to here
 # create build files
 cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF
 
@@ -130,12 +131,46 @@ rm -rf [a-zA-Z]* _CPack_Packages
 # armv7em_soft_nofp
 # armv7em_hard_fpv4_sp_d16
 # armv7em_hard_fpv5_d16
+# armv8m.main_soft_nofp
+# armv8m.main_hard_fp
+# armv8.1m.main_soft_nofp_nomve
+# armv8.1m.main_hard_fp
+# armv8.1m.main_hard_nofp_mve
 
-# -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16"
+# -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16;armv8m.main_soft_nofp;armv8m.main_hard_fp;armv8.1m.main_soft_nofp_nomve;armv8.1m.main_hard_fp;armv8.1m.main_hard_nofp_mve"
 ----
 
-NOTE: 25.04.2023: currently aarch64 does not compile because of libunwind.
+[NOTE]
+====
+* 25.04.2023: currently aarch64 does not compile because of libunwind
+* 20.07.2023: cannot compile anything else than branch/main because of libunwind
+* 21.07.2023: newer versions of the build scripts omit the config files.  How
+  to work without them?  They set a lot of things which now must be done manually...
+====
 
+
+.Retrying to compile 18.07.2023
+[source,bash]
+----
+# ins Verzeichnis wechseln
+cd ~/win/d/u/src/LLVM-embedded-toolchain-for-Arm/build
+export CC=clang-15 CXX=clang++-15
+
+# Holen / Konfigurieren der Sourcen
+cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp"
+
+# Compilieren
+time nice ninja llvm-toolchain
+
+# Paket zusammenbauen
+ninja package-llvm-toolchain
+
+# alles löschen, nur Paketsourcen nicht
+rm -rf [a-zA-Z]* _CPack_Packages
+
+# neu compilieren, nachdem die Optionen in contrib.cmake geändert wurden
+cmake .. -GNinja -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp"
+----
 
 === Using the toolchains with BlueConnect
 

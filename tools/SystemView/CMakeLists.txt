@@ -36,10 +36,12 @@ set(SRC_FILES
     system/nordic/system_nrf52840.c
 )
 
-add_subdirectory(SEGGER)
-target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-    sysview
-    #librtt_stdio.a
+#add_subdirectory(SEGGER)
+target_link_libraries(${PROJECT_ELF} LINK_PUBLIC
+    librtt.a
+    librtt_stdio.a
+    librtt_sysview.a
+    librtt.a
 )
 
 target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
@@ -67,10 +69,10 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        #--config armv7em_soft_nofp.cfg
-        --target=arm-none-eabi -mfloat-abi=soft -march=armv7m+nofp
+        --config armv7em_soft_nofp.cfg
+        #--target=arm-none-eabi -mfloat-abi=soft -march=armv7m+nofp
         -fno-exceptions -fno-rtti
-        --sysroot ${TOOLCHAIN_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp
+        #--sysroot ${TOOLCHAIN_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp
         -lcrt0
         
         -fdata-sections
