@@ -3,5 +3,5 @@
 Here are several things concerning LLVM.
 
 * link:pyocd[pyocd], mostly API scripts
-* link:SystemView[SystemView]
+* link:build-llvm[Build LLVM] for embedded with some extras
 * link:xray[XRay] (currently abandoned)
