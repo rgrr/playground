@@ -7,8 +7,8 @@ NOTE: Both procedures can also output toolchains for Windows
 
 === Building from scratch
 
-Here the important parts for BlueConnect (fielddevice side) of the LLVM
-toolchain are built.
+The important parts for BlueConnect (fielddevice side) of the LLVM
+toolchain are built here.
 
 The corresponding link:Makefile[Makefile] is taken from `BlueConnect_Tools`.  Note
 that the most recent version can be found there.
@@ -24,65 +24,29 @@ The Makefile creates several binaries of LLVM and some headers.
 Installation goes to `~/bin/clang-arm-none-eabi`.
 
 
-=== Building the LLVM embedded toolchain for Arm
+=== LLVM embedded toolchain for Arm
 
-As an alternative https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm
+As an alternative https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain for ARM]
 can be used.  This is more complete, because it contains Picolib and runtime as well.
-But note that this toolchain does not include `llvm-link` / `opt` / `llc` without
-modification.
 
-==== Patching...
-To create those files, `CMakeLists.txt` has to be patched/edited as below: 
+A https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib-16[fork]
+of the original repo includes libraries for semihost based profiling and support
+for Segger RTT & SysView.
 
-[source, diff]
-----
-diff -p -r1.1 ./CMakeLists.txt
-*** ./CMakeLists.txt    2023/02/20 18:09:47     1.1
---- ./CMakeLists.txt    2023/02/25 10:06:32
-*************** set(LLVM_DISTRIBUTION_COMPONENTS
-*** 142,153 ****
-      llvm-size
-      llvm-strip
-      llvm-symbolizer
-      LTO
-      CACHE STRING ""
-  )
-  set(LLVM_ENABLE_PROJECTS clang;lld CACHE STRING "")
-  set(LLVM_TARGETS_TO_BUILD AArch64;ARM CACHE STRING "")
-! set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-linux-gnu CACHE STRING "")
-  set(CLANG_DEFAULT_LINKER lld CACHE STRING "")
-  
-  # Default to a release build
---- 142,157 ----
-      llvm-size
-      llvm-strip
-      llvm-symbolizer
-+     llvm-link
-+     llc
-+     opt
-      LTO
-      CACHE STRING ""
-  )
-  set(LLVM_ENABLE_PROJECTS clang;lld CACHE STRING "")
-  set(LLVM_TARGETS_TO_BUILD AArch64;ARM CACHE STRING "")
-! set(LLVM_DEFAULT_TARGET_TRIPLE arm-none-eabi CACHE STRING "")
-! set(LLVM_TARGET_ARCH arm CACHE STRING "")
-  set(CLANG_DEFAULT_LINKER lld CACHE STRING "")
-  
-  # Default to a release build
-----
+This fork is used in the below build steps.
 
 
 ==== Building...
 
-* fetch https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm.git, branch feature/contrib
+Currently this will build llvm 16.0.6.
+
+* fetch https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm.git, branch feature/contrib-16
   (https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm.git[original])
-* patch as above
 * build as below
 * create package as below
 * unpack the created archive to e.g. `~/bin/llvm-arm-none-eabi`
 
-.Build steps with several options
+.Build steps for Linux
 [source,bash]
 ----
 # optional: use clang for compilation
@@ -93,16 +57,10 @@ mkdir build; cd build
 
 # versions.json can be changed up to here
 # create build files
-cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF
+cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16;armv8m.main_soft_nofp;armv8m.main_hard_fp;armv8.1m.main_soft_nofp_nomve;armv8.1m.main_hard_fp;armv8.1m.main_hard_nofp_mve"
 
 # create build files including profiling offline
-cmake .. -GNinja -DLLVM_TOOLCHAIN_CONTRIB_PROFILE=ON -DFETCHCONTENT_FULLY_DISCONNECTED=ON
-
-# create build files for parts of the toolchain offline
-cmake .. -GNinja -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="aarch64;armv6m_soft_nofp"
-
-# create build files and specify sources
-cmake .. -GNinja -DFETCHCONTENT_SOURCE_DIR_LLVMPROJECT=_deps/llvmproject-src -DFETCHCONTENT_SOURCE_DIR_PICOLIBC=_deps/picolibc-src
+cmake .. -GNinja -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 
 # build toolchain
 time nice ninja llvm-toolchain
@@ -110,9 +68,23 @@ time nice ninja llvm-toolchain
 # package the result
 ninja package-llvm-toolchain
 
-# clean build
+# start over for next iteration
 rm -rf [a-zA-Z]* _CPack_Packages
 ----
+
+.Build steps for Linux
+[source,bash]
+----
+# ... see above
+
+# create build files for MINGW
+cmake .. -GNinja -DLLVM_TOOLCHAIN_CROSS_BUILD_MINGW=ON -DFETCHCONTENT_QUIET=OFF -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16;armv8m.main_soft_nofp;armv8m.main_hard_fp;armv8.1m.main_soft_nofp_nomve;armv8.1m.main_hard_fp;armv8.1m.main_hard_nofp_mve"
+
+# ... see above
+----
+
+This will create a ZIP file with about twice the size of the Linux tar ball!
+
 
 .Important config options
 [source,bash]
@@ -142,35 +114,18 @@ rm -rf [a-zA-Z]* _CPack_Packages
 
 [NOTE]
 ====
+These notes are more or less a log of some incidents with compilation.
+They must not be valid any more.
+
 * 25.04.2023: currently aarch64 does not compile because of libunwind
 * 20.07.2023: cannot compile anything else than branch/main because of libunwind
 * 21.07.2023: newer versions of the build scripts omit the config files.  How
   to work without them?  They set a lot of things which now must be done manually...
+* 21.07.2023: to compile clang 16.0.6 the branch
+  https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib-16[llvm-16 (plus contrib)]
+  must be used
 ====
 
-
-.Retrying to compile 18.07.2023
-[source,bash]
-----
-# ins Verzeichnis wechseln
-cd ~/win/d/u/src/LLVM-embedded-toolchain-for-Arm/build
-export CC=clang-15 CXX=clang++-15
-
-# Holen / Konfigurieren der Sourcen
-cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp"
-
-# Compilieren
-time nice ninja llvm-toolchain
-
-# Paket zusammenbauen
-ninja package-llvm-toolchain
-
-# alles löschen, nur Paketsourcen nicht
-rm -rf [a-zA-Z]* _CPack_Packages
-
-# neu compilieren, nachdem die Optionen in contrib.cmake geändert wurden
-cmake .. -GNinja -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp"
-----
 
 === Using the toolchains with BlueConnect
 
