@@ -52,23 +52,41 @@ static void writeFileWithoutReturn(void);
     typedef uintptr_t sh_param_t;
 #endif
 
-
-#if __ARM_ARCH_PROFILE != 'M'
-    #error "wrong target, code works only for thumb"
-#endif
-
-
+/* see https://github.com/ARM-software/abi-aa/blob/main/semihosting/semihosting.rst for interface */
 static inline uintptr_t __attribute__ ((always_inline)) prf_sys_semihost(uintptr_t op, uintptr_t arg)
 {
+#ifdef __aarch64__
+    register uintptr_t w0 __asm("w0") = op;
+    register uintptr_t x0 __asm("x0") = op;
+    register uintptr_t x1 __asm("x1") = arg;
+
+    __asm volatile (
+            "hlt	#0xf000   \n"
+            : "=r" (x0)                                /* output */
+            : "r" (w0), "r" (x1)                       /* inputs */
+                                                       /* nothing must be clobbered */
+    );
+    return x0;
+#else
     register uintptr_t r0 __asm("r0") = op;
     register uintptr_t r1 __asm("r1") = arg;
+
     __asm volatile (
-            "bkpt    0xab       \n"
+            #if __ARM_ARCH_PROFILE == 'M'
+                "bkpt #0xab  \n"
+            #else
+                #ifdef __thumb__
+                    "svc #0xab  \n"
+                #else
+                    "svc #0x123456  \n"
+                #endif
+            #endif
             : "=r" (r0)                                /* output */
             : "r" (r0), "r" (r1)                       /* inputs */
-            : "r2", "r3", "ip", "lr", "memory", "cc"   /* clobber */
+                                                       /* nothing must be clobbered */
     );
     return r0;
+#endif
 }   // prf_sys_semihost
 
 

@@ -1,0 +1,53 @@
+== XRay
+
+=== Links
+
+* https://llvm.org/docs/XRay.html
+* -finstrument-functions: https://balau82.wordpress.com/2010/10/06/trace-and-profile-function-calls-with-gcc/
+* https://mcuoneclipse.com/2015/04/04/poor-mans-trace-free-of-charge-function-entryexit-trace-with-gnu-tools/
+* https://codingrelic.geekhold.com/2010/09/gcc-function-instrumentation.html
+
+
+=== Aim
+
+Some XRay experiments.  Haha, XRay is not implemented for thumb.  But the name
+of this subdirectory will stay until I have found another good tools for doing
+profiling.
+
+So other code instrumentation games are announced in the meantime.
+
+=== Options for Instrumentation
+
+```cmake
+# -> __cyg_profile_func_enter() and __cyg_profile_func_exit()
+# Instrument device library for HIP, which is a LLVM bitcode containing __cyg_profile_func_enter and __cyg_profile_func_exit
+set(XRAY_CONFIG -finstrument-functions)
+
+# -> __cyg_profile_func_enter_bare()
+#set(XRAY_CONFIG -finstrument-function-entry-bare)
+
+# -> nothing required!?
+#set(XRAY_CONFIG -pg)
+
+# regular profiling
+#set(XRAY_CONFIG -fprofile-instr-generate -fcoverage-mapping)
+
+# -> does not work for thumb
+#set(XRAY_CONFIG -fxray-instrument)
+
+# -> does not work
+#set(XRAY_CONFIG -p)
+```
+
+
+=== Tools
+
+* gprof
+* vtune
+
+=== Examples
+
+==== TI -finstrument-functions
+https://software-dl.ti.com/codegen/docs/tiarmclang/compiler_tools_user_guide/compiler_manual/using_compiler/compiler_options/instrumentation_options.html
+
+But what is func_timer?

@@ -4,7 +4,7 @@
 #
 
 BUILD_DIR       := _build
-PROJECT         := boilerplate_generic
+PROJECT         := RTT
 
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
@@ -43,7 +43,7 @@ cmake-create-release:
 
 .PHONY: flash
 flash: all
-	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 4000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
+	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
 
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf

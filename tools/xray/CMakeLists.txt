@@ -43,29 +43,43 @@ target_include_directories(${PROJECT_ELF} PRIVATE
 # Some configurations
 #
 #
-if(1)
-    # profiling function from here
-    add_subdirectory(profiling)
-    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-            rt-profile
-    )
-else()
-    # profiling function from generated libclang_rt.profile.a
-    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-            clang_rt.profile
-    )
-endif()
+#if(0)
+#    # profiling function from here
+#    add_subdirectory(profiling)
+#    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+#            rt-profile
+#    )
+#else()
+#    # profiling function from generated libclang_rt.profile.a
+#    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
+#            clang_rt.profile
+#    )
+#endif()
 
 #
 # if no semihosting is used, __llvm_profile_write_file() must be called at end of main()
 # use either armv6m_soft_nofp_semihost.cfg or armv6m_soft_nofp.cfg
 #
-if(USE_SEMIHOSTING_LIB)
-        add_definitions(-DUSE_SEMIHOSTING_LIB=1)
-        set(CONFIG armv7em_soft_nofp_semihost.cfg)
-else()
-        set(CONFIG armv7em_soft_nofp.cfg)
-endif()
+set(CONFIG armv7em_soft_nofp_semihost.cfg)
+
+# -> __cyg_profile_func_enter() and __cyg_profile_func_exit()
+# Instrument device library for HIP, which is a LLVM bitcode containing __cyg_profile_func_enter and __cyg_profile_func_exit
+set(XRAY_CONFIG -finstrument-functions)
+
+# -> __cyg_profile_func_enter_bare()
+#set(XRAY_CONFIG -finstrument-function-entry-bare)
+
+# -> nothing required!?
+#set(XRAY_CONFIG -pg)
+
+# regular profiling
+#set(XRAY_CONFIG -fprofile-instr-generate -fcoverage-mapping)
+
+# -> does not work for thumb
+#set(XRAY_CONFIG -fxray-instrument)
+
+# -> does not work
+#set(XRAY_CONFIG -p)
 
 #
 ########################################################################################################################
@@ -74,7 +88,7 @@ endif()
 target_compile_options(${PROJECT_ELF} PRIVATE
         --config ${CONFIG}
         -fdata-sections -ffunction-sections
-        -fprofile-instr-generate -fcoverage-mapping
+        ${XRAY_CONFIG}
         -v
         -Wall
 )
@@ -83,7 +97,7 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 target_link_options(${PROJECT_ELF} PRIVATE
         --config ${CONFIG}
         -fdata-sections -ffunction-sections
-        -fprofile-instr-generate -fcoverage-mapping
+        ${XRAY_CONFIG}
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
         -Wl,-Map=${PROJECT_ELF}.map
         -v

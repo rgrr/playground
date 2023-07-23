@@ -1,5 +1,6 @@
-/cpp/_build
+_build
 /.vscode
 /.project
 /.cproject
 /.settings
+default.profraw

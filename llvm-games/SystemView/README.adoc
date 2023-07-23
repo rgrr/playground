@@ -1,0 +1,64 @@
+:imagesdir: doc
+:source-highlighter: rouge
+:toc:
+:toclevels: 5
+
+
+== SystemView
+
+IMPORTANT: SystemView is free for non-commercial use only.
+
+
+=== Links
+
+Segger:
+
+* https://www.segger.com/products/development-tools/systemview/[SystemView @ Segger]
+* https://wiki.segger.com/Use_SystemView_without_RTOS[Use SystemView without RTOS]
+
+Other:
+
+* https://www.codeinsideout.com/blog/stm32/segger-systemview/[J-Link SysView - Record and Visualize System Activities]
+* https://mcuoneclipse.com/2020/10/11/freertos-v10-4-1-with-segger-systemview-v3-12/[FreeRTOS V10.4.1 with SEGGER SystemView V3.12]
+
+
+=== Aim
+
+Some SystemView experiments.  Trying to integrate it into LLVM Embedded so that it
+can be used without headache.
+
+
+=== SystemView Installation
+
+Installation is a simple download and install from
+https://www.segger.com/downloads/systemview/[Segger].
+
+
+=== Probe Configuration
+
+https://github.com/rgrr/yapicoprobe[YaPicoprobe] supports SystemView out of the box since
+v1.15.  IP address of the probe is 192.168.14.1.
+
+
+=== Test Program on the Target
+
+End result can be found in link:.[main.c].  The test program runs on a Nordic PCA10056 (nRF52840).
+Test program includes all the required startup code and linker files, so can be seen as another boiler
+plate for development.
+
+Required toolchain is my fork of the
+https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib-16[LLVM Embedded].
+
+
+To show the capabilities of SystemView, the following timing diagrams show the difference
+between debug and optimized compilation:
+
+.Debug Version
+[.text-center]
+image::PrintCycCnt-Debug.png[Debug Version, 90%]
+
+
+.Optimized Version
+[.text-center]
+image::PrintCycCnt-Optimized.png[Debug Version, 90%]
+

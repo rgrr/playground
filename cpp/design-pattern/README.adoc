@@ -15,7 +15,7 @@
 ** https://www.heise.de/blog/Antipatterns-in-der-Softwareentwicklung-die-boese-Schwester-der-Design-Patterns-7239865.html[Antipattern]
 ** https://www.heise.de/blog/Softwareentwicklung-Das-Design-Pattern-Fabrikmethode-zum-Erzeugen-von-Objekten-7252845.html[Fabrikmethode]
 ** https://www.heise.de/blog/Patterns-in-der-Softwareentwicklung-Das-Singleton-Muster-7266995.html[Singleton]
-
+** https://www.heise.de/blog/Patterns-in-der-Softwarearchitektur-Das-Reactor-Muster-8973433.html[Reactor]
 
 === Pattern
 * visitor

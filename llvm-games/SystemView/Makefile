@@ -4,7 +4,7 @@
 #
 
 BUILD_DIR       := _build
-PROJECT         := boilerplate_generic
+PROJECT         := systemview
 
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
@@ -27,7 +27,7 @@ clean-build:
 .PHONY: all
 all: $(BUILD_DIR)/$(PROJECT).elf
 	@echo "--------------------------"
-	@arm-none-eabi-size -Ax $(BUILD_DIR)/$(PROJECT).elf | awk '{size=strtonum($$2); addr=strtonum($$3); if (addr>=0x20000000 && addr<0x20040000) ram += size; if (addr>0 && addr<0x10000000) rom += size; } END {print "Flash: " rom "  RAM: " ram}'
+	@arm-none-eabi-size -Ax $(BUILD_DIR)/$(PROJECT).elf | awk '{size=strtonum($$2); addr=strtonum($$3); if (addr>=0x20000000 && addr<0x20040000) ram += size; if (addr>0x00000000 && addr<0x10000000) rom += size; } END {print "Flash: " rom "  RAM: " ram}'
 	@echo "--------------------------"
 
 
@@ -43,7 +43,21 @@ cmake-create-release:
 
 .PHONY: flash
 flash: all
-	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 4000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
+	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
+
+
+.PHONY: flash-pyocd
+flash-pyocd: all
+	pyocd flash -t nrf52840 -f 10M $(BUILD_DIR)/$(PROJECT).elf
+
+.PHONY: reset
+reset: all
+	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 8000" -c "init; reset run; exit"
+
+
+.PHONY: reset-pyocd
+reset-pyocd: all
+	pyocd reset -t nrf52840 -f 10M
 
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf

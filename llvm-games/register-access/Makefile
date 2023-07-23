@@ -4,7 +4,7 @@
 #
 
 BUILD_DIR       := _build
-PROJECT         := boilerplate_generic
+PROJECT         := register-access
 
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)

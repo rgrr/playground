@@ -17,14 +17,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(PROJECT_ELF ${PROJECT}.elf)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS        OFF)
+set(CMAKE_C_EXTENSIONS OFF)
 
 # Optional: issue a message to be sure it uses the correct toolchain file.
 message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
 
 # List of source files
 set(SRC_FILES
-        main.c
+        main.cpp
 )
 
 # Build the executable based on the source files
@@ -38,55 +38,22 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 target_include_directories(${PROJECT_ELF} PRIVATE
 )
 
-########################################################################################################################
-#
-# Some configurations
-#
-#
-if(1)
-    # profiling function from here
-    add_subdirectory(profiling)
-    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-            rt-profile
-    )
-else()
-    # profiling function from generated libclang_rt.profile.a
-    target_link_libraries(${PROJECT_ELF} LINK_PUBLIC 
-            clang_rt.profile
-    )
-endif()
-
-#
-# if no semihosting is used, __llvm_profile_write_file() must be called at end of main()
-# use either armv6m_soft_nofp_semihost.cfg or armv6m_soft_nofp.cfg
-#
-if(USE_SEMIHOSTING_LIB)
-        add_definitions(-DUSE_SEMIHOSTING_LIB=1)
-        set(CONFIG armv7em_soft_nofp_semihost.cfg)
-else()
-        set(CONFIG armv7em_soft_nofp.cfg)
-endif()
-
-#
-########################################################################################################################
-
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
-        --config ${CONFIG}
-        -fdata-sections -ffunction-sections
-        -fprofile-instr-generate -fcoverage-mapping
-        -v
+        --config armv6m_soft_nofp.cfg
+        -fdata-sections
+        -ffunction-sections
         -Wall
 )
 
+target_link_libraries(${PROJECT_ELF} librtt_stdio.a) 
+
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config ${CONFIG}
-        -fdata-sections -ffunction-sections
-        -fprofile-instr-generate -fcoverage-mapping
+        --config armv6m_soft_nofp.cfg
+        -fdata-sections
+        -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
-        -Wl,-Map=${PROJECT_ELF}.map
-        -v
 )
 
 # Optional: Print executable size as part of the post build process

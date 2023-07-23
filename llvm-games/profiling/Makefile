@@ -36,6 +36,11 @@ cmake-create-debug:
 	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
 
 
+.PHONY: cmake-create-debug-semihosting
+cmake-create-debug-semihosting:
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DUSE_SEMIHOSTING_LIB=1 $(CMAKE_FLAGS)
+
+
 .PHONY: cmake-create-release
 cmake-create-release:
 	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)

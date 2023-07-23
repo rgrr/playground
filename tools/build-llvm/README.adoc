@@ -1,0 +1,135 @@
+== Build (parts of) LLVM for Embedded Targets
+
+Description how to build an Arm toolchain on Linux.
+
+NOTE: Both procedures can also output toolchains for Windows
+
+
+=== Building from scratch
+
+The important parts for BlueConnect (fielddevice side) of the LLVM
+toolchain are built here.
+
+The corresponding link:Makefile[Makefile] is taken from `BlueConnect_Tools`.  Note
+that the most recent version can be found there.
+
+Important targets are:
+
+* `clean-linux`
+* `cmake-linux`
+* `build-linux`
+* `install-linux`
+
+The Makefile creates several binaries of LLVM and some headers.
+Installation goes to `~/bin/clang-arm-none-eabi`.
+
+
+=== LLVM embedded toolchain for Arm
+
+As an alternative https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain for ARM]
+can be used.  This is more complete, because it contains Picolib and runtime as well.
+
+A https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib-16[fork]
+of the original repo includes libraries for semihost based profiling and support
+for Segger RTT & SysView.
+
+This fork is used in the below build steps.
+
+
+==== Building...
+
+Currently this will build llvm 16.0.6.
+
+* fetch https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm.git, branch feature/contrib-16
+  (https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm.git[original])
+* build as below
+* create package as below
+* unpack the created archive to e.g. `~/bin/llvm-arm-none-eabi`
+
+.Build steps for Linux
+[source,bash]
+----
+# optional: use clang for compilation
+export CC=clang-15 CXX=clang++-15
+
+# create build directory
+mkdir build; cd build
+
+# versions.json can be changed up to here
+# create build files
+cmake .. -GNinja -DFETCHCONTENT_QUIET=OFF -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16;armv8m.main_soft_nofp;armv8m.main_hard_fp;armv8.1m.main_soft_nofp_nomve;armv8.1m.main_hard_fp;armv8.1m.main_hard_nofp_mve"
+
+# create build files including profiling offline
+cmake .. -GNinja -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+
+# build toolchain
+time nice ninja llvm-toolchain
+
+# package the result
+ninja package-llvm-toolchain
+
+# start over for next iteration
+rm -rf [a-zA-Z]* _CPack_Packages
+----
+
+.Build steps for Linux
+[source,bash]
+----
+# ... see above
+
+# create build files for MINGW
+cmake .. -GNinja -DLLVM_TOOLCHAIN_CROSS_BUILD_MINGW=ON -DFETCHCONTENT_QUIET=OFF -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16;armv8m.main_soft_nofp;armv8m.main_hard_fp;armv8.1m.main_soft_nofp_nomve;armv8.1m.main_hard_fp;armv8.1m.main_hard_nofp_mve"
+
+# ... see above
+----
+
+This will create a ZIP file with about twice the size of the Linux tar ball!
+
+
+.Important config options
+[source,bash]
+----
+# important config options:
+# -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="aarch64;armv6m_soft_nofp"
+# -DLLVM_TOOLCHAIN_CONTRIB_PROFILE=ON
+# -DLLVM_TOOLCHAIN_CONTRIB_RTT=ON
+----
+
+.Important targets for LLVM_TOOLCHAIN_LIBRARY_VARIANTS
+[source,bash]
+----
+# armv6m_soft_nofp
+# armv7m_soft_nofp
+# armv7em_soft_nofp
+# armv7em_hard_fpv4_sp_d16
+# armv7em_hard_fpv5_d16
+# armv8m.main_soft_nofp
+# armv8m.main_hard_fp
+# armv8.1m.main_soft_nofp_nomve
+# armv8.1m.main_hard_fp
+# armv8.1m.main_hard_nofp_mve
+
+# -DLLVM_TOOLCHAIN_LIBRARY_VARIANTS="armv6m_soft_nofp;armv7m_soft_nofp;armv7em_soft_nofp;armv7em_hard_fpv4_sp_d16;armv7em_hard_fpv5_d16;armv8m.main_soft_nofp;armv8m.main_hard_fp;armv8.1m.main_soft_nofp_nomve;armv8.1m.main_hard_fp;armv8.1m.main_hard_nofp_mve"
+----
+
+[NOTE]
+====
+These notes are more or less a log of some incidents with compilation.
+They must not be valid any more.
+
+* 25.04.2023: currently aarch64 does not compile because of libunwind
+* 20.07.2023: cannot compile anything else than branch/main because of libunwind
+* 21.07.2023: newer versions of the build scripts omit the config files.  How
+  to work without them?  They set a lot of things which now must be done manually...
+* 21.07.2023: to compile clang 16.0.6 the branch
+  https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm/tree/feature/contrib-16[llvm-16 (plus contrib)]
+  must be used
+====
+
+
+=== Using the toolchains with BlueConnect
+
+I.e. compile under Linux...  this is currently not integrated into the BlueConnect build process.
+
+NOTE: Not the whole build process can be done under Linux because some tools only exists for Windows.
+This is especially true for SFU image creation.

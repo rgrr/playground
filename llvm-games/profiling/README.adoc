@@ -5,6 +5,7 @@
 * https://mcuoneclipse.com/2023/03/09/using-semihosting-the-direct-way/[Using Semihosting the Direct Way]
 * https://github.com/picolibc/picolibc[picolibc on github]
 * https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
+* https://developer.arm.com/documentation/dui0471/m/what-is-semihosting-[Arm Semihosting]
 
 
 === Profiling
@@ -33,3 +34,6 @@ is used.  This includes Picolib which knows semihosting.
 
 ~/bin/clang-arm-none-eabi/bin/llvm-cov show $(find _build -iname "*.elf") -instr-profile=main.profdata
 ```
+
+To selectively enable/disable profiling, check the `-fprofile-filter-files=<value>`,
+`-fprofile-list=<value>` ... command line options of clang.

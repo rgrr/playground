@@ -6,4 +6,4 @@
 
 === Subdirectories
 There are boilerplates for the link:rp2040[RP2040] and one which only depends
-on link:arm-cortex[ARM-Cortex-Mx].
+on link:arm-cortex[ARM-Cortex-Mx] but does some semihosting.

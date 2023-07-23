@@ -1,0 +1,33 @@
+== pyOCD
+
+=== Links
+
+* https://pyocd.io/[pyOCD Home]
+* https://github.com/pyocd/pyOCD[pyOCD auf github]
+
+
+=== Skripte
+
+Als Testimage wird das link:../../llvm-games/profiling[Profiling]-Beispiel verwendet.
+
+* `ex_hello_world.py`: einfaches Beispiel, welches einfaches Singlestepping macht
+* `ex_breakpoint.py`: einfaches Beispiel mit Breakpoints
+* `ex_semihosting.py`: dieses Beispiel führt main() komplett (bis zum Rücksprung)
+  aus.  Werden Semihosting-Befehle ausgelöst, so werden diese abgearbeitet. +
+  Im Code-Beispiel wird Profiling durchgeführt und am Ende per Semihosting
+  geschrieben.
+
+Die Beispiele zeigen auch, wie explizit das Target in den Skripten angegeben wird. 
+
+=== Python API
+
+
+
+
+=== Installation pyOCD
+
+Um spezielle Versionen von pyOCD zu installieren, nimmt man
+
+  pip install -U "git+https://github.com/pyocd/pyOCD.git@1f19d61e14ba226ede4ff84595936061c208ec1b"
+
+
