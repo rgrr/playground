@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.15.3)
 # 1: use picolib stdio
 # 2: use librtt
 if(NOT RTT_TYPE)
-    set(RTT_TYPE 2)
+    set(RTT_TYPE 0)
 endif()
 
 
@@ -59,9 +59,11 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 target_include_directories(${PROJECT_ELF} PRIVATE
 )
 
+# TODO armv7em_soft_nofp kills compilation!  But for other projects it works.
+
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
-        --config armv7em_soft_nofp.cfg
+        --config armv7m_soft_nofp.cfg
         -fdata-sections
         -ffunction-sections
         -Wall
@@ -69,7 +71,7 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config armv7em_soft_nofp.cfg
+        --config armv7m_soft_nofp.cfg
         -fdata-sections
         -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/nrf52840.ld
