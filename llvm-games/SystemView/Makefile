@@ -25,7 +25,6 @@ else
 endif
 
 
-
 .PHONY: clean
 clean:
 	@$(UT_EXTEND_PATH)
@@ -72,6 +71,7 @@ flash: all
 .PHONY: flash-pyocd
 flash-pyocd: all
 	pyocd flash -t nrf52840 -f 10M $(BUILD_DIR)/$(PROJECT).elf
+
 
 .PHONY: reset
 reset: all
