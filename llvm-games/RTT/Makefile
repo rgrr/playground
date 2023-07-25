@@ -10,7 +10,7 @@ PROJECT         := RTT
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
 CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi-17.0.0/bin)
-
+CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em_soft_nofp
 
 UT_MSYS_ROOT         ?= /c/msys64
 UT_MSYS_ARCH_FOLDER  ?= $(UT_MSYS_ROOT)/mingw32
@@ -62,7 +62,7 @@ cmake-create-debug:
 .PHONY: cmake-create-release
 cmake-create-release:
 	export PATH=$(UT_PATH_EXT)
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
 
 
 .PHONY: flash
