@@ -5,7 +5,7 @@ add_library(RTT
 )
 
 target_compile_options(RTT PRIVATE
-        --config armv7em_soft_nofp.cfg
+        --config ${TOOLCHAIN_TARGET_CFG}
         -fdata-sections -ffunction-sections
         -Wall
 )

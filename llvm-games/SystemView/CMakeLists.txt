@@ -61,7 +61,7 @@ target_include_directories(${PROJECT_ELF} PRIVATE
 
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
-        --config armv7em_soft_nofp.cfg
+        --config ${TOOLCHAIN_TARGET_CFG}
         -fdata-sections
         -ffunction-sections
         -Wall
@@ -69,7 +69,7 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config armv7em_soft_nofp.cfg
+        --config ${TOOLCHAIN_TARGET_CFG}
         -fdata-sections
         -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/system/nrf52840.ld
