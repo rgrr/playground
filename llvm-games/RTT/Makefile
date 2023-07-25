@@ -1,54 +1,58 @@
-# Makefile to build the boilerplate
+# Makefile to build the target
 #
-# The Makefile is a helper construct for Eclipse usage.
+# The Makefile is a helper construct for Eclipse usage and compilation on different platforms.
 #
 .ONESHELL:
 
-BUILD_DIR       := _build
-PROJECT         := RTT
-
+BUILD_DIR   := _build
+PROJECT     := RTT
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
 CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi-17.0.0/bin)
-CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
 CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
+CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
 
-UT_MSYS_ROOT         ?= /c/msys64
-UT_MSYS_ARCH_FOLDER  ?= $(UT_MSYS_ROOT)/mingw32
-UT_PATH_EXT          := /c/u/b/llvm-arm-none-eabi/bin:$(UT_MSYS_ARCH_FOLDER)/bin:$(UT_MSYS_ROOT)/bin:$(UT_MSYS_ROOT)/usr/bin:/c/windows/system32
+ifneq ($(WINDIR),)
+	# msys2 must be in c:/msys64
+	UT_MSYS_ROOT         ?= /c/msys64
+	UT_MSYS_ARCH_FOLDER  ?= $(UT_MSYS_ROOT)/mingw32
+	UT_PATH_EXT          := /c/u/b/llvm-arm-none-eabi/bin:$(UT_MSYS_ARCH_FOLDER)/bin:$(UT_MSYS_ROOT)/bin:$(UT_MSYS_ROOT)/usr/bin:/c/windows/system32
+	UT_EXTEND_PATH       := export PATH=$(UT_PATH_EXT)
+	SHELL                := $(UT_MSYS_ROOT)/usr/bin/bash.exe
+endif
 
-SHELL := /c/msys64/usr/bin/bash.exe
 
 
 .PHONY: aaa
 aaa:
-	export PATH=$(UT_PATH_EXT)
+	$(UT_EXTEND_PATH)
 	which bash
 	which cmake
 	which clang
 	which ninja
-	echo $(SHELL)
-	echo $(MAKE)
+	echo shell:   $(SHELL)
+	echo make:    $(MAKE)
 	cmake --version
 	clang --version
 	ninja --version
+	echo ${USERNAME}
 
 
 .PHONY: clean
 clean:
-	export PATH=$(UT_PATH_EXT)
+	@$(UT_EXTEND_PATH)
 	ninja -C $(BUILD_DIR) -v clean
 
 
 .PHONY: clean-build
 clean-build:
-	export PATH=$(UT_PATH_EXT)
+	@$(UT_EXTEND_PATH)
 	rm -rf $(BUILD_DIR)
 
 
 .PHONY: all
 all: $(BUILD_DIR)/$(PROJECT).elf
-	@export PATH=$(UT_PATH_EXT)
+	@$(UT_EXTEND_PATH)
 	echo "--------------------------"
 	llvm-size -Ax $(BUILD_DIR)/$(PROJECT).elf | awk '{size=strtonum($$2); addr=strtonum($$3); if (addr>=0x20000000 && addr<0x20040000) ram += size; if (addr>0 && addr<0x10000000) rom += size; } END {print "Flash: " rom "  RAM: " ram}'
 	echo "--------------------------"
@@ -56,13 +60,19 @@ all: $(BUILD_DIR)/$(PROJECT).elf
 
 .PHONY: cmake-create-debug
 cmake-create-debug:
-	export PATH=$(UT_PATH_EXT)
+	@$(UT_EXTEND_PATH)
 	cmake -B $(BUILD_DIR) -G "Ninja" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
 
 
 .PHONY: cmake-create-release
 cmake-create-release:
-	export PATH=$(UT_PATH_EXT)
+	@$(UT_EXTEND_PATH)
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
+
+
+.PHONY: cmake-create-minsizerel
+cmake-create-minsizerel:
+	@$(UT_EXTEND_PATH)
 	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
 
 
@@ -73,6 +83,5 @@ flash: all
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf
 $(BUILD_DIR)/$(PROJECT).elf:
-	@export PATH=$(UT_PATH_EXT)
-	#ninja -C $(BUILD_DIR) -v all
-	cmake --build $(BUILD_DIR) -v
+	@$(UT_EXTEND_PATH)
+	ninja -C $(BUILD_DIR) -v all
