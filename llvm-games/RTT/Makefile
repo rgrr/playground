@@ -8,7 +8,6 @@ BUILD_DIR   := _build
 PROJECT     := RTT
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
-CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi-17.0.0/bin)
 CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
 CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
 
@@ -19,6 +18,10 @@ ifneq ($(WINDIR),)
 	UT_PATH_EXT          := /c/u/b/llvm-arm-none-eabi/bin:$(UT_MSYS_ARCH_FOLDER)/bin:$(UT_MSYS_ROOT)/bin:$(UT_MSYS_ROOT)/usr/bin:/c/windows/system32
 	UT_EXTEND_PATH       := export PATH=$(UT_PATH_EXT)
 	SHELL                := $(UT_MSYS_ROOT)/usr/bin/bash.exe
+	
+	CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi-17.0.0/bin)
+else
+	CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard ~/bin/llvm-arm-none-eabi/bin)
 endif
 
 
