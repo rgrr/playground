@@ -19,7 +19,7 @@ ifneq ($(WINDIR),)
 	UT_EXTEND_PATH       := export PATH=$(UT_PATH_EXT)
 	SHELL                := $(UT_MSYS_ROOT)/usr/bin/bash.exe
 	
-	CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi-17.0.0/bin)
+	CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi/bin)
 else
 	CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard ~/bin/llvm-arm-none-eabi/bin)
 endif

@@ -7,7 +7,8 @@
 === Intro
 
 === Links
-* https://en.wikipedia.org/wiki/Design_Patterns[wikipedia]
+* https://en.wikipedia.org/wiki/Design_Patterns[Wikipedia - Design Patterns: Elements of Reusable Object-Oriented Software]
+* https://en.wikipedia.org/wiki/Pattern-Oriented_Software_Architecture[Wikipedia - Pattern-Oriented Software Architecture: A System of Patterns]
 * Heise
 ** https://www.heise.de/blog/Ein-erster-Ueberblick-Design-Patterns-und-Architekturmuster-mit-C-7147402.html[Übersicht Design Patterns]
 ** https://www.heise.de/blog/Klassifizierung-von-Design-Patterns-in-der-Softwareentwicklung-7194039.html[Klassifizierung]

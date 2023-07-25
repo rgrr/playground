@@ -59,6 +59,12 @@ The following exercises are targeted:
 Several topics concerning link:llvm-games[LLVM].
 
 
+== Self Training
+There are plenty of websites for doing some self training.  My personal favourites:
+
+* https://www.hackerrank.com[HackerRank]
+
+
 [[setup-eclipse]]
 == Setup
 
