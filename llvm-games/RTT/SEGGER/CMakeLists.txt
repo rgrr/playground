@@ -5,7 +5,7 @@ add_library(RTT
 )
 
 target_compile_options(RTT PRIVATE
-        --config ${TOOLCHAIN_TARGET}.cfg
+        --config ${TOOLCHAIN_TARGET_CFG}
         -fdata-sections -ffunction-sections
         -Wall
 )

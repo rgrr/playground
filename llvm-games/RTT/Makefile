@@ -10,7 +10,8 @@ PROJECT         := RTT
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
 CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard /c/u/b/llvm-arm-none-eabi-17.0.0/bin)
-CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em_soft_nofp
+CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
+CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
 
 UT_MSYS_ROOT         ?= /c/msys64
 UT_MSYS_ARCH_FOLDER  ?= $(UT_MSYS_ROOT)/mingw32
