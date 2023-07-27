@@ -219,7 +219,7 @@ int main()
     SYSVIEW_Init(SystemCoreClock, SystemCoreClock, NULL);
     SYSVIEW_ConfigUpBuffer(buffer, sizeof(buffer));
 
-    SYSVIEW_SetSystem("SysView Games", "PCA10056 nRF52840", "Cortex-M4", "NoOS");
+    SYSVIEW_SetSystemInfo("SysView Games", "PCA10056 nRF52840", "Cortex-M4", "NoOS");
     SYSVIEW_AddMarker(MARKER_PRINT,     "MarkerPrint");
     SYSVIEW_AddMarker(MARKER_PRINT_MOD, "MarkerPrintModulo");
     SYSVIEW_AddTask(TASKID_CYCLIC,    "Cyclic");

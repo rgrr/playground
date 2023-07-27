@@ -1,8 +1,15 @@
+:imagesdir: doc/png
+:source-highlighter: rouge
+:toc:
+:toclevels: 5
+
 == Build (parts of) LLVM for Embedded Targets
 
 Description how to build an Arm toolchain on Linux.
 
-NOTE: Both procedures can also output toolchains for Windows
+NOTE: Both procedures can also output toolchains for Windows.  Preferred
+solution is the "LLVM embedded toolchain for Arm", "Building from scratch"
+is contained for historical reasons.
 
 
 === Building from scratch
