@@ -57,6 +57,18 @@ Note that the whole small test program is compiled to get only the object file o
 the above code.  This is due to my laziness to check how to do it differently ;-)
 
 
+### Compiling
+
+The test program is build with the following steps:
+
+  make clean-build
+  make cmake-create-debug | cmake-create-release | cmake-create-debug-clang | cmake-create-release-clang
+  make objdump
+
+Clang must be installed in `~/bin/llvm-arm-none-eabi` (or the `Makefile` has to be adopted
+accordingly).
+
+
 ### GCC generated Code
 
 [source,asm]
@@ -80,7 +92,7 @@ the above code.  This is due to my laziness to check how to do it differently ;-
    0:   46c0        nop         @ (mov r8, r8)
 ----
 
-The only difference between debug(above) and release code is the following:
+The only difference between debug (above) and release code is:
 
 [source,asm]
 ----
@@ -176,4 +188,4 @@ out when unstacking. Again, no user action required."
 ----
 
 So it seems, that this is the reason why nothing special is required for
-an interrupt service routine.
+an interrupt service routine on Cortex-Mx devices.
