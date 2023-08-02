@@ -10,7 +10,127 @@ Sometimes one is curious how several compiler attributes affect code
 generation.  This topic is handled here to some extent.
 
 
-### Interrupts on Cortex-Mx
+### C Test Program
+
+The relevant part is shown below:
+
+[source,C]
+----
+typedef void (*VECTOR_FUNCTION_Type)(void);
+
+void Interrupt_Handler(void) __attribute__ ((interrupt ("IRQ")));
+void Noattribute_Handler(void);
+void Naked_Handler(void) __attribute__ ((naked));
+void Noreturn_Handler() __attribute__((__noreturn__, section(".third_stage_boot")));
+
+const VECTOR_FUNCTION_Type test__VECTOR_TABLE[64] __attribute__((used, section(".test_vectors"))) = {
+    Noreturn_Handler,
+    Noattribute_Handler,
+    Naked_Handler,
+    Interrupt_Handler,
+};
+
+void Interrupt_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+}
+
+void Noattribute_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+}
+
+void Naked_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+}
+
+void Noreturn_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+    for (;;) {
+    }
+}
+----
+
+Note that the whole small test program is compiled to get only the object file of
+the above code.  This is due to my laziness to check how to do it differently ;-)
+
+
+### GCC generated Code
+
+[source,asm]
+----
+00000000 <Noreturn_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   e7fe        b.n 2 <Noreturn_Handler+0x2>
+
+...
+00000000 <Interrupt_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   4770        bx  lr
+
+...
+00000000 <Noattribute_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   4770        bx  lr
+
+...
+00000000 <Naked_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+----
+
+The only difference between debug(above) and release code is the following:
+
+[source,asm]
+----
+00000000 <Naked_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   46c0        nop         @ (mov r8, r8)
+----
+
+surprising...
+
+
+### Clang generated Code
+
+[source,asm]
+----
+00000000 <Noattribute_Handler>:
+   0:   bf00        nop
+   2:   4770        bx  lr
+
+...
+00000000 <Naked_Handler>:
+   0:   bf00        nop
+
+...
+00000000 <Interrupt_Handler>:
+   0:   b5d0        push    {r4, r6, r7, lr}
+   2:   af02        add r7, sp, #8
+   4:   466c        mov r4, sp
+   6:   08e4        lsrs    r4, r4, #3
+   8:   00e4        lsls    r4, r4, #3
+   a:   46a5        mov sp, r4
+   c:   bf00        nop
+   e:   1ffc        subs    r4, r7, #7
+  10:   3c01        subs    r4, #1
+  12:   46a5        mov sp, r4
+  14:   bdd0        pop {r4, r6, r7, pc}
+
+...
+00000000 <Noreturn_Handler>:
+   0:   bf00        nop
+   2:   e7fe        b.n 2 <Noreturn_Handler+0x2>
+----
+
+So the clang-`Interrupt_Handler()` does what a naive developer would
+expect it to do.  Unfortunately this is wrong (at least to my understanding).
+
+Debug and release versions generate the same code BTW.
+
+
+## Note about Interrupts on Cortex-Mx
 
 For most targets interrupt service routines have to be attributed
 in some way to tell the compiler that it has to add some prologue
