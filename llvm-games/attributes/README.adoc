@@ -1,0 +1,59 @@
+:imagesdir: doc
+:source-highlighter: rouge
+:toc:
+:toclevels: 5
+
+
+## Compiler Attributes
+
+Sometimes one is curious how several compiler attributes affect code
+generation.  This topic is handled here to some extent.
+
+
+### Interrupts on Cortex-Mx
+
+For most targets interrupt service routines have to be attributed
+in some way to tell the compiler that it has to add some prologue
+to a function etc.
+
+This is not required for the Cortex-Mx.  I'm quoting a comment from
+https://stackoverflow.com/questions/76432711/usage-of-attributeinterrupt-of-arm-none-eabi-gcc-for-exception-handlers[stackoverflow].
+
+[quote,Stackoverflow]
+----
+"In Cortex-M the "interrupt" attribute doesn't make any difference. 
+Cortex-M is built in such a way that interrupt handlers are just 
+regular C functions, and don't require any special function 
+prologue/epilogue like some other architectures do. Therefore, 
+you don't need to use this attribute at all, and HAL doesn't use it.
+
+ARMv7-M recommends to keep stack 8-byte (2 word, 64-bit) aligned
+at all times, but it doesn't force it. If you push or pop just
+1 word at a time, it will work perfectly ok. Nevertheless, such
+is the recommendation. So if you write a piece in assembly, it's
+considered a good practice to push/pop an even number of registers
+at a time, but it's not strictly forced, and to be honest I've 
+never had a situation where it would matter in any way at all. 
+Nothing in the docs actually prohibits it. As a pure speculation, 
+it could be due to internal AHB bus being 64-bit wide, but I know 
+too little about how it works down on that level.
+
+When you're in thread mode, and an interrupt occurs, Cortex-M 
+automatically stacks R0-R3, R12, LR, PC (of the next instr.) and 
+xPSR without any instructions in the code to do so. Which is 
+exactly why you don't need an "interrupt" attribute, and why 
+Cortex-M interrupt handlers are basic C functions - the registers
+automatically stacked are basically the same as caller-saved 
+registers in regular C-code thread. Except that stacking/unstacking
+happens automatically in hardware. So by the time you enter interrupt 
+handler, you have all caller-saved registers already saved on stack, 
+and if you were using dedicated thread stack pointer, then it will 
+switch to main stack pointer in the interrupts. If at the moment of 
+interrupt your thread (or other interrupt that will be interrupted) 
+had stack 4-byte aligned and not 8, the automatic stacking mechanism 
+will push one extra dummy register on stack, and it will be thrown 
+out when unstacking. Again, no user action required."
+----
+
+So it seems, that this is the reason why nothing special is required for
+an interrupt service routine.
