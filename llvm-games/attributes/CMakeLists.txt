@@ -34,14 +34,9 @@ set(SRC_FILES
     main.c
     system/gcc_startup_nrf52840.S
     system/nordic/system_nrf52840.c
-)
-
-#add_subdirectory(SEGGER)
-target_link_libraries(${PROJECT_ELF} LINK_PUBLIC
-    librtt.a
-    librtt_stdio.a
-    librtt_sysview.a
-    librtt.a
+    SEGGER/RTT/SEGGER_RTT.c
+    SEGGER/RTT/SEGGER_RTT_printf.c
+    SEGGER/RTT/SEGGER_RTT_ASM_ARMv7M.S
 )
 
 target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
@@ -57,6 +52,7 @@ target_compile_definitions(${PROJECT_ELF} PRIVATE
 target_include_directories(${PROJECT_ELF} PRIVATE
     system/cmsis
     system/nordic
+    SEGGER/Config
 )
 
 # Compiler options
