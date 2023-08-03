@@ -168,7 +168,7 @@ __interrupt_vector:
     .long   0                           /*Reserved */
     .long   0                           /*Reserved */
 
-    .size __isr_vector, . - __isr_vector
+    .size __interrupt_vector, . - __interrupt_vector
 
 /* Reset Handler */
 
@@ -295,7 +295,7 @@ clear_bss_done:
     bl __START
 
     .pool
-    .size   Reset_Handler,.-Reset_Handler
+    .size   Reset_Handler,. - Reset_Handler
 
     .section ".text"
 

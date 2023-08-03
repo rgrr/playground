@@ -53,25 +53,34 @@ target_include_directories(${PROJECT_ELF} PRIVATE
     system/cmsis
     system/nordic
     SEGGER/Config
+    .
 )
 
 # Compiler options
 target_compile_options(${PROJECT_ELF} PRIVATE
-        --config ${TOOLCHAIN_TARGET_CFG}
         -fdata-sections
         -ffunction-sections
         -Wall
 )
+if(${USE_CLANG})
+    target_compile_options(${PROJECT_ELF} PRIVATE
+        --config ${TOOLCHAIN_TARGET_CFG}
+    )
+endif()
 
 # Linker options
 target_link_options(${PROJECT_ELF} PRIVATE
-        --config ${TOOLCHAIN_TARGET_CFG}
         -fdata-sections
         -ffunction-sections
         -T${CMAKE_SOURCE_DIR}/system/nrf52840.ld
         -Wl,--defsym=__stack_size=${STACK_SIZE}
         -Wl,-Map=${PROJECT_ELF}.map
 )
+if(${USE_CLANG})
+    target_link_options(${PROJECT_ELF} PRIVATE
+        --config ${TOOLCHAIN_TARGET_CFG}
+    )
+endif()
 
 # Optional: Print executable size as part of the post build process
 add_custom_command(TARGET ${PROJECT_ELF}
