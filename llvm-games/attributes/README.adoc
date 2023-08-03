@@ -1,0 +1,191 @@
+:imagesdir: doc
+:source-highlighter: rouge
+:toc:
+:toclevels: 5
+
+
+## Compiler Attributes
+
+Sometimes one is curious how several compiler attributes affect code
+generation.  This topic is handled here to some extent.
+
+
+### C Test Program
+
+The relevant part is shown below:
+
+[source,C]
+----
+typedef void (*VECTOR_FUNCTION_Type)(void);
+
+void Interrupt_Handler(void) __attribute__ ((interrupt ("IRQ")));
+void Noattribute_Handler(void);
+void Naked_Handler(void) __attribute__ ((naked));
+void Noreturn_Handler() __attribute__((__noreturn__, section(".third_stage_boot")));
+
+const VECTOR_FUNCTION_Type test__VECTOR_TABLE[64] __attribute__((used, section(".test_vectors"))) = {
+    Noreturn_Handler,
+    Noattribute_Handler,
+    Naked_Handler,
+    Interrupt_Handler,
+};
+
+void Interrupt_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+}
+
+void Noattribute_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+}
+
+void Naked_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+}
+
+void Noreturn_Handler(void)
+{
+    __asm volatile ("nop\n" : : :);
+    for (;;) {
+    }
+}
+----
+
+Note that the whole small test program is compiled to get only the object file of
+the above code.  This is due to my laziness to check how to do it differently ;-)
+
+
+### Compiling
+
+The test program is build with the following steps:
+
+  make clean-build
+  make cmake-create-debug | cmake-create-release | cmake-create-debug-clang | cmake-create-release-clang
+  make objdump
+
+Clang must be installed in `~/bin/llvm-arm-none-eabi` (or the `Makefile` has to be adopted
+accordingly).
+
+
+### GCC generated Code
+
+[source,asm]
+----
+00000000 <Noreturn_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   e7fe        b.n 2 <Noreturn_Handler+0x2>
+
+...
+00000000 <Interrupt_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   4770        bx  lr
+
+...
+00000000 <Noattribute_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   4770        bx  lr
+
+...
+00000000 <Naked_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+----
+
+The only difference between debug (above) and release code is:
+
+[source,asm]
+----
+00000000 <Naked_Handler>:
+   0:   46c0        nop         @ (mov r8, r8)
+   2:   46c0        nop         @ (mov r8, r8)
+----
+
+surprising...
+
+
+### Clang generated Code
+
+[source,asm]
+----
+00000000 <Noattribute_Handler>:
+   0:   bf00        nop
+   2:   4770        bx  lr
+
+...
+00000000 <Naked_Handler>:
+   0:   bf00        nop
+
+...
+00000000 <Interrupt_Handler>:
+   0:   b5d0        push    {r4, r6, r7, lr}
+   2:   af02        add r7, sp, #8
+   4:   466c        mov r4, sp
+   6:   08e4        lsrs    r4, r4, #3
+   8:   00e4        lsls    r4, r4, #3
+   a:   46a5        mov sp, r4
+   c:   bf00        nop
+   e:   1ffc        subs    r4, r7, #7
+  10:   3c01        subs    r4, #1
+  12:   46a5        mov sp, r4
+  14:   bdd0        pop {r4, r6, r7, pc}
+
+...
+00000000 <Noreturn_Handler>:
+   0:   bf00        nop
+   2:   e7fe        b.n 2 <Noreturn_Handler+0x2>
+----
+
+So the clang-`Interrupt_Handler()` does what a naive developer would
+expect it to do.  Unfortunately this is wrong (at least to my understanding).
+
+Debug and release versions generate the same code BTW.
+
+
+## Note about Interrupts on Cortex-Mx
+
+For most targets interrupt service routines have to be attributed
+in some way to tell the compiler that it has to add some prologue
+to a function etc.
+
+This is not required for the Cortex-Mx.  I'm quoting a comment from
+https://stackoverflow.com/questions/76432711/usage-of-attributeinterrupt-of-arm-none-eabi-gcc-for-exception-handlers[stackoverflow].
+
+[quote,Stackoverflow]
+----
+"In Cortex-M the "interrupt" attribute doesn't make any difference. 
+Cortex-M is built in such a way that interrupt handlers are just 
+regular C functions, and don't require any special function 
+prologue/epilogue like some other architectures do. Therefore, 
+you don't need to use this attribute at all, and HAL doesn't use it.
+
+ARMv7-M recommends to keep stack 8-byte (2 word, 64-bit) aligned
+at all times, but it doesn't force it. If you push or pop just
+1 word at a time, it will work perfectly ok. Nevertheless, such
+is the recommendation. So if you write a piece in assembly, it's
+considered a good practice to push/pop an even number of registers
+at a time, but it's not strictly forced, and to be honest I've 
+never had a situation where it would matter in any way at all. 
+Nothing in the docs actually prohibits it. As a pure speculation, 
+it could be due to internal AHB bus being 64-bit wide, but I know 
+too little about how it works down on that level.
+
+When you're in thread mode, and an interrupt occurs, Cortex-M 
+automatically stacks R0-R3, R12, LR, PC (of the next instr.) and 
+xPSR without any instructions in the code to do so. Which is 
+exactly why you don't need an "interrupt" attribute, and why 
+Cortex-M interrupt handlers are basic C functions - the registers
+automatically stacked are basically the same as caller-saved 
+registers in regular C-code thread. Except that stacking/unstacking
+happens automatically in hardware. So by the time you enter interrupt 
+handler, you have all caller-saved registers already saved on stack, 
+and if you were using dedicated thread stack pointer, then it will 
+switch to main stack pointer in the interrupts. If at the moment of 
+interrupt your thread (or other interrupt that will be interrupted) 
+had stack 4-byte aligned and not 8, the automatic stacking mechanism 
+will push one extra dummy register on stack, and it will be thrown 
+out when unstacking. Again, no user action required."
+----
+
+So it seems, that this is the reason why nothing special is required for
+an interrupt service routine on Cortex-Mx devices.
