@@ -48,18 +48,17 @@ void Noreturn_Handler(void)
 }
 
 
-
 uint8_t u0[]              = "uint8_t []";
 static uint8_t u1[]       = "static uint8_t *";
 const uint8_t u2[]        = "const uint8_t *";
 static const uint8_t u3[] = "static const uint8_t *";
+extern uint32_t __stack;
+extern uint32_t __heap_end;
 
 
 static char const *p_eval( uint8_t const * const p )
 {
-    extern uint32_t __stack;
-
-    if (p >= (uint8_t *)&__stack) {
+    if (p >= (uint8_t *)&__heap_end) {
         return "STACK";
     }
     else if (p >= (uint8_t *)0x20000000) {
@@ -102,22 +101,23 @@ static void _Delay(uint32_t period_us)
 }   // _Delay
 
 
-//void Interrupt_Handler(void) __attribute__ ((interrupt ("IRQ")));
-//void Noattribute_Handler(void);
-//void Naked_Handler(void) __attribute__ ((naked));
-//void Noreturn_Handler() __attribute__((__noreturn__, section(".third_stage_boot")));
-
 int main()
 {
+    SEGGER_RTT_printf(0, "\n========================================\n");
+    SEGGER_RTT_printf(0, "Stack               : %p\n", &__stack);
+    SEGGER_RTT_printf(0, "Heap End            : %p\n", &__heap_end);
+    SEGGER_RTT_printf(0, "----------------------------------------\n");
     SEGGER_RTT_printf(0, "Interrupt_Handler   : %p\n", Interrupt_Handler);
     SEGGER_RTT_printf(0, "Noattribute_Handler : %p\n", Noattribute_Handler);
     SEGGER_RTT_printf(0, "Naked_Handler       : %p\n", Naked_Handler);
     SEGGER_RTT_printf(0, "Noreturn_Handler    : %p\n", Noreturn_Handler);
+    SEGGER_RTT_printf(0, "========================================\n");
 
     p_u(u0);
     constp_u(u1);
     p_constu(u2);
     constp_constu(u3);
+    SEGGER_RTT_printf(0, "========================================\n");
 
     while (true) {
         _Delay(250 * 1000);

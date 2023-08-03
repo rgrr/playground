@@ -43,14 +43,12 @@ cmake-create-release:
 
 .PHONY: cmake-create-debug-clang
 cmake-create-debug-clang:
-	export PICO_TOOLCHAIN_PATH=~/bin/llvm-arm-none-eabi/bin
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) -DPICO_COMPILER=pico_arm_clang
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
 
 
 .PHONY: cmake-create-release-clang
 cmake-create-release-clang:
-	export PICO_TOOLCHAIN_PATH=~/bin/llvm-arm-none-eabi-14.0.0/bin
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) -DPICO_COMPILER=pico_arm_clang
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS)
 
 
 .PHONY: flash
