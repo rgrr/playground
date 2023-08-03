@@ -3,16 +3,15 @@
 # The Makefile is a helper construct for Eclipse usage.
 #
 
+.ONESHELL:
+
 BUILD_DIR       := _build
-PICO_BOARD      := pico
 PROJECT         := attributes
 
-
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
-CMAKE_FLAGS += -DPICO_BOARD=$(PICO_BOARD)
-
-
-.ONESHELL:
+CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
+CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
+CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard ~/bin/llvm-arm-none-eabi/bin)
 
 
 .PHONY: clean
@@ -59,9 +58,14 @@ flash: all
 	openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
 
 
+.PHONY: flash-pyocd
+flash-pyocd: all
+	pyocd flash -t nrf52840 -f 10M $(BUILD_DIR)/$(PROJECT).elf
+
+
 .PHONY: objdump
 objdump: all
-	arm-none-eabi-objdump -D $(BUILD_DIR)/CMakeFiles/$(PROJECT).dir/main.c.obj
+	arm-none-eabi-objdump -D $(BUILD_DIR)/CMakeFiles/$(PROJECT).elf.dir/main.c.obj | head -n 500
 
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf

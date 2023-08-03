@@ -189,3 +189,7 @@ out when unstacking. Again, no user action required."
 
 So it seems, that this is the reason why nothing special is required for
 an interrupt service routine on Cortex-Mx devices.
+
+More links:
+
+* https://www.embedded.com/programming-embedded-systems-how-interrupts-work-in-arm-cortex-m/[Programming embedded systems: How interrupts work in ARM Cortex-M]
