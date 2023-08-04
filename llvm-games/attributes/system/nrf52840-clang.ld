@@ -9,18 +9,6 @@ MEMORY
 }
 
 
-/* ???? */
-/*
-PHDRS
-{
-    text PT_LOAD;
-    ram PT_LOAD;
-    ram_init PT_LOAD;
-    tls PT_TLS;
-}
-*/
-
-
 SECTIONS
 {
     PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
@@ -32,7 +20,7 @@ SECTIONS
     .text : {
         /* code */
         *(.text .text.*)
-    } >flash AT>flash :text
+    } >flash AT>flash
 
     .data :  {
         *(.data .data.*)
@@ -45,14 +33,14 @@ SECTIONS
     .bss (NOLOAD) : {
         *(.bss .bss.*)
         __bss_end = .;
-    } >ram AT>ram :ram
+    } >ram AT>ram
     PROVIDE( __bss_start = ADDR(.bss));
     PROVIDE( __bss_size = __bss_end - __bss_start );
 
     .tdata :  {
         *(.tdata .tdata.*)
         __tdata_end = .;
-    } >ram AT>flash :tls :ram_init
+    } >ram AT>flash
     PROVIDE( __tls_base = ADDR(.tdata));
 
     #PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
