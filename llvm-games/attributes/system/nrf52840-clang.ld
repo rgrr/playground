@@ -18,19 +18,21 @@ SECTIONS
     } >flash AT>flash :text
 
     .text : {
-        /* code */
+        . = ALIGN(4);
         *(.text .text.*)
     } >flash AT>flash
 
     .data :  {
+        . = ALIGN(4);
         *(.data .data.*)
         PROVIDE(__data_end = .);
-    } >ram AT>flash :ram_init
+    } >ram AT>flash
     PROVIDE(__data_start = ADDR(.data));
     PROVIDE(__data_source = LOADADDR(.data));
     PROVIDE(__data_size = __data_end - __data_start);
 
     .bss (NOLOAD) : {
+        . = ALIGN(4);
         *(.bss .bss.*)
         __bss_end = .;
     } >ram AT>ram
@@ -38,6 +40,7 @@ SECTIONS
     PROVIDE( __bss_size = __bss_end - __bss_start );
 
     .tdata :  {
+        . = ALIGN(4);
         *(.tdata .tdata.*)
         __tdata_end = .;
     } >ram AT>flash
