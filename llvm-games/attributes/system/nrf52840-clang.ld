@@ -51,10 +51,14 @@ SECTIONS
 
     .tdata :  {
         *(.tdata .tdata.*)
+        __tdata_end = .;
     } >ram AT>flash :tls :ram_init
     PROVIDE( __tls_base = ADDR(.tdata));
 
     #PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
     PROVIDE( __tls_align = ALIGNOF(.tdata) );
     PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+
+    # my private symbol for end of RAM usage    
+    PROVIDE(__data_end = __tdata_end);
 }
