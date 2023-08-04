@@ -34,10 +34,12 @@ SECTIONS
     .bss (NOLOAD) : {
         . = ALIGN(4);
         *(.bss .bss.*)
-        __bss_end = .;
+        __bss_end__ = .;
     } >ram AT>ram
-    PROVIDE( __bss_start = ADDR(.bss));
-    PROVIDE( __bss_size = __bss_end - __bss_start );
+    PROVIDE( __bss_start__ = ADDR(.bss));
+    PROVIDE( __bss_size__  = __bss_end__ - __bss_start__ );
+    PROVIDE( __bss_start   = __bss_start);
+    PROVIDE( __bss_size    = __bss_size__);
 
     .tdata :  {
         . = ALIGN(4);
@@ -50,6 +52,8 @@ SECTIONS
     PROVIDE( __tls_align = ALIGNOF(.tdata) );
     PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
 
-    # my private symbol for end of RAM usage    
-    PROVIDE(__data_end = __tdata_end);
+    # my private symbol for end of RAM usage
+    .mydata (NOLOAD) : {
+        __my_data_end = .;
+    } >ram AT>ram
 }

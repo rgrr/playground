@@ -56,12 +56,12 @@ static uint8_t u1[]       = "static uint8_t *";
 const uint8_t u2[]        = "const uint8_t *";
 static const uint8_t u3[] = "static const uint8_t *";
 extern uint32_t __stack;
-extern uint32_t __data_end;
+extern uint32_t __my_data_end;
 
 
 static char const *p_eval( uint8_t const * const p )
 {
-    if (p >= (uint8_t *)&__data_end) {
+    if (p >= (uint8_t *)&__my_data_end) {
         return "STACK";
     }
     else if (p >= (uint8_t *)0x20000000) {
@@ -130,7 +130,7 @@ int main()
     SEGGER_RTT_printf(0, "\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
     SEGGER_RTT_printf(0, "\n========================================\n");
     SEGGER_RTT_printf(0, "Stack               : %p\n", &__stack);
-    SEGGER_RTT_printf(0, "Data End            : %p\n", &__data_end);
+    SEGGER_RTT_printf(0, "Data End            : %p\n", &__my_data_end);
     SEGGER_RTT_printf(0, "----------------------------------------\n");
     SEGGER_RTT_printf(0, "Interrupt_Handler   : %p\n", Interrupt_Handler);
     SEGGER_RTT_printf(0, "Noattribute_Handler : %p\n", Noattribute_Handler);
