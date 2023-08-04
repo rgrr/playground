@@ -30,7 +30,7 @@ set(STACK_SIZE  0x8000)
 
 add_executable(${PROJECT_ELF})
 
-set(SRC_FILES 
+target_sources(${PROJECT_ELF} PRIVATE 
     main.c
     system/gcc_startup_nrf52840.S
     system/nordic/system_nrf52840.c
@@ -38,8 +38,6 @@ set(SRC_FILES
     SEGGER/RTT/SEGGER_RTT_printf.c
     SEGGER/RTT/SEGGER_RTT_ASM_ARMv7M.S
 )
-
-target_sources(${PROJECT_ELF} PRIVATE ${SRC_FILES})
 
 # List of compiler defines, prefix with -D compiler option
 target_compile_definitions(${PROJECT_ELF} PRIVATE
@@ -56,7 +54,10 @@ target_include_directories(${PROJECT_ELF} PRIVATE
     .
 )
 
+
+#
 # Compiler options
+#
 target_compile_options(${PROJECT_ELF} PRIVATE
         -fdata-sections
         -ffunction-sections
@@ -68,27 +69,40 @@ if(${USE_CLANG})
     )
 endif()
 
+
+#
 # Linker options
+#
 target_link_options(${PROJECT_ELF} PRIVATE
         -fdata-sections
         -ffunction-sections
-        -T${CMAKE_SOURCE_DIR}/system/nrf52840.ld
         -Wl,--defsym=__stack_size=${STACK_SIZE}
         -Wl,-Map=${PROJECT_ELF}.map
 )
 if(${USE_CLANG})
     target_link_options(${PROJECT_ELF} PRIVATE
         --config ${TOOLCHAIN_TARGET_CFG}
+        -T${CMAKE_SOURCE_DIR}/system/nrf52840-clang.ld
+    )
+else()
+    target_link_options(${PROJECT_ELF} PRIVATE
+        --specs=nosys.specs
+        -T${CMAKE_SOURCE_DIR}/system/nrf52840-gcc.ld
     )
 endif()
 
+
+#
 # Optional: Print executable size as part of the post build process
+#
 add_custom_command(TARGET ${PROJECT_ELF}
         POST_BUILD
         COMMAND ${CMAKE_SIZE_UTIL} ${PROJECT}.elf
 )
 
+#
 # Optional: Create hex and bin files after the build
+#
 add_custom_command(TARGET ${PROJECT_ELF}
         POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -O ihex   "${PROJECT}.elf" "${PROJECT}.hex"

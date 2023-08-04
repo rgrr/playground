@@ -10,8 +10,12 @@ PROJECT         := attributes
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
 CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
-CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
-CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard ~/bin/llvm-arm-none-eabi/bin)
+
+CLANG_CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
+CLANG_CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard ~/bin/llvm-arm-none-eabi/bin)
+CLANG_CMAKE_FLAGS += -DUSE_CLANG=1
+
+GCC_CMAKE_FLAGS += -DUSE_CLANG=0
 
 
 .PHONY: clean
@@ -33,27 +37,27 @@ all: $(BUILD_DIR)/$(PROJECT).elf
 
 .PHONY: cmake-create-debug
 cmake-create-debug:
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) -DUSE_CLANG=0
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) $(GCC_CMAKE_FLAGS)
 
 
 .PHONY: cmake-create-release
 cmake-create-release:
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) -DUSE_CLANG=0
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) $(GCC_CMAKE_FLAGS)
 
 
 .PHONY: cmake-create-debug-clang
 cmake-create-debug-clang:
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) -DUSE_CLANG=1
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) $(CLANG_CMAKE_FLAGS)
 
 
 .PHONY: cmake-create-release-clang
 cmake-create-release-clang:
-	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) -DUSE_CLANG=1
+	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) $(CLANG_CMAKE_FLAGS)
 
 
 .PHONY: flash
 flash: all
-	openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
+	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "adapter speed 8000" -c "program {$(BUILD_DIR)/$(PROJECT).elf} verify reset; shutdown;"
 
 
 .PHONY: flash-pyocd
