@@ -18,10 +18,6 @@ if(${USE_CLANG})
     set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
     set(CMAKE_CXX_COMPILER "${TOOLCHAIN_PATH}/clang++")
     
-    #SET(CMAKE_C_COMPILER_TARGET   ${TOOLCHAIN_TARGET})
-    #SET(CMAKE_CXX_COMPILER_TARGET ${TOOLCHAIN_TARGET})
-    #SET(CMAKE_ASM_COMPILER_TARGET ${TOOLCHAIN_TARGET})
-    
     set(CMAKE_OBJCOPY   ${TOOLCHAIN_PATH}/llvm-objcopy CACHE INTERNAL "llvm objcopy tool")
     set(CMAKE_SIZE_UTIL ${TOOLCHAIN_PATH}/llvm-size    CACHE INTERNAL "llvm size tool")
     set(CMAKE_LINKER    ${TOOLCHAIN_PATH}/ld.ldd       CACHE INTERNAL "llvm ARM linker")
@@ -32,10 +28,6 @@ else()
     set(CMAKE_C_COMPILER   "arm-none-eabi-gcc")
     set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
     set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
-    
-    #SET(CMAKE_C_COMPILER_TARGET   ${TOOLCHAIN_TARGET})
-    #SET(CMAKE_CXX_COMPILER_TARGET ${TOOLCHAIN_TARGET})
-    #SET(CMAKE_ASM_COMPILER_TARGET ${TOOLCHAIN_TARGET})
     
     set(CMAKE_OBJCOPY   arm-none-eabi-objcopy CACHE INTERNAL "gcc objcopy tool")
     set(CMAKE_SIZE_UTIL arm-none-eabi-size    CACHE INTERNAL "gcc size tool")

@@ -94,15 +94,15 @@ static void constp_constu( uint8_t const * const p )
 
 
 
-static void _Delay(uint32_t period_us)
+static void _Delay_us(uint32_t period_us)
 {
     volatile int i;
 
-    i = (6400 * period_us) / 1000;
+    i = 6400 * (period_us / 1000);
     do {
         __asm volatile ("nop\n" : : :);
     } while (i--);
-}   // _Delay
+}   // _Delay_us
 
 
 
@@ -119,6 +119,7 @@ void _exit(void)
 int main()
 {
     SEGGER_RTT_printf(0, "\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    _Delay_us(1500 * 1000);
     SEGGER_RTT_printf(0, "Compiler:\n");
 #if defined(__clang__)
     SEGGER_RTT_printf(0, "  clang %d.%d.%d (%s) -", __clang_major__, __clang_minor__, __clang_patchlevel__, __VERSION__);
@@ -150,14 +151,29 @@ int main()
     SEGGER_RTT_printf(0, "========================================\n");
 
 #ifdef INC_CONST
+    _Delay_us(200 * 1000);
     p_u(u0);
+    p_u(u1);
+
+    _Delay_us(200 * 1000);
+    constp_u(u0);
     constp_u(u1);
+
+    _Delay_us(200 * 1000);
+    p_constu(u0);
+    p_constu(u1);
     p_constu(u2);
+    p_constu(u3);
+
+    _Delay_us(200 * 1000);
+    constp_constu(u0);
+    constp_constu(u1);
+    constp_constu(u2);
     constp_constu(u3);
 #endif
     SEGGER_RTT_printf(0, "========================================\n");
 
     while (true) {
-        _Delay(250 * 1000);
+        _Delay_us(250 * 1000);
     }
 }

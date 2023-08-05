@@ -12,9 +12,7 @@ MEMORY
 PHDRS
 {
     text     PT_LOAD;
-    //ram      PT_LOAD;
     ram_init PT_LOAD;
-    //tls      PT_TLS;
 }
 
 
@@ -31,14 +29,6 @@ SECTIONS
         *(.text .text.*)
     } >flash AT>flash
 
-    #.data :  {
-    #    __data_start = .;
-    #    *(.data .data.*)
-    #    __data_end = .;
-    #} >ram AT>flash :ram_init
-    #PROVIDE(__data_source = LOADADDR(.data));
-    #PROVIDE(__data_size = __data_end - __data_start);
-
     .bss (NOLOAD) : {
         __bss_start = .;
         __bss_start__ = .;
@@ -47,11 +37,6 @@ SECTIONS
         __bss_end = .;
         __bss_end__ = .;
     } >ram AT>ram
-
-
-
-
-
 
     # my private symbol for end of RAM usage
     .mydata (NOLOAD) : {

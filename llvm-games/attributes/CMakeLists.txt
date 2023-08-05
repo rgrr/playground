@@ -64,11 +64,11 @@ target_compile_options(${PROJECT_ELF} PRIVATE
 )
 if(${USE_CLANG})
     target_compile_options(${PROJECT_ELF} PRIVATE
-        --config ${TOOLCHAIN_TARGET_CFG}
+        --config ${TOOLCHAIN_CLANG_TARGET_CFG}
     )
 else()
     target_compile_options(${PROJECT_ELF} PRIVATE
-        -mcpu=cortex-m0plus -mthumb
+        -mcpu=${TOOLCHAIN_GCC_TARGET_CPU}
     )
 endif()
 
@@ -84,12 +84,12 @@ target_link_options(${PROJECT_ELF} PRIVATE
 )
 if(${USE_CLANG})
     target_link_options(${PROJECT_ELF} PRIVATE
-        --config ${TOOLCHAIN_TARGET_CFG}
+        --config ${TOOLCHAIN_CLANG_TARGET_CFG}
         -T${CMAKE_SOURCE_DIR}/system/nrf52840-clang.ld
     )
 else()
     target_link_options(${PROJECT_ELF} PRIVATE
-        -mcpu=cortex-m0plus -mthumb
+        -mcpu=${TOOLCHAIN_GCC_TARGET_CPU}
         -T${CMAKE_SOURCE_DIR}/system/nrf52840-gcc.ld
     )
 endif()
