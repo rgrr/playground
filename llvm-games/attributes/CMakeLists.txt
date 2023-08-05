@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.15.3)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Path to toolchain file. This one has to be before 'project()' below
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/system/arm-none-eabi-clang.cmake)
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/system/arm-none-eabi.cmake)
 
 # Setup project, output and linker file
 project(${PROJECT} C CXX ASM)
@@ -33,7 +33,6 @@ add_executable(${PROJECT_ELF})
 target_sources(${PROJECT_ELF} PRIVATE 
     main.c
     system/gcc_startup_nrf52840.S
-    system/nordic/system_nrf52840.c
     SEGGER/RTT/SEGGER_RTT.c
     SEGGER/RTT/SEGGER_RTT_printf.c
     SEGGER/RTT/SEGGER_RTT_ASM_ARMv7M.S
@@ -67,6 +66,10 @@ if(${USE_CLANG})
     target_compile_options(${PROJECT_ELF} PRIVATE
         --config ${TOOLCHAIN_TARGET_CFG}
     )
+else()
+    target_compile_options(${PROJECT_ELF} PRIVATE
+        -mcpu=cortex-m0plus -mthumb
+    )
 endif()
 
 
@@ -86,7 +89,7 @@ if(${USE_CLANG})
     )
 else()
     target_link_options(${PROJECT_ELF} PRIVATE
-        --specs=nosys.specs
+        -mcpu=cortex-m0plus -mthumb
         -T${CMAKE_SOURCE_DIR}/system/nrf52840-gcc.ld
     )
 endif()

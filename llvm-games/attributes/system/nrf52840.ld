@@ -191,6 +191,7 @@ SECTIONS
 		PROVIDE( __tbss_end = . );
 	} >ram AT>ram :tls :ram
 	PROVIDE( __bss_start = ADDR(.tbss));
+    PROVIDE( __bss_start__ = ADDR(.tbss));
 	PROVIDE( __tbss_start = ADDR(.tbss));
 	PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
@@ -225,6 +226,7 @@ SECTIONS
 		/* Align the heap */
 		. = ALIGN(8);
 		__bss_end = .;
+        __bss_end__ = .;
 	} >ram AT>ram :ram
 	PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 	PROVIDE( __end = __bss_end );
@@ -242,13 +244,18 @@ SECTIONS
 		. += (DEFINED(__stack_size) ? __stack_size : 0x00001000);
 	} >ram :ram
 
+    # my private symbol for end of RAM usage
+    .mydata (NOLOAD) : {
+        __my_data_end = .;
+    } >ram AT>ram
+
 	/* Throw away C++ exception handling information */
 
 	
 
 	/DISCARD/ : {
 		*(.note .note.*)
-		*(.eh_frame .eh_frame.*)
+		#*(.eh_frame .eh_frame.*)
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 		*(.ARM.exidx*)
 	}

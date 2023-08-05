@@ -9,7 +9,7 @@ BUILD_DIR       := _build
 PROJECT         := attributes
 
 CMAKE_FLAGS += -DPROJECT=$(PROJECT)
-CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
+#CMAKE_FLAGS += -DTOOLCHAIN_TARGET=armv7em-none-eabi
 
 CLANG_CMAKE_FLAGS += -DTOOLCHAIN_TARGET_CFG=armv7em_soft_nofp.cfg
 CLANG_CMAKE_FLAGS += -DTOOLCHAIN_PATH=$(wildcard ~/bin/llvm-arm-none-eabi/bin)

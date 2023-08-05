@@ -105,6 +105,17 @@ static void _Delay(uint32_t period_us)
 }   // _Delay
 
 
+
+#if !defined(__clang_major__)
+// actually required for newlib
+void _exit(void)
+{
+    for (;;) {
+    }
+}   // _exit
+#endif
+
+
 int main()
 {
     SEGGER_RTT_printf(0, "\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");

@@ -9,6 +9,9 @@
 Sometimes one is curious how several compiler attributes affect code
 generation.  This topic is handled here to some extent.
 
+WARNING: The startup code and linker files cannot be considered generic.
+So transfer them to your own projects with extreme care.
+
 
 ### C Test Program
 

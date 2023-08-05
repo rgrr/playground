@@ -284,7 +284,7 @@ clear_bss_done:
 #endif /* __STARTUP_CLEAR_BSS */
 
 /* Execute SystemInit function. */
-    bl SystemInit
+    //bl SystemInit
 
 /* Call _start function provided by libraries.
  * If those libraries are not accessible, define __START as your entry point.
