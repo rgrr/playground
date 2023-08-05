@@ -253,13 +253,13 @@ copy_etext_done:
     ldr r2, =__bss_end
     bl clear_region
 
-    ldr r1, =__tbss_start
-    ldr r2, =__tbss_end
-    bl clear_region
+    #ldr r1, =__tbss_start
+    #ldr r2, =__tbss_end
+    #bl clear_region
 
-//    ldr r1, =__sbss_start
-//    ldr r2, =__sbss_end
-//    bl clear_region
+    #ldr r1, =__sbss_start
+    #ldr r2, =__sbss_end
+    #bl clear_region
 
     b clear_bss_done
 
