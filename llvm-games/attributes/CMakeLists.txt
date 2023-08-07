@@ -39,11 +39,20 @@ target_sources(${PROJECT_ELF} PRIVATE
 )
 
 # List of compiler defines, prefix with -D compiler option
-target_compile_definitions(${PROJECT_ELF} PRIVATE
-    -DNRF52840_XXAA
-    -D__STARTUP_SKIP_ETEXT
-    -D__STARTUP_CLEAR_BSS          # actually not required, because done in crt0.c
-)
+if(${USE_CLANG})
+    target_compile_definitions(${PROJECT_ELF} PRIVATE
+        # picolib does all this stuff of init
+        -DNRF52840_XXAA
+        #-D__STARTUP_CLEAR_BSS
+        -D__STARTUP_SKIP_ETEXT
+    )
+else()
+    target_compile_definitions(${PROJECT_ELF} PRIVATE
+        # newlib needs at least copy of .data
+        -DNRF52840_XXAA
+        #-D__STARTUP_CLEAR_BSS
+    )
+endif()
 
 # List of include directories
 target_include_directories(${PROJECT_ELF} PRIVATE
@@ -91,6 +100,8 @@ else()
     target_link_options(${PROJECT_ELF} PRIVATE
         -mcpu=${TOOLCHAIN_GCC_TARGET_CPU}
         -T${CMAKE_SOURCE_DIR}/system/nrf52840-gcc.ld
+        -specs=nano.specs                             # with nano 14K instead of 43K
+        -specs=nosys.specs
     )
 endif()
 

@@ -199,22 +199,22 @@ Reset_Handler:
     bl copy_region
 
 /* Load .sdata */
-    ldr r1, =__sdata_start
-    ldr r2, =__sdata_end
-    ldr r3, =__sdata_load_start
-    bl copy_region
+#    ldr r1, =__sdata_start
+#    ldr r2, =__sdata_end
+#    ldr r3, =__sdata_load_start
+#    bl copy_region
 
 /* Load .tdata */
-    ldr r1, =__tdata_start
-    ldr r2, =__tdata_end
-    ldr r3, =__tdata_load_start
-    bl copy_region
+#    ldr r1, =__tdata_start
+#    ldr r2, =__tdata_end
+#    ldr r3, =__tdata_load_start
+#    bl copy_region
 
 /* Load .fast */
-    ldr r1, =__fast_start
-    ldr r2, =__fast_end
-    ldr r3, =__fast_load_start
-    bl copy_region
+#    ldr r1, =__fast_start
+#    ldr r2, =__fast_end
+#    ldr r3, =__fast_load_start
+#    bl copy_region
 
     b copy_etext_done
 

@@ -49,16 +49,6 @@ static char const *p_eval( uint8_t const * const p )
 }
 
 
-#if !defined(__clang_major__)
-// actually required for newlib
-void _exit(void)
-{
-    for (;;) {
-    }
-}   // _exit
-#endif
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 // various function attributes
@@ -181,7 +171,7 @@ static void print_const_memory_layout(void)
 
 uint8_t tud_network_mac_address[6] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 const uint8_t const_tud_network_mac_address[6] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
-static char abuf[253];
+static char abuf[253];   // check alignment ;-)
 
 static const char *print_array_to_abuf(const void *buf, size_t len)
 {
