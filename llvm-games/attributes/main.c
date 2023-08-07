@@ -9,10 +9,14 @@
 #include <SEGGER/RTT/SEGGER_RTT.h>
 
 
-#define xINC_HANDLER
-#define xINC_CONST
+#define INC_HANDLER
+#define INC_CONST
 #define INC_CONST_TINYUSB
 
+#if defined(INC_CONST_TINYUSB)
+    #include <string.h>
+    #include <stdio.h>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -177,13 +181,34 @@ static void print_const_memory_layout(void)
 
 uint8_t tud_network_mac_address[6] = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 const uint8_t const_tud_network_mac_address[6] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
+static char abuf[253];
+
+static const char *print_array_to_abuf(const void *buf, size_t len)
+{
+    const char *p = (const char *)buf;
+
+    memset(abuf, 0, sizeof(abuf));
+    for (size_t n = 0;  n < len;  ++n)
+    {
+        sprintf(abuf + 3*n, " %02x", p[n]);
+    }
+    return abuf;
+}   // print_array_to_abuf
+
 
 static void print_tinyusb_memory_layout(void)
 {
     _Delay_us(100 * 1000);
-    SEGGER_RTT_printf(0, "tud_network_mac_address=0x%08p - %s\n", tud_network_mac_address, p_eval(tud_network_mac_address));
-    SEGGER_RTT_printf(0, "const_tud_network_mac_address=0x%08p - %s\n", const_tud_network_mac_address, p_eval(const_tud_network_mac_address));
+    SEGGER_RTT_printf(0, "tud_network_mac_address=0x%08p - %s - %s\n",
+                      tud_network_mac_address,
+                      print_array_to_abuf(tud_network_mac_address, sizeof(tud_network_mac_address)),
+                      p_eval(tud_network_mac_address));
+    SEGGER_RTT_printf(0, "const_tud_network_mac_address=0x%08p - %s - %s\n",
+                      const_tud_network_mac_address,
+                      print_array_to_abuf(const_tud_network_mac_address, sizeof(const_tud_network_mac_address)),
+                      p_eval(const_tud_network_mac_address));
 }   // print_tinyusb_memory_layout
+
 #endif
 
 
