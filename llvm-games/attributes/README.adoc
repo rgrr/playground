@@ -4,22 +4,13 @@
 :toclevels: 5
 
 
-## Function / Variable Attributes
+## Function Attributes
 
 Sometimes one is curious how several compiler attributes affect code
-generation.  This topic is handled here to some extent.
+generation.  This topic is handled here to some extent for function
+attributes.
 
-To execute parts of the example, minimum linker and startup code
-were also created.
-
-WARNING: The startup code and linker files cannot be considered generic.
-Instead they are optimized for simplicity for this use case.
-So transfer them to your own projects with extreme care.
-
-
-### Some Function Attributes
-
-#### C Test Program
+### C Test Program
 
 The relevant part is shown below:
 
@@ -65,20 +56,23 @@ void Noreturn_Handler(void)
 Note that the whole small test program is compiled to get only the object file of
 the above code.  This is due to my laziness to check how to do it differently ;-)
 
+Nevertheless the image can be executed on the target.  It uses the minimized startup
+and linker files from link:../const-variables[const / variable experiments].
 
-#### Compiling
+
+### Compiling
 
 The test program is build with the following steps:
 
   make clean-build
-  make cmake-create-debug | cmake-create-release | cmake-create-debug-clang | cmake-create-release-clang
+  make cmake-create-debug-gcc | cmake-create-release-gcc | cmake-create-debug-clang | cmake-create-release-clang
   make objdump
 
 Clang must be installed in `~/bin/llvm-arm-none-eabi` (or the `Makefile` has to be adopted
 accordingly).
 
 
-#### GCC generated Code
+### GCC generated Code
 
 [source,asm]
 ----
@@ -113,7 +107,7 @@ The only difference between debug (above) and release code is:
 surprising...
 
 
-#### Clang generated Code
+### Clang generated Code
 
 [source,asm]
 ----
@@ -149,41 +143,6 @@ So the clang-`Interrupt_Handler()` does what a naive developer would
 expect it to do.  Unfortunately this is wrong (at least to my understanding).
 
 Debug and release versions generate the same code BTW.
-
-
-### Some Const Games for Variables
-
-Sometimes one wonder, where variables or constants are actually placed.
-The test program in link:main.c[main.c] does some examples with
-corresponding output.
-
-In contrast to the function attributes above which rely on inspection of the
-generated code, this example executes the test program in the target
-to determine placement correctly, output is obtained via RTT.
-
-
-#### Startup Code and Linker Script
-
-Difficulty of this example was to get it compile with gcc and clang including
-minimum infrastructure containing link instructions, linker script and
-startup code.  Additional effort was to keep all those files
-as small as possible to make it more clear, what actually happens.
-
-Two cases:
-
-gcc & newlib::
-   This is often the standard for bare metal development because this
-   configuration is often available thru regular package installation. +
-   `crt` of newlib leaves a lot of work to be done by the startup code.
-
-clang & picolib::
-   This is my personal favorite, see the link:../../tools/build-llvm[how to build].
-   `crt` of picolib seems to do a lot more of the startup action so that
-   the target dependent startup code can be kept simpler. +
-   There is a https://github.com/picolibc/picolibc/blob/main/picolibc.ld.in[linker script template] in the picolib sources which
-   is nicely commented.
-
-Different options can be selected via the make targets `cmake-create-{debug|release}-{gcc|clang}`.
 
 
 ## Note about Interrupts on Cortex-Mx
