@@ -4,7 +4,7 @@ Here are several things concerning LLVM.
 
 * link:boilerplate[Boilerplate for Embedded Experiments]
 * link:attributes[Function Attributes]
-* link:const-variables[Const and Variables]
+* link:const-variables[Const, Variables and Initializers]
 * link:broken-lto[Broken LTO]
 * link:profiling[Profiling]
 * link:register-access[Register Access]

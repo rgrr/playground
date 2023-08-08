@@ -36,12 +36,12 @@ static void _Delay_us(uint32_t period_us)
 }   // _Delay_us
 
 
-static char const *p_eval( uint8_t const * const p )
+static char const *p_eval( char const * const p )
 {
-    if (p >= (uint8_t *)&__my_data_end) {
+    if ((uint8_t *)p >= (uint8_t *)&__my_data_end) {
         return "STACK";
     }
-    else if (p >= (uint8_t *)0x20000000) {
+    else if ((uint8_t *)p >= (uint8_t *)0x20000000) {
         return "RAM";
     }
     return "FLASH";
@@ -54,55 +54,39 @@ static char const *p_eval( uint8_t const * const p )
 //
 #ifdef INC_CONST
 
-uint8_t u0[]              = "uint8_t []";
-static uint8_t u1[]       = "static uint8_t *";
-const uint8_t u2[]        = "const uint8_t *";
-static const uint8_t u3[] = "static const uint8_t *";
-
-
-static void p_u( uint8_t *p )
+static void p_u( char const * const p )
 {
-    SEGGER_RTT_printf(0, "  p_u('%s')=0x%08p - %s\n", (char *)p, p, p_eval(p));
+    SEGGER_RTT_printf(0, "  p('%s')=0x%08p - %s\n", p, p, p_eval(p));
 }
 
-static void constp_u( uint8_t * const p )
-{
-    SEGGER_RTT_printf(0, "  constp_u('%s')=0x%08p - %s\n", (char *)p, p, p_eval(p));
-}
 
-static void p_constu( uint8_t const *p )
-{
-    SEGGER_RTT_printf(0, "  p_constu('%s')=0x%08p - %s\n", (char *)p, p, p_eval(p));
-}
+char u0[]              = "char []";
+static char u1[]       = "static char []";
+const char u2[]        = "const char []";
+static const char u3[] = "static const char []";
 
-static void constp_constu( uint8_t const * const p )
-{
-    SEGGER_RTT_printf(0, "  constp_constu('%s')=0x%08p - %s\n", (char *)p, p, p_eval(p));
-}
 
 static void print_const_memory_layout(void)
 {
-    _Delay_us(100 * 1000);
-    p_u(u0);
-    p_u(u1);
+    char l0[]              = "local char []";
+    static char l1[]       = "local static char []";
+    const char l2[]        = "local const char []";
+    static const char l3[] = "local static const char []";
 
     _Delay_us(100 * 1000);
-    constp_u(u0);
-    constp_u(u1);
+    SEGGER_RTT_printf(0, "global (const and initializers):\n=======\n");
+    p_u( u0 );
+    p_u( u1 );
+    p_u( u2 );
+    p_u( u3 );
 
     _Delay_us(100 * 1000);
-    p_constu(u0);
-    p_constu(u1);
-    p_constu(u2);
-    p_constu(u3);
-
-    _Delay_us(100 * 1000);
-    constp_constu(u0);
-    constp_constu(u1);
-    constp_constu(u2);
-    constp_constu(u3);
-}   // print_const_memory_layout
-
+    SEGGER_RTT_printf(0, "local (const and initializers):\n======\n");
+    p_u( l0 );
+    p_u( l1 );
+    p_u( l2 );
+    p_u( l3 );
+}
 #endif
 
 
@@ -133,13 +117,13 @@ static void print_tinyusb_memory_layout(void)
 {
     _Delay_us(100 * 1000);
     SEGGER_RTT_printf(0, "tud_network_mac_address=0x%08p - %s - %s\n",
-                      tud_network_mac_address,
+                      (char *)tud_network_mac_address,
                       print_array_to_abuf(tud_network_mac_address, sizeof(tud_network_mac_address)),
-                      p_eval(tud_network_mac_address));
+                      p_eval((char *)tud_network_mac_address));
     SEGGER_RTT_printf(0, "const_tud_network_mac_address=0x%08p - %s - %s\n",
-                      const_tud_network_mac_address,
+                      (char *)const_tud_network_mac_address,
                       print_array_to_abuf(const_tud_network_mac_address, sizeof(const_tud_network_mac_address)),
-                      p_eval(const_tud_network_mac_address));
+                      p_eval((char *)const_tud_network_mac_address));
 }   // print_tinyusb_memory_layout
 
 #endif

@@ -4,7 +4,7 @@
 :toclevels: 5
 
 
-## Const and Variables
+## Const, Variables and Initializers
 
 Sometimes one wonder, where variables or constants are actually placed.
 The test program in link:main.c[main.c] does some examples with
@@ -16,9 +16,8 @@ Output is obtained via RTT.
 Minimum linker and startup code were also created.
 
 WARNING: The startup code and linker files cannot be considered generic.
-Instead they are optimized for simplicity for this use case.
-So transfer them to your own projects with extreme care.
-
+Instead they are optimized for simplicity for this example.
+So transfering them to other projects needs some care.
 
 
 ### Startup Code and Linker Script
@@ -43,6 +42,16 @@ clang & picolib::
    is nicely commented.
 
 Different options can be selected via the make targets `cmake-create-{debug|release}-{gcc|clang}`.
+
+
+### Test Program
+
+The test program link:main.c[main.c] prints the position within memory of
+several variable/const definitions.
+
+Surprising thing (at least to me) is, that the compiler places a global
+`const uint8_t []` into flash, while on stack for the local variant.
+Both compiler do exactly the same thing.
 
 
 ### Links
