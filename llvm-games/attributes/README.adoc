@@ -4,11 +4,11 @@
 :toclevels: 5
 
 
-## Compiler Attributes
+## Function Attributes
 
 Sometimes one is curious how several compiler attributes affect code
-generation.  This topic is handled here to some extent.
-
+generation.  This topic is handled here to some extent for function
+attributes.
 
 ### C Test Program
 
@@ -56,13 +56,16 @@ void Noreturn_Handler(void)
 Note that the whole small test program is compiled to get only the object file of
 the above code.  This is due to my laziness to check how to do it differently ;-)
 
+Nevertheless the image can be executed on the target.  It uses the minimized startup
+and linker files from link:../const-variables[const / variable experiments].
+
 
 ### Compiling
 
 The test program is build with the following steps:
 
   make clean-build
-  make cmake-create-debug | cmake-create-release | cmake-create-debug-clang | cmake-create-release-clang
+  make cmake-create-debug-gcc | cmake-create-release-gcc | cmake-create-debug-clang | cmake-create-release-clang
   make objdump
 
 Clang must be installed in `~/bin/llvm-arm-none-eabi` (or the `Makefile` has to be adopted
@@ -137,7 +140,8 @@ surprising...
 ----
 
 So the clang-`Interrupt_Handler()` does what a naive developer would
-expect it to do.  Unfortunately this is wrong (at least to my understanding).
+expect it to do.  Unfortunately this is wrong or at least superfluous
+(at least to my understanding).
 
 Debug and release versions generate the same code BTW.
 
@@ -189,3 +193,7 @@ out when unstacking. Again, no user action required."
 
 So it seems, that this is the reason why nothing special is required for
 an interrupt service routine on Cortex-Mx devices.
+
+More links:
+
+* https://www.embedded.com/programming-embedded-systems-how-interrupts-work-in-arm-cortex-m/[Programming embedded systems: How interrupts work in ARM Cortex-M]

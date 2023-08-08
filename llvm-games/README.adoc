@@ -3,7 +3,8 @@
 Here are several things concerning LLVM.
 
 * link:boilerplate[Boilerplate for Embedded Experiments]
-* link:attributes[Compiler Attributes] etc
+* link:attributes[Function Attributes]
+* link:const-variables[Const and Variables]
 * link:broken-lto[Broken LTO]
 * link:profiling[Profiling]
 * link:register-access[Register Access]
@@ -11,7 +12,8 @@ Here are several things concerning LLVM.
 * link:SystemView[SystemView]
 
 As toolchain I'm using the https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm[LLVM Embedded Toolchain]
-or better my flavor of it, because this one also integrates profiling and RTT.
+or better https://github.com/rgrr/LLVM-embedded-toolchain-for-Arm[my flavor]
+of it, because this one also integrates profiling and RTT.
 
 Probe used is my own based on https://github.com/rgrr/yapicoprobe[picoprobe]
 because it supports RTT console IO smoothly.

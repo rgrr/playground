@@ -67,7 +67,7 @@ flash-pyocd: all
 
 .PHONY: objdump
 objdump: all
-	arm-none-eabi-objdump -D $(BUILD_DIR)/CMakeFiles/$(PROJECT).elf.dir/main.c.obj | head -n 500
+	arm-none-eabi-objdump -D $(BUILD_DIR)/CMakeFiles/$(PROJECT).elf.dir/main.c.obj
 
 
 .PHONY: $(BUILD_DIR)/$(PROJECT).elf
