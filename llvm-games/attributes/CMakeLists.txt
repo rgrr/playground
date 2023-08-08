@@ -32,7 +32,7 @@ add_executable(${PROJECT_ELF})
 
 target_sources(${PROJECT_ELF} PRIVATE 
     main.c
-    system/gcc_startup_nrf52840.S
+    system/startup_nrf52840.S
     SEGGER/RTT/SEGGER_RTT.c
     SEGGER/RTT/SEGGER_RTT_printf.c
     SEGGER/RTT/SEGGER_RTT_ASM_ARMv7M.S

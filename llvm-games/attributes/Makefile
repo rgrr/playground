@@ -35,13 +35,13 @@ all: $(BUILD_DIR)/$(PROJECT).elf
 	@echo "--------------------------"
 
 
-.PHONY: cmake-create-debug
-cmake-create-debug:
+.PHONY: cmake-create-debug-gcc
+cmake-create-debug-gcc:
 	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) $(GCC_CMAKE_FLAGS)
 
 
-.PHONY: cmake-create-release
-cmake-create-release:
+.PHONY: cmake-create-release-gcc
+cmake-create-release-gcc:
 	cmake -B $(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $(CMAKE_FLAGS) $(GCC_CMAKE_FLAGS)
 
 

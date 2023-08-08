@@ -3,7 +3,7 @@
 Here are several things concerning LLVM.
 
 * link:boilerplate[Boilerplate for Embedded Experiments]
-* link:attributes[Compiler Attributes] etc
+* link:attributes[Function / Variable Attributes] etc
 * link:broken-lto[Broken LTO]
 * link:profiling[Profiling]
 * link:register-access[Register Access]
