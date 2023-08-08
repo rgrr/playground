@@ -140,7 +140,8 @@ surprising...
 ----
 
 So the clang-`Interrupt_Handler()` does what a naive developer would
-expect it to do.  Unfortunately this is wrong (at least to my understanding).
+expect it to do.  Unfortunately this is wrong or at least superfluous
+(at least to my understanding).
 
 Debug and release versions generate the same code BTW.
 
