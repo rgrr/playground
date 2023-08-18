@@ -191,8 +191,10 @@ static void _TestFunc0(void)
 
 #define FAST
 #ifdef FAST
-    // -> ~70000 events/s, 295 KByte/s
-    #define SYSTICKS_PER_SEC    20000
+    // -> ~85000 events/s, 325 KByte/s
+    //    speed record: 40000 SYSTICKS -> 95000 events/s 356 KByte/s
+    //    with 35000 there is a nice effect: it works with debug, but not with release!
+    #define SYSTICKS_PER_SEC    35000
     #define IDLE_US             1000
     #define PRINT_MOD           1000
 #else
