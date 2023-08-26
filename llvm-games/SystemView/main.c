@@ -194,9 +194,9 @@ static void _TestFunc0(void)
     // -> ~85000 events/s, 325 KByte/s
     //    speed record: 40000 SYSTICKS -> 95000 events/s 356 KByte/s
     //    with 35000 there is a nice effect: it works with debug, but not with release!
-    #define SYSTICKS_PER_SEC    35000
-    #define IDLE_US             1000
-    #define PRINT_MOD           1000
+    #define SYSTICKS_PER_SEC    10000     // 35000
+    #define IDLE_US             1000     // 1000
+    #define PRINT_MOD           1000     // 1000
 #else
     // -> ~1800 events/s, 10 KByte/s
     #define SYSTICKS_PER_SEC    15
@@ -229,13 +229,14 @@ int main()
     SYSVIEW_AddTask(TASKID_TESTFUNC0, "TestFunc0");
     SYSVIEW_AddInt(15, "SysTick");
 
-    //SEGGER_SYSVIEW_Start();
-    _Delay(10000);
+    SEGGER_SYSVIEW_Start();
+    _Delay(100000);
 
     SysTick_Init(SYSTICKS_PER_SEC);
 
 #if 1
-    for (int j = 0;  j < 5000000;  ++j) {
+    for (int j = 0;  j < 50000000;  ++j) {
+        SEGGER_SYSVIEW_OnTaskStartReady(TASKID_MAINLOOP);
         SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
         _Delay(200);
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
@@ -264,9 +265,13 @@ int main()
     }
 
     SEGGER_SYSVIEW_Print("Stop\n");
-    SEGGER_SYSVIEW_Stop();
+    //SEGGER_SYSVIEW_Stop();
 
     printf("finished\n");
+    for(;;) {
+        _Delay(1000);
+        SEGGER_SYSVIEW_OnIdle();
+    }
 #else
     for (;;) {
         SEGGER_SYSVIEW_IsStarted();
