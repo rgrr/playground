@@ -1,0 +1,13 @@
+
+== Installing googletest
+
+* see link:https://stackoverflow.com/questions/3951808/using-googletest-in-eclipse-how[here]
+for general googletest setup.
+* build googletest
+** unpack everything to e.g. `googletest`
+** goto `googletest`
+** `mkdir _build`
+** `cd _build`
+** `cmake ..`
+** `make`
+
