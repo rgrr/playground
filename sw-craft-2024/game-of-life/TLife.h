@@ -35,10 +35,6 @@ public:
 	{
 		return true;
 	}
-//	bool operator==(const TLifeField & rh, const TLifeField & rh) const
-//	{
-//		return true;
-//	}
 
 private:
 	uint32_t CountLiveNeighbors(uint32_t x, uint32_t y) const;
