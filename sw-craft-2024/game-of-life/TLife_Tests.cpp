@@ -1,52 +1,65 @@
-#include "TLife.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+
+
+#define LIFE_TYPE  1
+
+#if (LIFE_TYPE == 0)
+    #include "TLife.h"
+    #define TLIFE TLife
+#elif (LIFE_TYPE == 1)
+    #include "TLifeFaster.h"
+    #define TLIFE TLifeFaster
+#else
+    #error "Wrong LIFE_TYPE"
+#endif
 
 
 class LifeTest : public testing::Test
 {
 protected:
-	void SetUp() override {
-	}
+    void SetUp() override {
+    }
 
-	void TearDown() override {
-	}
+    void TearDown() override {
+    }
 };
 
 
 MATCHER_P(MatchesFieldOf, compare_field, "")
 {
-	uint32_t row_cnt = 0;
-	bool matches = true;
+    uint32_t row_cnt = 0;
+    bool matches = true;
 
-	for (const auto & row : compare_field)
-	{
-		uint32_t col_cnt = 0;
-		for (const auto & val : row)
-		{
-			if (val != arg[row_cnt][col_cnt])
-			{
-				return false;
-			}
-			++col_cnt;
-		}
-		++row_cnt;
-	}
+    for (const auto & row : compare_field)
+    {
+        uint32_t col_cnt = 0;
+        for (const auto & val : row)
+        {
+            if (val != arg[row_cnt][col_cnt])
+            {
+                return false;
+            }
+            ++col_cnt;
+        }
+        ++row_cnt;
+    }
+    // actually it should be tested that the remainder of "arg" is empty
 
-	return matches;
+    return matches;
 }
 
 
 TEST_F(LifeTest, EmptyField)
 {
-	TLifeField initialState = {
+    TLifeField initialState = {
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0}
     };
-	TLife game(1000);
+    TLIFE game(1000);
 
     game.InitField(initialState);
     game.NextGeneration();
@@ -56,14 +69,14 @@ TEST_F(LifeTest, EmptyField)
 
 TEST_F(LifeTest, LifeBlock)
 {
-	TLifeField initialState = {
+    TLifeField initialState = {
         {0, 0, 0, 0, 0},
         {0, 1, 1, 0, 0},
         {0, 1, 1, 0, 0},
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0}
     };
-	TLife game(1000);
+    TLIFE game(1000);
 
     game.InitField(initialState);
     game.NextGeneration();
@@ -73,21 +86,21 @@ TEST_F(LifeTest, LifeBlock)
 
 TEST_F(LifeTest, Blinker)
 {
-	TLifeField initialState = {
+    TLifeField initialState = {
         {0, 0, 0, 0, 0},
         {0, 0, 1, 0, 0},
         {0, 0, 1, 0, 0},
         {0, 0, 1, 0, 0},
         {0, 0, 0, 0, 0}
     };
-	TLifeField expected1 = {
+    TLifeField expected1 = {
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0},
         {0, 1, 1, 1, 0},
         {0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0}
     };
-	TLife game(1000);
+    TLIFE game(1000);
 
     game.InitField(initialState);
     game.NextGeneration();
@@ -99,7 +112,7 @@ TEST_F(LifeTest, Blinker)
 
 TEST_F(LifeTest, Glider)
 {
-	TLifeField initialState = {
+    TLifeField initialState = {
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 1, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0},
@@ -108,7 +121,7 @@ TEST_F(LifeTest, Glider)
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0}
     };
-	TLifeField expected1 = {
+    TLifeField expected1 = {
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0},
         {0, 1, 0, 1, 0, 0, 0},
@@ -117,7 +130,7 @@ TEST_F(LifeTest, Glider)
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0}
     };
-	TLifeField expected2 = {
+    TLifeField expected2 = {
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0},
@@ -126,26 +139,26 @@ TEST_F(LifeTest, Glider)
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0}
     };
-	TLifeField expected3 = {
+    TLifeField expected3 = {
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 1, 0, 0, 0, 0},
-		{0, 0, 0, 1, 1, 0, 0},
-		{0, 0, 1, 1, 0, 0, 0},
+        {0, 0, 1, 0, 0, 0, 0},
+        {0, 0, 0, 1, 1, 0, 0},
+        {0, 0, 1, 1, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0}
     };
     // like initialState, but the glider has moved
-	TLifeField expected4 = {
-		{0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 1, 0, 0, 0},
-		{0, 0, 0, 0, 1, 0, 0},
-		{0, 0, 1, 1, 1, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0}
+    TLifeField expected4 = {
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0, 0, 0},
+        {0, 0, 0, 0, 1, 0, 0},
+        {0, 0, 1, 1, 1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0}
     };
-	TLife game(1000);
+    TLIFE game(1000);
 
     game.InitField(initialState);
     game.NextGeneration();
