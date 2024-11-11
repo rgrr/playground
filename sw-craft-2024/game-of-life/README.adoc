@@ -1,0 +1,10 @@
+:toc:
+:toclevel: 5
+
+= Game of Life
+
+== Introduction
+This are some "Game of Life" implementations.
+
+== Testing
+Change the used generator via link:TLife_Tests.cpp[].
