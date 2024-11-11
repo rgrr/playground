@@ -31,11 +31,6 @@ public:
 	void NextGeneration();
 	const TLifeField& GetField() { return field; }
 
-	bool operator==(const TLifeField & rh) const
-	{
-		return true;
-	}
-
 private:
 	uint32_t CountLiveNeighbors(uint32_t x, uint32_t y) const;
 	uint32_t rows;
