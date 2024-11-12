@@ -4,7 +4,20 @@
 = Game of Life
 
 == Introduction
-This are some "Game of Life" implementations.
+This are some link:https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life[Game of Life]
+implementations.
+
+The field is organized as a link:https://en.wikipedia.org/wiki/Torus[torus]. 
+
+== Algorithms
+
+=== TLife
+Stupid algorithm which uses a field of boolean (alive/dead, actually ints) 
+and counts the neighbors for each cell.
+
+=== TLifeFaster
+Less stupid algorithm which uses two fields.  One field is holding the boolean
+state of the cells (alive/dead), the other holds the neighbor count of each cell.
 
 == Testing
 Change the used generator via link:TLife_Tests.cpp[].
