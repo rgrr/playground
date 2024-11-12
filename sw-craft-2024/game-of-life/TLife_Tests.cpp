@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"
 
 
-#define LIFE_TYPE  1
+#define LIFE_TYPE  2
 
 #if (LIFE_TYPE == 0)
     #include "TLife.h"
@@ -10,6 +10,9 @@
 #elif (LIFE_TYPE == 1)
     #include "TLifeFaster.h"
     #define TLIFE TLifeFaster
+#elif (LIFE_TYPE == 2)
+    #include "TLifeFasterMulti.h"
+    #define TLIFE TLifeFasterMulti
 #else
     #error "Wrong LIFE_TYPE"
 #endif
