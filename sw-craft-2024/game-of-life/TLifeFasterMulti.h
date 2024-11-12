@@ -33,8 +33,8 @@ public:
 
     void InitField(const TLifeField& initialState);
     void NextGeneration();
-    void NextGeneration(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
-                        uint32_t row_min, uint32_t row_max);
+    void NextGenerationThread(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
+                              uint32_t row_min, uint32_t row_max);
     const TLifeField& GetField() { return field; }
 
 private:

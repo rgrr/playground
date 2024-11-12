@@ -5,6 +5,9 @@
  *      Author: i02441001
  */
 
+#include <iostream>
+#include <thread>
+
 #include "TLifeFasterMulti.h"
 
 
@@ -35,16 +38,33 @@ void TLifeFasterMulti::NextGeneration()
 {
     TLifeField newField = field;
     TLifeField newFieldWithNeighbourCnt = fieldWithNeighbourCnt;
+//    const uint32_t threads_max = std::jthread::hardware_concurrency();
+    //std::vector<std::jthread> threads(threads_max);
 
-    NextGeneration(newField, newFieldWithNeighbourCnt, 0, rows - 1);
+//    printf("threads_max %d\n", threads_max);
+
+#if 0
+    for (uint32_t thread_cnt = 0;  thread_cnt < threads_max;  ++thread_cnt)
+    {
+        //threads[thread_cnt](NextGeneration, newField, newFieldWithNeighbourCnt, 0, rows - 1);
+        threads.push_back(std::jthread(&TLifeFasterMulti::NextGeneration, this)); //, newField, newFieldWithNeighbourCnt, 0, rows - 1));
+        NextGeneration(newField, newFieldWithNeighbourCnt, 0, rows - 1);
+    }
+#endif
+
+    std::thread t(&TLifeFasterMulti::NextGenerationThread, this,
+                  std::ref(newField), std::ref(newFieldWithNeighbourCnt), 0, rows - 1);
+    t.join();
+
+    //NextGeneration(newField, newFieldWithNeighbourCnt, 0, rows - 1);
 
     field = newField;
     fieldWithNeighbourCnt = newFieldWithNeighbourCnt;
 }
 
 
-void TLifeFasterMulti::NextGeneration(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
-                                      uint32_t row_min, uint32_t row_max)
+void TLifeFasterMulti::NextGenerationThread(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
+                                            uint32_t row_min, uint32_t row_max)
 {
     for (uint32_t x = row_min;  x <= row_max;  ++x)
     {
