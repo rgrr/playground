@@ -10,29 +10,20 @@
 
 void TLifeFaster::InitField(const TLifeField& initialState)
 {
-    uint32_t row_cnt = 0;
+    uint32_t x = 0;
     for (const auto & row : initialState)
     {
-        uint32_t col_cnt = 0;
+        uint32_t y = 0;
         for (int val : row)
         {
-            field[row_cnt][col_cnt] = val;
-            ++col_cnt;
+            if (val != 0)
+            {
+                field[x][y] = val;
+                IncLiveNeighbors(fieldWithNeighbourCnt, x, y);
+            }
+            ++y;
         }
-        ++row_cnt;
-    }
-
-    row_cnt = 0;
-    for (const auto & row : field)
-    {
-        uint32_t col_cnt = 0;
-        for (int val : row)
-        {
-            (void)val;
-            fieldWithNeighbourCnt[row_cnt][col_cnt] = CountLiveNeighbors(row_cnt, col_cnt);
-            ++col_cnt;
-        }
-        ++row_cnt;
+        ++x;
     }
 }
 
@@ -42,26 +33,26 @@ void TLifeFaster::NextGeneration()
     TLifeField newField = field;
     TLifeField newFieldWithNeighbourCnt = fieldWithNeighbourCnt;
 
-    for (uint32_t i = 0;  i < rows;  ++i)
+    for (uint32_t x = 0;  x < rows;  ++x)
     {
-        for (uint32_t j = 0;  j < cols;  ++j)
+        for (uint32_t y = 0;  y < cols;  ++y)
         {
-            int liveNeighbors = fieldWithNeighbourCnt[i][j];
+            int liveNeighbors = fieldWithNeighbourCnt[x][y];
 
-            if (field[i][j] != 0)
+            if (field[x][y] != 0)
             {
                 if (liveNeighbors < 2  ||  liveNeighbors > 3)
                 {
-                    newField[i][j] = 0;
-                    DecLiveNeighbors(newFieldWithNeighbourCnt, i, j);
+                    newField[x][y] = 0;
+                    DecLiveNeighbors(newFieldWithNeighbourCnt, x, y);
                 }
             }
             else
             {
                 if (liveNeighbors == 3)
                 {
-                    newField[i][j] = 1;
-                    IncLiveNeighbors(newFieldWithNeighbourCnt, i, j);
+                    newField[x][y] = 1;
+                    IncLiveNeighbors(newFieldWithNeighbourCnt, x, y);
                 }
             }
         }
