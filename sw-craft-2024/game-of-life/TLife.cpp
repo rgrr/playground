@@ -27,23 +27,23 @@ void TLife::InitField(const TLifeField& initialState)
 void TLife::NextGeneration()
 {
     TLifeField newField = field;
-    for (uint32_t i = 0;  i < rows;  ++i)
+    for (uint32_t x = 0;  x < rows;  ++x)
     {
-        for (uint32_t j = 0;  j < cols;  ++j)
+        for (uint32_t y = 0;  y < cols;  ++y)
         {
-            int liveNeighbors = CountLiveNeighbors(i, j);
-            if (field[i][j] != 0)
+            int liveNeighbors = CountLiveNeighbors(x, y);
+            if (field[x][y] != 0)
             {
                 if (liveNeighbors < 2  || liveNeighbors > 3)
                 {
-                    newField[i][j] = 0;
+                    newField[x][y] = 0;
                 }
             }
             else
             {
                 if (liveNeighbors == 3)
                 {
-                    newField[i][j] = 1;
+                    newField[x][y] = 1;
                 }
             }
         }

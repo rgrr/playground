@@ -38,4 +38,4 @@ private:
     TLifeField field;
 };
 
-#endif /* TLIFE_H_ */
+#endif
