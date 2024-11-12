@@ -9,6 +9,9 @@
 
 
 void TLifeFasterMulti::InitField(const TLifeField& initialState)
+/*
+ * This actually adds alive cells
+ */
 {
     uint32_t x = 0;
     for (const auto & row : initialState)
@@ -33,7 +36,17 @@ void TLifeFasterMulti::NextGeneration()
     TLifeField newField = field;
     TLifeField newFieldWithNeighbourCnt = fieldWithNeighbourCnt;
 
-    for (uint32_t x = 0;  x < rows;  ++x)
+    NextGeneration(newField, newFieldWithNeighbourCnt, 0, rows - 1);
+
+    field = newField;
+    fieldWithNeighbourCnt = newFieldWithNeighbourCnt;
+}
+
+
+void TLifeFasterMulti::NextGeneration(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
+                                      uint32_t row_min, uint32_t row_max)
+{
+    for (uint32_t x = row_min;  x <= row_max;  ++x)
     {
         for (uint32_t y = 0;  y < cols;  ++y)
         {
@@ -57,8 +70,6 @@ void TLifeFasterMulti::NextGeneration()
             }
         }
     }
-    field = newField;
-    fieldWithNeighbourCnt = newFieldWithNeighbourCnt;
 }
 
 
