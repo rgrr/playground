@@ -201,13 +201,6 @@ TEST_F(LifeTest, GliderMulti)
         {0, 0, 1, 1, 0},
         {0, 0, 1, 0, 0}
     };
-    TLifeField expectedEndState = {
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 1},
-        {0, 0, 1, 1, 1}
-    };
     TLIFE game(sizeXY);
 
     printf("[          ] Playing with field size = %d (%d iterations)\n", sizeXY, 4*sizeXY);
@@ -215,7 +208,7 @@ TEST_F(LifeTest, GliderMulti)
     game.InitField(initialState);
     game.NextGeneration();
     EXPECT_THAT(game.GetField(), MatchesFieldOf(expectedStepState));
-    for (int i = 1;  i < 4 * sizeXY;  ++i)
+    for (uint32_t u = 1;  u < 4 * sizeXY;  ++u)
     {
         game.NextGeneration();
     }
