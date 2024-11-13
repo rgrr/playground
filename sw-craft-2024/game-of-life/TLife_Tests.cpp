@@ -6,13 +6,13 @@
 
 #if (LIFE_TYPE == 0)
     #include "TLife.h"
-    #define TLIFE TLife
+    using TLIFE = TLife;
 #elif (LIFE_TYPE == 1)
     #include "TLifeFaster.h"
-    #define TLIFE TLifeFaster
+    using TLIFE = TLifeFaster;
 #elif (LIFE_TYPE == 2)
     #include "TLifeFasterMulti.h"
-    #define TLIFE TLifeFasterMulti
+    using TLIFE = TLifeFasterMulti;
 #else
     #error "Wrong LIFE_TYPE"
 #endif
@@ -172,4 +172,40 @@ TEST_F(LifeTest, Glider)
     EXPECT_THAT(game.GetField(), MatchesFieldOf(expected3));
     game.NextGeneration();
     EXPECT_THAT(game.GetField(), MatchesFieldOf(expected4));
+}
+
+
+TEST_F(LifeTest, GliderMulti)
+{
+    TLifeField initialState = {
+        {0, 0, 0, 0, 0},
+        {0, 0, 1, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, 1, 1, 1, 0},
+        {0, 0, 0, 0, 0}
+    };
+    TLifeField expectedStepState = {
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0},
+        {0, 0, 1, 1, 0},
+        {0, 0, 1, 0, 0}
+    };
+    TLifeField expectedEndState = {
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, 0, 0, 0, 1},
+        {0, 0, 1, 1, 1}
+    };
+    TLIFE game(200);
+
+    game.InitField(initialState);
+    game.NextGeneration();
+    EXPECT_THAT(game.GetField(), MatchesFieldOf(expectedStepState));
+    for (int i = 1;  i < 800;  ++i)
+    {
+        game.NextGeneration();
+    }
+    EXPECT_THAT(game.GetField(), MatchesFieldOf(initialState));
 }
