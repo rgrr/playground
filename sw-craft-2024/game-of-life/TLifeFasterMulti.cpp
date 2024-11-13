@@ -5,6 +5,7 @@
  *      Author: i02441001
  */
 
+#include <chrono>
 #include <iostream>
 #include <thread>
 
@@ -38,25 +39,26 @@ void TLifeFasterMulti::NextGeneration()
 {
     TLifeField newField = field;
     TLifeField newFieldWithNeighbourCnt = fieldWithNeighbourCnt;
-//    const uint32_t threads_max = std::jthread::hardware_concurrency();
-    //std::vector<std::jthread> threads(threads_max);
+    std::vector<std::thread> threads;
+    const uint32_t threads_max = 4; // std::thread::hardware_concurrency();
 
-//    printf("threads_max %d\n", threads_max);
+//    printf("---------------------new game with %d threads\n", threads_max);
 
-#if 0
-    for (uint32_t thread_cnt = 0;  thread_cnt < threads_max;  ++thread_cnt)
+    uint32_t x = 0;
+    const uint32_t dx = rows / threads_max + 1;
+    while (x < rows)
     {
-        //threads[thread_cnt](NextGeneration, newField, newFieldWithNeighbourCnt, 0, rows - 1);
-        threads.push_back(std::jthread(&TLifeFasterMulti::NextGeneration, this)); //, newField, newFieldWithNeighbourCnt, 0, rows - 1));
-        NextGeneration(newField, newFieldWithNeighbourCnt, 0, rows - 1);
+        const uint32_t xmax = x + dx;
+
+        threads.push_back(std::thread(&TLifeFasterMulti::NextGenerationThread, this,
+                                      std::ref(newField), std::ref(newFieldWithNeighbourCnt), x, xmax));
+        x = xmax;
     }
-#endif
 
-    std::thread t(&TLifeFasterMulti::NextGenerationThread, this,
-                  std::ref(newField), std::ref(newFieldWithNeighbourCnt), 0, rows - 1);
-    t.join();
-
-    //NextGeneration(newField, newFieldWithNeighbourCnt, 0, rows - 1);
+    for (std::thread &t: threads)
+    {
+        t.join();
+    }
 
     field = newField;
     fieldWithNeighbourCnt = newFieldWithNeighbourCnt;
@@ -66,7 +68,16 @@ void TLifeFasterMulti::NextGeneration()
 void TLifeFasterMulti::NextGenerationThread(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
                                             uint32_t row_min, uint32_t row_max)
 {
-    for (uint32_t x = row_min;  x <= row_max;  ++x)
+    //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+    if (row_max > rows)
+    {
+        row_max = rows;
+    }
+
+//    printf("thread %d %d\n", row_min, row_max);
+
+    for (uint32_t x = row_min;  x < row_max;  ++x)
     {
         for (uint32_t y = 0;  y < cols;  ++y)
         {
@@ -90,6 +101,8 @@ void TLifeFasterMulti::NextGenerationThread(TLifeField &newField, TLifeField &ne
             }
         }
     }
+
+//    printf("thread %d %d fin\n", row_min, row_max);
 }
 
 
