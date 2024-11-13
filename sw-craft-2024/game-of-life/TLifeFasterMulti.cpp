@@ -55,6 +55,8 @@ void TLifeFasterMulti::NextGeneration()
         x = xmax;
     }
 
+//    std::this_thread::sleep_for(std::chrono::milliseconds(0));
+
     for (std::thread &t: threads)
     {
         t.join();
@@ -68,7 +70,7 @@ void TLifeFasterMulti::NextGeneration()
 void TLifeFasterMulti::NextGenerationThread(TLifeField &newField, TLifeField &newFieldWithNeighbourCnt,
                                             uint32_t row_min, uint32_t row_max)
 {
-    //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+//    std::this_thread::sleep_for(std::chrono::milliseconds(0));
 
     if (row_max > rows)
     {

@@ -19,5 +19,8 @@ and counts the neighbors for each cell.
 Less stupid algorithm which uses two fields.  One field is holding the boolean
 state of the cells (alive/dead), the other holds the neighbor count of each cell.
 
+=== TLifeFasterMulti
+Like `TLifeFaster`, but multi-threaded.
+
 == Testing
 Change the used generator via link:TLife_Tests.cpp[].
