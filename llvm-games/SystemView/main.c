@@ -194,9 +194,9 @@ static void _TestFunc0(void)
     // -> ~85000 events/s, 325 KByte/s
     //    speed record: 40000 SYSTICKS -> 95000 events/s 356 KByte/s
     //    with 35000 there is a nice effect: it works with debug, but not with release!
-    #define SYSTICKS_PER_SEC    35000
-    #define IDLE_US             1000
-    #define PRINT_MOD           1000
+    #define SYSTICKS_PER_SEC    10000     // 35000
+    #define IDLE_US             1000     // 1000
+    #define PRINT_MOD           1000     // 1000
 #else
     // -> ~1800 events/s, 10 KByte/s
     #define SYSTICKS_PER_SEC    15
@@ -229,13 +229,51 @@ int main()
     SYSVIEW_AddTask(TASKID_TESTFUNC0, "TestFunc0");
     SYSVIEW_AddInt(15, "SysTick");
 
-    //SEGGER_SYSVIEW_Start();
-    _Delay(10000);
+    SEGGER_SYSVIEW_Start();
+    _Delay(100000);
 
+    // 0 - with systick and a main loop which does something
+    // 1 - with systick and a loop which does function calls to delay
+    // 2 - no systick, try to create some parallel graphs (poor mans oscilloscope)
+
+#define TEST_NO   2
+
+#define OSZI_START(ID)    SEGGER_SYSVIEW_OnTaskStartReady(ID); //SEGGER_SYSVIEW_OnTaskStartExec(ID); SEGGER_SYSVIEW_OnTaskStartReady(ID);
+#define OSZI_STOP(ID)     SEGGER_SYSVIEW_OnTaskStartExec(ID); SEGGER_SYSVIEW_OnTaskStopExec();
+
+#if (TEST_NO == 2)
+    for (int cnt = 0; ;  ++cnt) {
+        OSZI_START(TASKID_MAINLOOP);
+        _Delay(100);
+        OSZI_START(TASKID_CYCLIC);
+        SEGGER_SYSVIEW_MarkStart(MARKER_PRINT_MOD);
+        _Delay(240);
+        OSZI_START(TASKID_TESTFUNC0);
+        _Delay(100);
+        OSZI_STOP(TASKID_CYCLIC);
+        _Delay(170);
+
+        if (cnt % 11 == 0)
+            SEGGER_SYSVIEW_Warn("close to overflow");
+
+        OSZI_START(TASKID_CYCLIC);
+        _Delay(30);
+        OSZI_STOP(TASKID_MAINLOOP);
+        _Delay(130);
+        SEGGER_SYSVIEW_Mark(MARKER_PRINT);
+        OSZI_STOP(TASKID_CYCLIC);
+        _Delay(170);
+        OSZI_STOP(TASKID_TESTFUNC0);
+        SEGGER_SYSVIEW_MarkStop(MARKER_PRINT_MOD);
+        _Delay(400);
+        SEGGER_SYSVIEW_ErrorfHost("cnt: %d", cnt);
+    }
+#endif
+#if (TEST_NO == 0)
     SysTick_Init(SYSTICKS_PER_SEC);
 
-#if 1
-    for (int j = 0;  j < 5000000;  ++j) {
+    for (int j = 0;  j < 50000000;  ++j) {
+        SEGGER_SYSVIEW_OnTaskStartReady(TASKID_MAINLOOP);
         SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
         _Delay(200);
         SEGGER_SYSVIEW_PrintfTarget("Start %d\n", j);
@@ -264,16 +302,26 @@ int main()
     }
 
     SEGGER_SYSVIEW_Print("Stop\n");
-    SEGGER_SYSVIEW_Stop();
+    //SEGGER_SYSVIEW_Stop();
 
     printf("finished\n");
-#else
+    for(;;) {
+        _Delay(1000);
+        SEGGER_SYSVIEW_OnIdle();
+    }
+#endif
+#if (TEST_NO == 1)
+    SysTick_Init(SYSTICKS_PER_SEC);
+
     for (;;) {
         SEGGER_SYSVIEW_IsStarted();
 
         _Delay(10);
+        SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
         _Delay(100);
+        SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
         _Delay(1000);
+        SEGGER_SYSVIEW_OnTaskStartExec(TASKID_MAINLOOP);
     }
 #endif
 }   // main
