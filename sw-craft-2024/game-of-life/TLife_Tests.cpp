@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include <cstdio>
 
 
 #define LIFE_TYPE  2
@@ -177,6 +178,15 @@ TEST_F(LifeTest, Glider)
 
 TEST_F(LifeTest, GliderMulti)
 {
+#if (LIFE_TYPE == 0)
+    const uint32_t sizeXY = 200;
+#elif (LIFE_TYPE == 1)
+    const uint32_t sizeXY = 500;
+#elif (LIFE_TYPE == 2)
+    const uint32_t sizeXY = 1000;
+#else
+    #error "Wrong LIFE_TYPE"
+#endif
     TLifeField initialState = {
         {0, 0, 0, 0, 0},
         {0, 0, 1, 0, 0},
@@ -198,12 +208,14 @@ TEST_F(LifeTest, GliderMulti)
         {0, 0, 0, 0, 1},
         {0, 0, 1, 1, 1}
     };
-    TLIFE game(200);
+    TLIFE game(sizeXY);
+
+    printf("[          ] Playing with field size = %d (%d iterations)\n", sizeXY, 4*sizeXY);
 
     game.InitField(initialState);
     game.NextGeneration();
     EXPECT_THAT(game.GetField(), MatchesFieldOf(expectedStepState));
-    for (int i = 1;  i < 800;  ++i)
+    for (int i = 1;  i < 4 * sizeXY;  ++i)
     {
         game.NextGeneration();
     }
