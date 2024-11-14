@@ -40,7 +40,7 @@ void TLifeFasterMulti::NextGeneration()
     TLifeField newField = field;
     TLifeField newFieldWithNeighbourCnt = fieldWithNeighbourCnt;
     std::vector<std::thread> threads;
-    const uint32_t threads_max = std::thread::hardware_concurrency();
+    const uint32_t threads_max = std::thread::hardware_concurrency() / 2;
 
 //    printf("---------------------new game with %d threads\n", threads_max);
 

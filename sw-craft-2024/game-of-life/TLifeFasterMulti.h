@@ -12,7 +12,8 @@
 #include <cstdint>
 
 
-using TLifeField = std::vector<std::vector<int>>;
+using TLifeCell  = uint8_t;
+using TLifeField = std::vector<std::vector<TLifeCell>>;
 
 class TLifeFasterMulti {
 public:
@@ -21,8 +22,8 @@ public:
     TLifeFasterMulti(uint32_t rows, uint32_t cols) :
         rows(rows),
         cols(cols),
-        field(rows, std::vector<int>(cols, 0)),
-        fieldWithNeighbourCnt(rows, std::vector<int>(cols, 0)) {}
+        field(rows, std::vector<TLifeCell>(cols, 0)),
+        fieldWithNeighbourCnt(rows, std::vector<TLifeCell>(cols, 0)) {}
     TLifeFasterMulti(uint32_t size) : TLifeFasterMulti(size, size) {}
     TLifeFasterMulti() : TLifeFasterMulti(10) {}
 
