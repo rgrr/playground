@@ -22,5 +22,9 @@ state of the cells (alive/dead), the other holds the neighbor count of each cell
 === TLifeFasterMulti
 Like `TLifeFaster`, but multi-threaded.
 
+This version does actually not scale very good.  Reasons are under "investigation".
+E.g. Changing `TLifeCell` from `uint32_t` to `uint8_t` led to much better results, so
+cache trashing is perhaps an issue.
+
 == Testing
 Change the used generator via link:TLife_Tests.cpp[].

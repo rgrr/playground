@@ -181,9 +181,9 @@ TEST_F(LifeTest, GliderMulti)
 #if (LIFE_TYPE == 0)
     const uint32_t sizeXY = 200;
 #elif (LIFE_TYPE == 1)
-    const uint32_t sizeXY = 500;
+    const uint32_t sizeXY = 700;
 #elif (LIFE_TYPE == 2)
-    const uint32_t sizeXY = 1000;
+    const uint32_t sizeXY = 1200;
 #else
     #error "Wrong LIFE_TYPE"
 #endif

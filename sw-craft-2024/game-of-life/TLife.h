@@ -12,13 +12,14 @@
 #include <cstdint>
 
 
-using TLifeField = std::vector<std::vector<int>>;
+using TLifeCell  = uint8_t;
+using TLifeField = std::vector<std::vector<TLifeCell>>;
 
 class TLife {
 public:
     virtual ~TLife() { }
 
-    TLife(uint32_t rows, uint32_t cols) : rows(rows), cols(cols), field(rows, std::vector<int>(cols, 0)) {}
+    TLife(uint32_t rows, uint32_t cols) : rows(rows), cols(cols), field(rows, std::vector<TLifeCell>(cols, 0)) {}
     TLife(uint32_t size) : TLife(size, size) {}
     TLife() : TLife(10) {}
 
